@@ -5,8 +5,11 @@ Opus is an all-in-one productivity app with a motivational user experience, seem
 
 ## Team Members
 Rohit Krishna r28krish@uwaterloo.ca
+
 Sophie Lan s9lan@uwaterloo.ca
+
 Matthew Mach m4mach@uwaterloo.ca
+
 Dereck Tu d8tu@uwaterloo.ca
 
 ## Screenshots/Videos
