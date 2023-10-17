@@ -120,11 +120,11 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit) {
                             true
                         }
                         .focusRequester(textFieldFocusRequester)
-                        .width(IntrinsicSize.Max)
+                        .weight(1f)
                 )
                 // tag colors
                 // change to rounded box? or not full width?
-                Box(Modifier.align(Alignment.Bottom).fillMaxHeight().width(4.dp).background(Color.Blue))
+                Box(Modifier.fillMaxHeight().width(4.dp).background(Color.Blue))
             }
         }
         // Edit Options Tray
