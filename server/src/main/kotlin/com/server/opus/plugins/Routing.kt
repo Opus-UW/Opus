@@ -6,8 +6,9 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.opus.models.Todo
+import java.util.UUID
 
-val todosMap = mutableMapOf<Int, MutableList<Todo>>()
+val todosMap = mutableMapOf<Int, MutableMap<String,Todo>>()
 
 fun Application.configureRouting() {
     routing {
@@ -20,7 +21,7 @@ fun Application.configureRouting() {
             val todos = todosMap[userId]
 
             if (todos != null) {
-                call.respond(todos)
+                call.respond(todos.values.toList())
             } else {
                 call.response.status(HttpStatusCode.BadRequest)
             }
@@ -35,20 +36,22 @@ fun Application.configureRouting() {
 
             val todos = todosMap[userId]
             val todo = call.receive<Todo>()
+            val newId = UUID.randomUUID().toString()
+            val newTodo = todo.copy(id = newId)
 
             if (todos != null) {
-                todos.add(todo)
+                todos[newId] = newTodo
             } else {
-                todosMap[userId] = mutableListOf(todo)
+                todosMap[userId] = mutableMapOf(Pair(newId, newTodo))
             }
 
-            call.response.status(HttpStatusCode.OK)
+            call.respond(todosMap[userId]!!.values.toList())
 
 
         }
         delete("/users/{user_id}/todos/{todo_id}") {
             val userId = call.parameters["user_id"]?.toInt()
-            val todoId = call.parameters["todo_id"]?.toInt()
+            val todoId = call.parameters["todo_id"]
             if(userId == null || todoId == null) {
                 call.response.status(HttpStatusCode.BadRequest)
                 return@delete
@@ -56,9 +59,9 @@ fun Application.configureRouting() {
 
             val todos = todosMap[userId]
 
-            if (todos != null && todoId < todos.size) {
-                todos.removeAt(todoId)
-                call.response.status(HttpStatusCode.OK)
+            if (todos != null && todos.contains(todoId)) {
+                todos.remove(todoId)
+                call.respond(todos.values.toList())
             } else {
                 call.response.status(HttpStatusCode.BadRequest)
             }
