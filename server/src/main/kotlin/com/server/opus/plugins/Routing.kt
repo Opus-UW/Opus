@@ -26,7 +26,7 @@ fun Application.configureRouting() {
                 call.response.status(HttpStatusCode.BadRequest)
             }
         }
-        get("/users/{user_id}/uncompleted_todos") {
+        get("/users/{user_id}/uncompleted-todos") {
             val userId = call.parameters["user_id"]?.toInt()
             if(userId == null) {
                 call.response.status(HttpStatusCode.BadRequest)
@@ -40,7 +40,7 @@ fun Application.configureRouting() {
                 call.response.status(HttpStatusCode.BadRequest)
             }
         }
-        get("/users/{user_id}/completed_todos") {
+        get("/users/{user_id}/completed-todos") {
             val userId = call.parameters["user_id"]?.toInt()
             if(userId == null) {
                 call.response.status(HttpStatusCode.BadRequest)

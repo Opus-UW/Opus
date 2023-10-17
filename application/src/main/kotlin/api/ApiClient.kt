@@ -37,6 +37,22 @@ class ApiClient {
         return httpClient.get(url.build()).body()
     }
 
+    suspend fun getCompletedTodos(userId: Int): List<Todo> {
+        val url = URLBuilder().apply {
+            takeFrom("$baseUrl/users/$userId/completed-todos") // Replace with your API endpoint
+        }
+
+        return httpClient.get(url.build()).body()
+    }
+
+    suspend fun getUncompletedTodos(userId: Int): List<Todo> {
+        val url = URLBuilder().apply {
+            takeFrom("$baseUrl/users/$userId/uncompleted-todos") // Replace with your API endpoint
+        }
+
+        return httpClient.get(url.build()).body()
+    }
+
     suspend fun postTodo(userId: Int, todo: Todo): List<Todo> {
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId/todos") // Replace with your API endpoint
