@@ -66,5 +66,23 @@ fun Application.configureRouting() {
                 call.response.status(HttpStatusCode.BadRequest)
             }
         }
+        put("/users/{user_id}/todos/{todo_id}") {
+            val userId = call.parameters["user_id"]?.toInt()
+            val todoId = call.parameters["todo_id"]
+            if(userId == null || todoId == null) {
+                call.response.status(HttpStatusCode.BadRequest)
+                return@put
+            }
+
+            val todos = todosMap[userId]
+            val todo = call.receive<Todo>()
+
+            if (todos != null && todos.contains(todoId)) {
+                todos[todoId] = todo
+                call.respond(todos.values.toList())
+            } else {
+                call.response.status(HttpStatusCode.BadRequest)
+            }
+        }
     }
 }
