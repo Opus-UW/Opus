@@ -5,37 +5,37 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import org.opus.models.Todo
+import org.opus.models.Task
 import java.util.UUID
 
-val todosMap = mutableMapOf<Int, MutableMap<String,Todo>>()
+val tasksMap = mutableMapOf<Int, MutableMap<String,Task>>()
 
 fun Application.configureRouting() {
     routing {
-        get("/users/{user_id}/todos") {
+        get("/users/{user_id}/tasks") {
             val userId = call.parameters["user_id"]?.toInt()
             if(userId == null) {
                 call.response.status(HttpStatusCode.BadRequest)
                 return@get
             }
-            val todos = todosMap[userId]
+            val tasks = tasksMap[userId]
 
-            if (todos != null) {
-                call.respond(todos.values.toList())
+            if (tasks != null) {
+                call.respond(tasks.values.toList())
             } else {
                 call.response.status(HttpStatusCode.BadRequest)
             }
         }
-        get("/users/{user_id}/uncompleted-todos") {
+        get("/users/{user_id}/uncompleted-tasks") {
             val userId = call.parameters["user_id"]?.toInt()
             if(userId == null) {
                 call.response.status(HttpStatusCode.BadRequest)
                 return@get
             }
-            val todos = todosMap[userId]
+            val tasks = tasksMap[userId]
 
-            if (todos != null) {
-                call.respond(todos.filter{!it.value.completed}.values.toList())
+            if (tasks != null) {
+                call.respond(tasks.filter{!it.value.completed}.values.toList())
             } else {
                 call.response.status(HttpStatusCode.BadRequest)
             }
@@ -46,15 +46,15 @@ fun Application.configureRouting() {
                 call.response.status(HttpStatusCode.BadRequest)
                 return@get
             }
-            val todos = todosMap[userId]
+            val tasks = tasksMap[userId]
 
-            if (todos != null) {
-                call.respond(todos.filter{it.value.completed}.values.toList())
+            if (tasks != null) {
+                call.respond(tasks.filter{it.value.completed}.values.toList())
             } else {
                 call.response.status(HttpStatusCode.BadRequest)
             }
         }
-        post("/users/{user_id}/todos") {
+        post("/users/{user_id}/tasks") {
             val userId = call.parameters["user_id"]?.toInt()
 
             if(userId == null) {
@@ -62,34 +62,34 @@ fun Application.configureRouting() {
                 return@post
             }
 
-            val todos = todosMap[userId]
-            val todo = call.receive<Todo>()
+            val tasks = tasksMap[userId]
+            val task = call.receive<Task>()
             val newId = UUID.randomUUID().toString()
-            val newTodo = todo.copy(id = newId)
+            val newTask = task.copy(id = newId)
 
-            if (todos != null) {
-                todos[newId] = newTodo
+            if (tasks != null) {
+                tasks[newId] = newTask
             } else {
-                todosMap[userId] = mutableMapOf(Pair(newId, newTodo))
+                tasksMap[userId] = mutableMapOf(Pair(newId, newTask))
             }
 
-            call.respond(todosMap[userId]!!.values.toList())
+            call.respond(tasksMap[userId]!!.values.toList())
 
 
         }
-        delete("/users/{user_id}/todos/{todo_id}") {
+        delete("/users/{user_id}/tasks/{task_id}") {
             val userId = call.parameters["user_id"]?.toInt()
-            val todoId = call.parameters["todo_id"]
-            if(userId == null || todoId == null) {
+            val taskId = call.parameters["task_id"]
+            if(userId == null || taskId == null) {
                 call.response.status(HttpStatusCode.BadRequest)
                 return@delete
             }
 
-            val todos = todosMap[userId]
+            val tasks = tasksMap[userId]
 
-            if (todos != null && todos.contains(todoId)) {
-                todos.remove(todoId)
-                call.respond(todos.values.toList())
+            if (tasks != null && tasks.contains(taskId)) {
+                tasks.remove(taskId)
+                call.respond(tasks.values.toList())
             } else {
                 call.response.status(HttpStatusCode.BadRequest)
             }
@@ -102,12 +102,12 @@ fun Application.configureRouting() {
                 return@put
             }
 
-            val todos = todosMap[userId]
-            val todo = call.receive<Todo>()
+            val tasks = tasksMap[userId]
+            val task = call.receive<Task>()
 
-            if (todos != null && todos.contains(todoId)) {
-                todos[todoId] = todo
-                call.respond(todos.values.toList())
+            if (tasks != null && tasks.contains(todoId)) {
+                tasks[todoId] = task
+                call.respond(tasks.values.toList())
             } else {
                 call.response.status(HttpStatusCode.BadRequest)
             }

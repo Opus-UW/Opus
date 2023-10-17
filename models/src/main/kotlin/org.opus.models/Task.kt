@@ -5,4 +5,4 @@ import kotlinx.serialization.Serializable
 
 
 @Serializable
-data class Todo(val completed: Boolean, val action: String, val date: LocalDateTime, val id: String = "")
+data class Task(val completed: Boolean, val action: String, val date: LocalDateTime, val id: String = "")
