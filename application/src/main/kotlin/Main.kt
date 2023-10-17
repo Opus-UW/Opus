@@ -31,7 +31,7 @@ import org.opus.models.Todo
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun task(task: Todo?, updateTasks: (List<Todo>) -> Unit) {
-    var isTaskFocused by remember { mutableStateOf(false) }
+    var isTaskFocused by remember(task) { mutableStateOf(false) }
     val new = task == null
     var text by remember(task) { mutableStateOf(task?.action ?: "") }
 
