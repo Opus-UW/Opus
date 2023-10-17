@@ -1,5 +1,11 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
+val ktorVersion: String by project
+val kotlinVersion: String by project
+val logbackVersion: String by project
+val slf4jVersion: String by project
+
+
 plugins {
     kotlin("jvm")
     id("org.jetbrains.compose")
@@ -23,6 +29,11 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
     implementation(compose.materialIconsExtended)
     implementation(project(mapOf("path" to ":models")))
+
+    implementation("io.ktor:ktor-client-core:$ktorVersion")
+    implementation("io.ktor:ktor-client-cio:$ktorVersion")
+    implementation("org.slf4j:slf4j-simple:$slf4jVersion")
+
 }
 
 compose.desktop {
