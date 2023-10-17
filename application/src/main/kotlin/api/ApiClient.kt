@@ -7,7 +7,7 @@ import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
-import org.opus.models.Todo
+import org.opus.models.Task
 
 class ApiClient {
 
@@ -19,7 +19,7 @@ class ApiClient {
         }
     }
 
-    private val baseUrl = "http://192.168.0.56:8080"
+    private val baseUrl = "http://0.0.0.0:8080"
 
     private val httpClient = HttpClient {
         install(ContentNegotiation){
@@ -29,28 +29,28 @@ class ApiClient {
             level = LogLevel.ALL
         }
     }
-    suspend fun getTodos(userId: Int): List<Todo> {
+    suspend fun getTasks(userId: Int): List<Task> {
         val url = URLBuilder().apply {
-            takeFrom("$baseUrl/users/$userId/todos") // Replace with your API endpoint
+            takeFrom("$baseUrl/users/$userId/tasks") // Replace with your API endpoint
         }
 
         return httpClient.get(url.build()).body()
     }
 
-    suspend fun postTodo(userId: Int, todo: Todo): List<Todo> {
+    suspend fun postTask(userId: Int, task: Task): List<Task> {
         val url = URLBuilder().apply {
-            takeFrom("$baseUrl/users/$userId/todos") // Replace with your API endpoint
+            takeFrom("$baseUrl/users/$userId/tasks") // Replace with your API endpoint
         }
 
         return httpClient.post(url.build()){
             contentType(ContentType.Application.Json)
-            setBody(todo)
+            setBody(task)
         }.body()
     }
 
-    suspend fun deleteTodo(userId: Int, todoId: String): List<Todo> {
+    suspend fun deleteTask(userId: Int, TaskId: String): List<Task> {
         val url = URLBuilder().apply {
-            takeFrom("$baseUrl/users/$userId/todos/$todoId") // Replace with your API endpoint
+            takeFrom("$baseUrl/users/$userId/tasks/$TaskId") // Replace with your API endpoint
         }
         return httpClient.delete(url.build()).body()
     }
