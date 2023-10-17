@@ -26,6 +26,34 @@ fun Application.configureRouting() {
                 call.response.status(HttpStatusCode.BadRequest)
             }
         }
+        get("/users/{user_id}/uncompleted_todos") {
+            val userId = call.parameters["user_id"]?.toInt()
+            if(userId == null) {
+                call.response.status(HttpStatusCode.BadRequest)
+                return@get
+            }
+            val todos = todosMap[userId]
+
+            if (todos != null) {
+                call.respond(todos.filter{!it.value.completed}.values.toList())
+            } else {
+                call.response.status(HttpStatusCode.BadRequest)
+            }
+        }
+        get("/users/{user_id}/completed_todos") {
+            val userId = call.parameters["user_id"]?.toInt()
+            if(userId == null) {
+                call.response.status(HttpStatusCode.BadRequest)
+                return@get
+            }
+            val todos = todosMap[userId]
+
+            if (todos != null) {
+                call.respond(todos.filter{it.value.completed}.values.toList())
+            } else {
+                call.response.status(HttpStatusCode.BadRequest)
+            }
+        }
         post("/users/{user_id}/todos") {
             val userId = call.parameters["user_id"]?.toInt()
 
