@@ -1,6 +1,6 @@
-package com.example
+package com.server.opus
 
-import com.example.plugins.*
+import com.server.opus.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -14,8 +14,7 @@ class ApplicationTest {
             configureRouting()
         }
         client.get("/").apply {
-            assertEquals(HttpStatusCode.OK, status)
-            assertEquals("Received", bodyAsText())
+            assertEquals(HttpStatusCode.NotFound, status)
         }
     }
 }

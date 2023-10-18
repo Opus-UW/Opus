@@ -28,6 +28,7 @@ dependencies {
     implementation(compose.desktop.currentOs)
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
     implementation(compose.materialIconsExtended)
+    implementation(compose.material3)
     implementation(project(mapOf("path" to ":models")))
 
     implementation("io.ktor:ktor-client-core:$ktorVersion")
