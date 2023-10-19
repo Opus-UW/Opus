@@ -32,11 +32,12 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import org.opus.models.Tag
 import org.opus.models.Task
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: MutableList<String>) {
+fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: MutableList<Tag>) {
     // Indicates if it's a new task creation bar or not
     val new = task == null
     // Focus variable for task
@@ -49,7 +50,7 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: MutableList<Strin
 
     // Task variables
     var text by remember(task) { mutableStateOf(task?.action ?: "") }
-    var taskTags by remember(task) { mutableStateOf(task?.tags ?: listOf<String>()) }
+    var taskTags by remember(task) { mutableStateOf(task?.tags ?: listOf<Tag>()) }
 
 
     // Column for task + options bar
@@ -131,7 +132,7 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: MutableList<Strin
                                 // Get current time
                                 val time = Clock.System.now()
                                 val taskToSend =
-                                    Task(false, text, time.toLocalDateTime(TimeZone.currentSystemDefault()), taskTags)
+                                    Task(false, text, time.toLocalDateTime(TimeZone.currentSystemDefault()), time.toLocalDateTime(TimeZone.currentSystemDefault()), taskTags)
                                 if (new) {
                                     // Insert update code here
                                     coroutineScope.launch {
@@ -183,7 +184,7 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: MutableList<Strin
 }
 
 @Composable
-fun optionsTray(isTaskFocused: Boolean, tags: MutableList<String>) {
+fun optionsTray(isTaskFocused: Boolean, tags: MutableList<Tag>) {
     val (showCalendar, setShowCalendar) = remember { mutableStateOf(false) }
     val (showOccurrence, setShowOccurrence) = remember { mutableStateOf(false) }
     val (showTags, setShowTags) = remember { mutableStateOf(false) }
@@ -265,7 +266,7 @@ fun chooseOccurrence(showOccurrence: Boolean, setShowOccurrence: (Boolean) -> Un
 }
 
 @Composable
-fun chooseTags(showTags: Boolean, setShowTags: (Boolean) -> Unit, pos: Offset, tags: MutableList<String>) {
+fun chooseTags(showTags: Boolean, setShowTags: (Boolean) -> Unit, pos: Offset, tags: MutableList<Tag>) {
     var newTag by remember { mutableStateOf("") }
     DropdownMenu(
         expanded = showTags,
@@ -273,7 +274,7 @@ fun chooseTags(showTags: Boolean, setShowTags: (Boolean) -> Unit, pos: Offset, t
     ) {
         Column {
             tags.forEach { tag ->
-                Text(tag)
+                Text(tag.title)
             }
             Row {
                 Icon(Icons.Default.Add, contentDescription = "Add Tag")

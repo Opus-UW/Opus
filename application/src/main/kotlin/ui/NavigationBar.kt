@@ -10,6 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import api.ApiClient
 import kotlinx.coroutines.launch
+import org.opus.models.Colour
+import org.opus.models.Tag
 import org.opus.models.Task
 
 @Composable
@@ -19,14 +21,14 @@ fun NavigationBar(tasks: List<Task>, setTasks: (List<Task>) -> Unit) {
     var screen by remember { mutableStateOf("All") }
 
     val taskMap by remember(tasks) { mutableStateOf(mutableMapOf<String, MutableList<Task>>())}
-    val tags by remember(tasks) { mutableStateOf(mutableListOf<String>()) }
+    val tags by remember(tasks) { mutableStateOf(mutableListOf<Tag>()) }
 
-    tags.add("All")
+    tags.add(Tag("All", Colour(255,255,255)))
     taskMap["All"] = mutableListOf<Task>()
 
     tasks.forEach{ task ->
         task.tags.forEach { tag ->
-            taskMap[tag]?.add(task) ?: { taskMap[tag] = mutableListOf(task); tags.add(tag) }
+            taskMap[tag.title]?.add(task) ?: { taskMap[tag.title] = mutableListOf(task); tags.add(tag) }
         }
         taskMap["All"]?.add(task)
     }
@@ -54,8 +56,8 @@ fun NavigationBar(tasks: List<Task>, setTasks: (List<Task>) -> Unit) {
                 }
             }
             tags.forEach{ tag ->
-                if (screen == tag){
-                    taskMap[tag]?.let { it1 -> EditScreen(tag, it1, setTasks, showMenu, toggleMenu, tags) }
+                if (screen == tag.title){
+                    taskMap[tag.title]?.let { it1 -> EditScreen(tag.title, it1, setTasks, showMenu, toggleMenu, tags) }
                 }
             }
 // Insert Calendar code here (remember to pass toggleMenu to be able to toggle the menu lol)

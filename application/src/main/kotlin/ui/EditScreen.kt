@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.opus.models.Tag
 import org.opus.models.Task
 import ui.components.NotePreview
 import ui.components.taskList
@@ -24,7 +25,7 @@ fun EditScreen(
     setTasks: (List<Task>) -> Unit,
     showMenu: Boolean,
     toggleMenu: () -> Unit,
-    tags: MutableList<String>
+    tags: MutableList<Tag>
 ) {
     Column {
         // Title + Menu Button

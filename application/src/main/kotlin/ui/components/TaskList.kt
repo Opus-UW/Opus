@@ -10,10 +10,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import api.ApiClient
 import kotlinx.coroutines.launch
+import org.opus.models.Tag
 import org.opus.models.Task
 
 @Composable
-fun taskList(tasks: List<Task>, setTasks: (List<Task>) -> Unit, tags: MutableList<String>){
+fun taskList(tasks: List<Task>, setTasks: (List<Task>) -> Unit, tags: MutableList<Tag>){
     Column(
         modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
         verticalArrangement = Arrangement.spacedBy(5.dp),

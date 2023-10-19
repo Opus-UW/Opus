@@ -67,14 +67,14 @@ class ApiClient {
         }.body()
     }
 
-    suspend fun deleteTask(userId: Int, taskId: String): List<Task> {
+    suspend fun deleteTask(userId: Int, taskId: Int): List<Task> {
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId/tasks/$taskId")
         }
         return httpClient.delete(url.build()).body()
     }
 
-    suspend fun editTask(userId: Int, taskId: String, newTask: Task): List<Task> {
+    suspend fun editTask(userId: Int, taskId: Int, newTask: Task): List<Task> {
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId/tasks/$taskId")
         }
@@ -103,14 +103,14 @@ class ApiClient {
         }.body()
     }
 
-    suspend fun deleteNote(userId: Int, noteId: String): List<Note> {
+    suspend fun deleteNote(userId: Int, noteId: Int): List<Note> {
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId/notes/$noteId")
         }
         return httpClient.delete(url.build()).body()
     }
 
-    suspend fun editNote(userId: Int, noteId: String, newNote: Note): List<Note> {
+    suspend fun editNote(userId: Int, noteId: Int, newNote: Note): List<Note> {
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId/notes/$noteId")
         }
@@ -139,14 +139,14 @@ class ApiClient {
         }.body()
     }
 
-    suspend fun deleteTag(userId: Int, tagId: String): List<Tag> {
+    suspend fun deleteTag(userId: Int, tagId: Int): List<Tag> {
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId/tags/$tagId")
         }
         return httpClient.delete(url.build()).body()
     }
 
-    suspend fun editTag(userId: Int, tagId: String, newTag: Tag): List<Tag> {
+    suspend fun editTag(userId: Int, tagId: Int, newTag: Tag): List<Tag> {
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId/tags/$tagId")
         }
