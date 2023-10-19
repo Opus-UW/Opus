@@ -38,6 +38,9 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
     implementation("io.ktor:ktor-client-logging:$ktorVersion")
 
+    implementation("com.mohamedrejeb.richeditor:richeditor-compose:1.0.0-beta03")
+
+
 }
 
 compose.desktop {

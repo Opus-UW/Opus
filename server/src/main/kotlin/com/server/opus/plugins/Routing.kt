@@ -23,7 +23,7 @@ fun Application.configureRouting() {
             if (tasks != null) {
                 call.respond(tasks.values.toList())
             } else {
-                call.response.status(HttpStatusCode.BadRequest)
+                call.respond(listOf<Task>().toList())
             }
         }
         get("/users/{user_id}/uncompleted-tasks") {

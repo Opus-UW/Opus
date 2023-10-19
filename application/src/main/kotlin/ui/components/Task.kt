@@ -1,6 +1,7 @@
-package components
+package ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -23,19 +24,33 @@ import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import api.ApiClient
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.opus.models.Task
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun task(task: Task?, updateTasks: (List<Task>) -> Unit) {
+fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: MutableList<String>) {
     // Indicates if it's a new task creation bar or not
     val new = task == null
     // Focus variable for task
     var isTaskFocused by remember(task) { mutableStateOf(false) }
+    var edit by remember { mutableStateOf(false) }
+    var isCheckboxHovered by remember { mutableStateOf(false) }
+    var isTextboxHovered by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+
+    // Task variables
+    var text by remember(task) { mutableStateOf(task?.action ?: "") }
+    var taskTags by remember(task) { mutableStateOf(task?.tags ?: listOf<String>()) }
+
+
     // Column for task + options bar
     Column(
         modifier = Modifier
@@ -51,17 +66,17 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit) {
     ) {
         // Task Action + Input
         val textFieldFocusRequester = remember { FocusRequester() }
-        var text by remember(task) { mutableStateOf(task?.action ?: "") }
-        Box(modifier = Modifier
-            .height(IntrinsicSize.Min)
-            .background(Color.White)
-            .fillMaxWidth()) {
-            Row(verticalAlignment = Alignment.CenterVertically,
+        Box(
+            modifier = Modifier
+                .height(IntrinsicSize.Min)
+                .background(Color.White)
+                .fillMaxWidth()
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 // Checkbox / plus sign
-                var hovered by remember { mutableStateOf(false) }
-                val coroutineScope = rememberCoroutineScope()
                 IconButton(onClick = {
                     // delete the task (note change to finished)
                     if (task != null) {
@@ -71,7 +86,7 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit) {
                     }
                     // For new task
                     // Clicking on the plus focuses text box
-                    else{
+                    else {
                         textFieldFocusRequester.requestFocus()
                     }
                 }) {
@@ -81,14 +96,14 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit) {
                             if (isTaskFocused) Icons.Outlined.Circle else Icons.Default.Add
                         // For already created tasks, click to check off
                         else
-                            if (hovered) Icons.Default.CheckCircle else Icons.Outlined.Circle,
+                            if (isCheckboxHovered) Icons.Default.CheckCircle else Icons.Outlined.Circle,
                         contentDescription = "Check mark",
                         modifier = Modifier
                             .onPointerEvent(PointerEventType.Enter) {
-                                hovered = true
+                                isCheckboxHovered = true
                             }
                             .onPointerEvent(PointerEventType.Exit) {
-                                hovered = false
+                                isCheckboxHovered = false
                             }
                     )
                 }
@@ -100,20 +115,31 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit) {
                     onValueChange = { text = it },
                     singleLine = true,
                     colors = TextFieldDefaults.textFieldColors(
-                        textColor = Color.Gray,
-                        disabledTextColor = Color.Transparent,
+                        textColor = Color.Black,
+                        disabledTextColor = Color.Black,
                         backgroundColor = Color.White,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
                         disabledIndicatorColor = Color.Transparent
                     ),
+                    enabled = new || edit,
                     modifier = Modifier
                         .onKeyEvent { keyEvent ->
                             if (keyEvent.key != Key.Enter) return@onKeyEvent false
                             if (keyEvent.type == KeyEventType.KeyUp) {
-                                val taskToSend = Task(false, text, LocalDateTime(2002, 12, 21, 0, 0))
-                                coroutineScope.launch {
-                                    updateTasks(ApiClient.getInstance().postTask(0, taskToSend))
+                                // Get current time
+                                val time = Clock.System.now()
+                                val taskToSend =
+                                    Task(false, text, time.toLocalDateTime(TimeZone.currentSystemDefault()), taskTags)
+                                if (new) {
+                                    // Insert update code here
+                                    coroutineScope.launch {
+                                        updateTasks(ApiClient.getInstance().postTask(0, taskToSend))
+                                    }
+                                } else {
+                                    coroutineScope.launch {
+                                        updateTasks(ApiClient.getInstance().postTask(0, taskToSend))
+                                    }
                                 }
                                 text = ""
                             }
@@ -121,22 +147,43 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit) {
                         }
                         .focusRequester(textFieldFocusRequester)
                         .weight(1f)
+                        .onPointerEvent(PointerEventType.Enter) {
+                            isTextboxHovered = true
+                        }
+                        .onPointerEvent(PointerEventType.Exit) {
+                            isTextboxHovered = false
+                        }
                 )
+                if (!new && isTextboxHovered) {
+                    IconButton(
+                        onClick = { edit = true },
+                        modifier = Modifier
+                            .onPointerEvent(PointerEventType.Enter) {
+                                isTextboxHovered = true
+                            }
+                            .onPointerEvent(PointerEventType.Exit) {
+                                isTextboxHovered = false
+                            }
+                    ) { Icon(Icons.Default.Edit, contentDescription = "Edit") }
+                }
                 // tag colors
                 // change to rounded box? or not full width?
                 Box(Modifier.fillMaxHeight().width(4.dp).background(Color.Blue))
             }
         }
         // Edit Options Tray
-        optionsTray(isTaskFocused)
+        if (new || edit) {
+            optionsTray(isTaskFocused, tags)
+        }
     }
 
 }
 
 @Composable
-fun optionsTray(isTaskFocused: Boolean) {
+fun optionsTray(isTaskFocused: Boolean, tags: MutableList<String>) {
     val (showCalendar, setShowCalendar) = remember { mutableStateOf(false) }
     val (showOccurrence, setShowOccurrence) = remember { mutableStateOf(false) }
+    val (showTags, setShowTags) = remember { mutableStateOf(false) }
 
     var rootPos by remember { mutableStateOf(Offset.Zero) }
     Box(modifier = Modifier.fillMaxWidth().background(Color.Gray)) {
@@ -156,8 +203,11 @@ fun optionsTray(isTaskFocused: Boolean) {
                     }) {
                     Icon(Icons.Default.Repeat, contentDescription = "Occurring")
                 }
-                TextButton(onClick = {}) {
-                    Icon(Icons.Default.Sell, contentDescription = "Tag")
+                TextButton(onClick = { setShowTags(true) },
+                    modifier = Modifier.onGloballyPositioned { coordinates ->
+                        rootPos = coordinates.positionInRoot()
+                    }) {
+                    Icon(Icons.Default.Sell, contentDescription = "Tags")
                 }
             }
         }
@@ -170,11 +220,16 @@ fun optionsTray(isTaskFocused: Boolean) {
     if (showOccurrence) {
         chooseOccurrence(showOccurrence, setShowOccurrence, rootPos)
     }
+
+    if (showTags) {
+        chooseTags(showTags, setShowTags, rootPos, tags)
+    }
 }
 
 @Composable
 fun chooseDate(showCalendar: Boolean, setShowCalendar: (Boolean) -> Unit, pos: Offset) {
-    DropdownMenu(expanded = showCalendar, onDismissRequest = { setShowCalendar(false) }) {
+    DropdownMenu(
+        expanded = showCalendar, onDismissRequest = { setShowCalendar(false) }) {
         DropdownMenuItem(onClick = {}) {
             Text("Today")
         }
@@ -194,11 +249,33 @@ fun chooseDate(showCalendar: Boolean, setShowCalendar: (Boolean) -> Unit, pos: O
 @Composable
 fun chooseOccurrence(showOccurrence: Boolean, setShowOccurrence: (Boolean) -> Unit, pos: Offset) {
     var multi by remember { mutableStateOf("1") }
-    DropdownMenu(expanded = showOccurrence, onDismissRequest = { setShowOccurrence(false) }) {
+    DropdownMenu(
+        expanded = showOccurrence,
+        onDismissRequest = { setShowOccurrence(false) }
+    ) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(5.dp)) {
             Text("Every")
             BasicTextField(value = multi, onValueChange = { multi = it }, Modifier.width(10.dp))
             Text("Weeks")
+        }
+    }
+}
+
+@Composable
+fun chooseTags(showTags: Boolean, setShowTags: (Boolean) -> Unit, pos: Offset, tags: MutableList<String>) {
+    var newTag by remember { mutableStateOf("") }
+    DropdownMenu(
+        expanded = showTags,
+        onDismissRequest = { setShowTags(false) }
+    ) {
+        Column {
+            tags.forEach { tag ->
+                Text(tag)
+            }
+            Row {
+                Icon(Icons.Default.Add, contentDescription = "Add Tag")
+                BasicTextField(value = newTag, onValueChange = { newTag = it }, Modifier.width(10.dp))
+            }
         }
     }
 }

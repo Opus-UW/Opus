@@ -8,9 +8,12 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.material.Card
 import api.ApiClient
-import components.task
+import ui.components.task
 import kotlinx.coroutines.launch
 import org.opus.models.Task
+import ui.EditScreen
+import ui.NavigationBar
+import ui.components.taskList
 
 @Composable
 fun menu() {
@@ -34,27 +37,15 @@ fun note() {
 
 fun main() = application {
     Window(onCloseRequest = ::exitApplication, title = "Opus") {
-
-        val coroutinescope = rememberCoroutineScope()
+        val coroutineScope = rememberCoroutineScope()
         val (tasks,setTasks) = remember { mutableStateOf(listOf<Task>()) }
         val getOnClick: () -> Unit = {
-            coroutinescope.launch {
+            coroutineScope.launch {
                 setTasks(ApiClient.getInstance().getTasks(0))
             }
         }
+        getOnClick()
 
-        Column {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(5.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                task(null, setTasks)
-                tasks.forEach {
-                    task(it, setTasks)
-                }
-            }
-            //note()
-        }
+        NavigationBar(tasks, setTasks)
     }
 }
