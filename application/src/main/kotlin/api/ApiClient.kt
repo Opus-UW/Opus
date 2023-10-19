@@ -31,7 +31,7 @@ class ApiClient {
     }
     suspend fun getTasks(userId: Int): List<Task> {
         val url = URLBuilder().apply {
-            takeFrom("$baseUrl/users/$userId/tasks") // Replace with your API endpoint
+            takeFrom("$baseUrl/users/$userId/tasks")
         }
 
         return httpClient.get(url.build()).body()
@@ -39,7 +39,7 @@ class ApiClient {
 
     suspend fun getCompletedTasks(userId: Int): List<Task> {
         val url = URLBuilder().apply {
-            takeFrom("$baseUrl/users/$userId/completed-tasks") // Replace with your API endpoint
+            takeFrom("$baseUrl/users/$userId/completed-tasks")
         }
 
         return httpClient.get(url.build()).body()
@@ -47,14 +47,14 @@ class ApiClient {
 
     suspend fun getUncompletedTasks(userId: Int): List<Task> {
         val url = URLBuilder().apply {
-            takeFrom("$baseUrl/users/$userId/uncompleted-tasks") // Replace with your API endpoint
+            takeFrom("$baseUrl/users/$userId/uncompleted-tasks")
         }
 
         return httpClient.get(url.build()).body()
     }
     suspend fun postTask(userId: Int, task: Task): List<Task> {
         val url = URLBuilder().apply {
-            takeFrom("$baseUrl/users/$userId/tasks") // Replace with your API endpoint
+            takeFrom("$baseUrl/users/$userId/tasks")
         }
 
         return httpClient.post(url.build()){
@@ -63,10 +63,20 @@ class ApiClient {
         }.body()
     }
 
-    suspend fun deleteTask(userId: Int, TaskId: String): List<Task> {
+    suspend fun deleteTask(userId: Int, taskId: String): List<Task> {
         val url = URLBuilder().apply {
-            takeFrom("$baseUrl/users/$userId/tasks/$TaskId") // Replace with your API endpoint
+            takeFrom("$baseUrl/users/$userId/tasks/$taskId")
         }
         return httpClient.delete(url.build()).body()
+    }
+
+    suspend fun editTask(userId: Int, taskId: String, newTask: Task): List<Task> {
+        val url = URLBuilder().apply {
+            takeFrom("$baseUrl/users/$userId/tasks/$taskId")
+        }
+        return httpClient.put(url.build()){
+            contentType(ContentType.Application.Json)
+            setBody(newTask)
+        }.body()
     }
 }

@@ -94,10 +94,10 @@ fun Application.configureRouting() {
                 call.response.status(HttpStatusCode.BadRequest)
             }
         }
-        put("/users/{user_id}/todos/{todo_id}") {
+        put("/users/{user_id}/tasks/{task_id}") {
             val userId = call.parameters["user_id"]?.toInt()
-            val todoId = call.parameters["todo_id"]
-            if(userId == null || todoId == null) {
+            val taskId = call.parameters["task_id"]
+            if(userId == null || taskId == null) {
                 call.response.status(HttpStatusCode.BadRequest)
                 return@put
             }
@@ -105,8 +105,8 @@ fun Application.configureRouting() {
             val tasks = tasksMap[userId]
             val task = call.receive<Task>()
 
-            if (tasks != null && tasks.contains(todoId)) {
-                tasks[todoId] = task
+            if (tasks != null && tasks.contains(taskId)) {
+                tasks[taskId] = task
                 call.respond(tasks.values.toList())
             } else {
                 call.response.status(HttpStatusCode.BadRequest)
