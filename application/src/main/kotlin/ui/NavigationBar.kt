@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -41,6 +42,9 @@ fun NavigationBar(tasks: List<Task>, setTasks: (List<Task>) -> Unit) {
             if (showMenu) {
                 Box(modifier = Modifier.fillMaxHeight().width(IntrinsicSize.Min)) {
                     Column(modifier = Modifier) {
+                        IconButton(onClick = { toggleMenu() }) {
+                            Icon(Icons.Default.Menu, contentDescription = "Menu Button")
+                        }
                         taskMap.keys.forEach{ tag ->
                             TextButton(onClick = { screen = tag }) {
                                 Text(tag)
@@ -51,7 +55,7 @@ fun NavigationBar(tasks: List<Task>, setTasks: (List<Task>) -> Unit) {
             }
             tags.forEach{ tag ->
                 if (screen == tag){
-                    taskMap[tag]?.let { it1 -> EditScreen(tag, it1, setTasks, toggleMenu, tags) }
+                    taskMap[tag]?.let { it1 -> EditScreen(tag, it1, setTasks, showMenu, toggleMenu, tags) }
                 }
             }
 // Insert Calendar code here (remember to pass toggleMenu to be able to toggle the menu lol)

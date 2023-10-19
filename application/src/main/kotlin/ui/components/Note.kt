@@ -1,18 +1,22 @@
 package ui.components
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FormatBold
-import androidx.compose.material.icons.filled.FormatItalic
-import androidx.compose.material.icons.filled.FormatUnderlined
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.*
+import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -28,11 +32,11 @@ import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotePreview(){
+fun NotePreview() {
     var editNote by remember { mutableStateOf(false) }
     var (title, setTitle) = remember { mutableStateOf("") }
     val state = rememberRichTextState()
-    var (html, setHtml) = remember { mutableStateOf("") }
+
 
     ElevatedCard(
         onClick = { editNote = true },
@@ -40,9 +44,12 @@ fun NotePreview(){
             defaultElevation = 6.dp
         ),
         modifier = Modifier
-            .size(width = 240.dp, height = 200.dp)
+            .size(width = 240.dp, height = 200.dp).alpha(if (editNote) 0f else 1f),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.LightGray, //Card background color
+        )
     ) {
-        Column{
+        Column {
             TextField(
                 value = title,
                 placeholder = { androidx.compose.material.Text("Title") },
@@ -69,26 +76,33 @@ fun NotePreview(){
                     unfocusedIndicatorColor = Color.Transparent,
                     disabledIndicatorColor = Color.Transparent
                 ),
-                enabled = true
+                readOnly = true
             )
         }
     }
-    if (editNote){
-        html = state.toHtml()
+    if (editNote) {
         val newState = rememberRichTextState()
+        // Launched effect to only run on change
         LaunchedEffect(editNote) {
-            newState.setHtml(html)
+            newState.setHtml(state.toHtml())
         }
-        EditNoteDialog({ editNote = false }, title, setTitle, newState, setHtml, state)
+        EditNoteDialog({ editNote = false; }, title, setTitle, newState, state)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditNoteDialog(onDismissRequest: () -> Unit, title: String, setTitle: (String) -> Unit, newState: RichTextState, setHtml: (String) -> Unit, state: RichTextState) {
+fun EditNoteDialog(
+    onDismissRequest: () -> Unit,
+    title: String,
+    setTitle: (String) -> Unit,
+    newState: RichTextState,
+    state: RichTextState
+) {
     var newTitle by remember { mutableStateOf(title) }
 
-    Dialog(onDismissRequest = { setTitle(newTitle); state.setHtml(newState.toHtml()); onDismissRequest() },
+    Dialog(
+        onDismissRequest = { setTitle(newTitle); state.setHtml(newState.toHtml()); onDismissRequest() },
         properties = DialogProperties(dismissOnClickOutside = true)
     ) {
         Card(
@@ -112,14 +126,104 @@ fun EditNoteDialog(onDismissRequest: () -> Unit, title: String, setTitle: (Strin
                     disabledIndicatorColor = Color.Transparent
                 )
             )
-            Row (modifier = Modifier.fillMaxWidth()){
-                IconButton(onClick = {newState.toggleSpanStyle(SpanStyle(fontWeight = FontWeight.Bold))}) {Icon(Icons.Default.FormatBold, contentDescription = "Bold Text")}
-                IconButton(onClick = {newState.toggleSpanStyle(SpanStyle(fontStyle = FontStyle.Italic))}) {Icon(Icons.Default.FormatItalic, contentDescription = "Italic Text")}
-                IconButton(onClick = {newState.toggleSpanStyle(SpanStyle(textDecoration = TextDecoration.Underline))}) {Icon(Icons.Default.FormatUnderlined, contentDescription = "Underlined Text")}
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(IntrinsicSize.Min)
+            ) {
+                IconButton(onClick = { newState.toggleSpanStyle(SpanStyle(fontWeight = FontWeight.Bold)) }) {
+                    Icon(
+                        Icons.Default.FormatBold,
+                        contentDescription = "Bold Text"
+                    )
+                }
+                IconButton(onClick = { newState.toggleSpanStyle(SpanStyle(fontStyle = FontStyle.Italic)) }) {
+                    Icon(
+                        Icons.Default.FormatItalic,
+                        contentDescription = "Italic Text"
+                    )
+                }
+                IconButton(onClick = { newState.toggleSpanStyle(SpanStyle(textDecoration = TextDecoration.Underline)) }) {
+                    Icon(
+                        Icons.Default.FormatUnderlined,
+                        contentDescription = "Underlined Text"
+                    )
+                }
+                IconButton(onClick = { newState.toggleSpanStyle(SpanStyle(textDecoration = TextDecoration.LineThrough)) }) {
+                    Icon(
+                        Icons.Default.FormatStrikethrough,
+                        contentDescription = "Strikethrough Text"
+                    )
+                }
+                IconButton(onClick = { newState.toggleParagraphStyle(ParagraphStyle(textAlign = TextAlign.Start)) }) {
+                    Icon(
+                        Icons.Default.FormatAlignLeft,
+                        contentDescription = "Left Align Text"
+                    )
+                }
+                IconButton(onClick = { newState.toggleParagraphStyle(ParagraphStyle(textAlign = TextAlign.Center)) }) {
+                    Icon(
+                        Icons.Default.FormatAlignCenter,
+                        contentDescription = "Center Align Text"
+                    )
+                }
+                IconButton(onClick = { newState.toggleParagraphStyle(ParagraphStyle(textAlign = TextAlign.End)) }) {
+                    Icon(
+                        Icons.Default.FormatAlignRight,
+                        contentDescription = "Right Align Text"
+                    )
+                }
+                IconButton(onClick = { newState.toggleOrderedList() }) {
+                    Icon(
+                        Icons.Default.FormatListNumbered,
+                        contentDescription = "Numbered List Text"
+                    )
+                }
+                IconButton(onClick = { newState.toggleUnorderedList() }) {
+                    Icon(
+                        Icons.Default.FormatListBulleted,
+                        contentDescription = "Bullet List Text"
+                    )
+                }
             }
             RichTextEditor(
                 state = newState,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onKeyEvent {
+                        if (it.isCtrlPressed && it.key == Key.B && it.type == KeyEventType.KeyUp) {
+                            newState.toggleSpanStyle(SpanStyle(fontWeight = FontWeight.Bold))
+                            true
+                        } else if (it.isCtrlPressed && it.key == Key.I && it.type == KeyEventType.KeyUp) {
+                            newState.toggleSpanStyle(SpanStyle(fontStyle = FontStyle.Italic))
+                            true
+                        } else if (it.isCtrlPressed && it.key == Key.U && it.type == KeyEventType.KeyUp) {
+                            newState.toggleSpanStyle(SpanStyle(textDecoration = TextDecoration.Underline))
+                            true
+                        } else if (it.isAltPressed && it.isShiftPressed && it.key == Key.Five && it.type == KeyEventType.KeyUp) {
+                            newState.toggleSpanStyle(SpanStyle(textDecoration = TextDecoration.LineThrough))
+                            true
+                        } else if (it.isCtrlPressed && it.isShiftPressed && it.key == Key.L && it.type == KeyEventType.KeyUp) {
+                            newState.toggleParagraphStyle(ParagraphStyle(textAlign = TextAlign.Start))
+                            true
+                        } else if (it.isCtrlPressed && it.isShiftPressed && it.key == Key.E && it.type == KeyEventType.KeyUp) {
+                            newState.toggleParagraphStyle(ParagraphStyle(textAlign = TextAlign.Center))
+                            true
+                        } else if (it.isCtrlPressed && it.isShiftPressed && it.key == Key.R && it.type == KeyEventType.KeyUp) {
+                            newState.toggleParagraphStyle(ParagraphStyle(textAlign = TextAlign.End))
+                            true
+                        } else if (it.isCtrlPressed && it.isShiftPressed && it.key == Key.Seven && it.type == KeyEventType.KeyUp) {
+                            newState.toggleOrderedList()
+                            true
+                        } else if (it.isCtrlPressed && it.isShiftPressed && it.key == Key.Eight && it.type == KeyEventType.KeyUp) {
+                            newState.toggleUnorderedList()
+                            true
+                        }
+                        else {
+                            // let other handlers receive this event
+                            false
+                        }
+                    },
                 colors = RichTextEditorDefaults.richTextEditorColors(
                     textColor = Color.Black,
                     disabledTextColor = Color.Transparent,
