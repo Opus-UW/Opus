@@ -1,13 +1,13 @@
 package ui
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,19 +18,34 @@ import ui.components.NotePreview
 import ui.components.taskList
 
 @Composable
-fun EditScreen(title: String, tasks: List<Task>, setTasks: (List<Task>) -> Unit, toggleMenu: () -> Unit, tags: MutableList<String>){
+fun EditScreen(
+    title: String,
+    tasks: List<Task>,
+    setTasks: (List<Task>) -> Unit,
+    showMenu: Boolean,
+    toggleMenu: () -> Unit,
+    tags: MutableList<String>
+) {
     Column {
         // Title + Menu Button
-        Row (verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = {toggleMenu()}) {
-                Icon (Icons.Default.Menu, contentDescription = "Menu Button")
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = { toggleMenu() }, enabled = !showMenu) {
+                Icon(if (showMenu) Icons.Default.Book else Icons.Default.Menu, contentDescription = "Menu Button")
             }
-            Text (title)
+            Text(title)
         }
         // Task List
         taskList(tasks, setTasks, tags)
         Spacer(modifier = Modifier.size(30.dp))
         // Insert notes here
-        NotePreview()
+        val list = (1..10).map { it.toString() }
+        LazyVerticalGrid(
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            columns = GridCells.Adaptive(minSize = 240.dp),
+            content = {
+                items(list.size) { NotePreview() }
+            }
+        )
     }
 }

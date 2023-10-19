@@ -15,26 +15,6 @@ import ui.EditScreen
 import ui.NavigationBar
 import ui.components.taskList
 
-@Composable
-fun menu() {
-    Column() {
-
-    }
-}
-
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-fun note() {
-    Card(
-        onClick = { /* Do something */ },
-        modifier = Modifier.size(width = 180.dp, height = 100.dp)
-    ) {
-        Box(Modifier.fillMaxSize()) {
-            Text("Clickable", Modifier.align(Alignment.Center))
-        }
-    }
-}
-
 fun main() = application {
     Window(onCloseRequest = ::exitApplication, title = "Opus") {
         val coroutineScope = rememberCoroutineScope()

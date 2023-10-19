@@ -40,6 +40,7 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: MutableList<Strin
     // Indicates if it's a new task creation bar or not
     val new = task == null
     // Focus variable for task
+    val textFieldFocusRequester = remember(task) { FocusRequester() }
     var isTaskFocused by remember(task) { mutableStateOf(false) }
     var edit by remember { mutableStateOf(false) }
     var isCheckboxHovered by remember { mutableStateOf(false) }
@@ -55,7 +56,8 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: MutableList<Strin
     Column(
         modifier = Modifier
             .onFocusChanged {
-                isTaskFocused = it.isFocused
+                isTaskFocused = it.isFocused;
+                edit = false
             }
             .shadow(
                 elevation = 10.dp,
@@ -65,7 +67,6 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: MutableList<Strin
             .height(IntrinsicSize.Min)
     ) {
         // Task Action + Input
-        val textFieldFocusRequester = remember { FocusRequester() }
         Box(
             modifier = Modifier
                 .height(IntrinsicSize.Min)
@@ -122,7 +123,7 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: MutableList<Strin
                         unfocusedIndicatorColor = Color.Transparent,
                         disabledIndicatorColor = Color.Transparent
                     ),
-                    enabled = new || edit,
+//                    readOnly = !(new || edit),
                     modifier = Modifier
                         .onKeyEvent { keyEvent ->
                             if (keyEvent.key != Key.Enter) return@onKeyEvent false
@@ -154,27 +155,29 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: MutableList<Strin
                             isTextboxHovered = false
                         }
                 )
-                if (!new && isTextboxHovered) {
-                    IconButton(
-                        onClick = { edit = true },
-                        modifier = Modifier
-                            .onPointerEvent(PointerEventType.Enter) {
-                                isTextboxHovered = true
-                            }
-                            .onPointerEvent(PointerEventType.Exit) {
-                                isTextboxHovered = false
-                            }
-                    ) { Icon(Icons.Default.Edit, contentDescription = "Edit") }
-                }
+//                if (!new && isTextboxHovered) {
+//                    IconButton(
+//                        onClick = {textFieldFocusRequester.requestFocus(); edit = true; },
+//                        modifier = Modifier
+//                            .onPointerEvent(PointerEventType.Enter) {
+//                                isTextboxHovered = true
+//                            }
+//                            .onPointerEvent(PointerEventType.Exit) {
+//                                isTextboxHovered = false
+//                            }
+//                    ) { Icon(Icons.Default.Edit, contentDescription = "Edit") }
+//                }
                 // tag colors
                 // change to rounded box? or not full width?
                 Box(Modifier.fillMaxHeight().width(4.dp).background(Color.Blue))
             }
         }
+//        print("Edit: ")
+//        println(edit)
         // Edit Options Tray
-        if (new || edit) {
+//        if (new || edit) {
             optionsTray(isTaskFocused, tags)
-        }
+//        }
     }
 
 }
