@@ -13,7 +13,7 @@ fun main() {
 }
 
 fun Application.module() {
-    install(ContentNegotiation){
+    install(ContentNegotiation) {
         json()
     }
     configureRouting()
