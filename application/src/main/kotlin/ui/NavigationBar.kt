@@ -20,13 +20,13 @@ fun NavigationBar(tasks: List<Task>, setTasks: (List<Task>) -> Unit) {
     val toggleMenu: () -> Unit = { setShowMenu(!showMenu) }
     var screen by remember { mutableStateOf("All") }
 
-    val taskMap by remember(tasks) { mutableStateOf(mutableMapOf<String, MutableList<Task>>())}
+    val taskMap by remember(tasks) { mutableStateOf(mutableMapOf<String, MutableList<Task>>()) }
     val tags by remember(tasks) { mutableStateOf(mutableListOf<Tag>()) }
 
-    tags.add(Tag("All", Colour(255,255,255)))
+    tags.add(Tag("All", Colour(255, 255, 255)))
     taskMap["All"] = mutableListOf<Task>()
 
-    tasks.forEach{ task ->
+    tasks.forEach { task ->
         task.tags.forEach { tag ->
             taskMap[tag.title]?.add(task) ?: { taskMap[tag.title] = mutableListOf(task); tags.add(tag) }
         }
@@ -47,7 +47,10 @@ fun NavigationBar(tasks: List<Task>, setTasks: (List<Task>) -> Unit) {
                         IconButton(onClick = { toggleMenu() }) {
                             Icon(Icons.Default.Menu, contentDescription = "Menu Button")
                         }
-                        taskMap.keys.forEach{ tag ->
+                        TextButton(onClick = { screen = "Calendar" }) {
+                            Text("Calendar")
+                        }
+                        taskMap.keys.forEach { tag ->
                             TextButton(onClick = { screen = tag }) {
                                 Text(tag)
                             }
@@ -55,15 +58,14 @@ fun NavigationBar(tasks: List<Task>, setTasks: (List<Task>) -> Unit) {
                     }
                 }
             }
-            tags.forEach{ tag ->
-                if (screen == tag.title){
+            tags.forEach { tag ->
+                if (screen == tag.title) {
                     taskMap[tag.title]?.let { it1 -> EditScreen(tag.title, it1, setTasks, showMenu, toggleMenu, tags) }
                 }
             }
-// Insert Calendar code here (remember to pass toggleMenu to be able to toggle the menu lol)
-//        else if (screen == "Calendar"){
-//
-//        }
+            if (screen == "Calendar") {
+                CalendarScreen(toggleMenu, showMenu)
+            }
         }
     }
 }
