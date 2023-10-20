@@ -13,6 +13,7 @@ import org.opus.models.Tag
 import org.opus.models.Task
 import ui.EditScreen
 import ui.NavigationBar
+import ui.calendarScreen
 
 fun main() = application {
     val coroutineScope = rememberCoroutineScope()
@@ -74,7 +75,7 @@ fun main() = application {
                     currentTag = null
                     EditScreen("All", tasks, setTasks, showMenu, toggleMenu, tags, setTags, notes, setNotes, null)
                 } else if (screen == "Calendar") {
-                    // Insert Calendar here
+                    calendarScreen(toggleMenu, showMenu, tasks)
                 }
 
                 tags.forEach{ tag ->

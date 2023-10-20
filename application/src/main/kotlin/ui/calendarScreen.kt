@@ -81,8 +81,11 @@ fun calendarScreen(toggleMenu: () -> Unit, showMenu: Boolean, tasks: List<Task>)
             modifier = Modifier.fillMaxWidth().padding(2.dp).padding(5.dp),
             content = {
                 items(list.size) {
-                    dayPreview(tempDate, curDate.month.name)
-                    println(tempDate)
+                    val tasksOnDay = tasks.filter{
+                        it.dueDate?.dayOfYear == tempDate.dayOfYear
+                                && it.dueDate?.year == tempDate.year
+                    }
+                    dayPreview(tempDate, curDate.month.name, tasksOnDay)
                     tempDate += 1
                 }
             }
