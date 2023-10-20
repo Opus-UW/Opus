@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -32,12 +33,19 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import org.opus.models.Colour
 import org.opus.models.Tag
 import org.opus.models.Task
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
-fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: List<Tag>, currentTag: Tag?) {
+fun task(
+    task: Task?,
+    updateTasks: (List<Task>) -> Unit,
+    tags: List<Tag>,
+    setTags: (List<Tag>) -> Unit,
+    currentTag: Tag?
+) {
     // Indicates if it's a new task creation bar or not
     val new = task == null
     // Focus variable for task
@@ -51,18 +59,30 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: List<Tag>, curren
 
     // Task variables
     var text by remember(task) { mutableStateOf(task?.action ?: "") }
-    val taskTags = remember(task) { mutableStateListOf(*(task?.tags?.toTypedArray() ?: listOf<Tag>().toTypedArray()))}
+    var tagStatus = remember(tags) { mutableStateMapOf(*tags.map { it to false }.toTypedArray()) }
+    LaunchedEffect(Unit){
+        task?.tags?.forEach{ tag ->
+            tagStatus[tag] = true
+        }
+    }
+
 
     fun updateTask() {
         // Get current time
         val time = Clock.System.now()
+        val newTaskTags = mutableListOf<Tag>()
+        tagStatus.forEach{ entry ->
+            if (entry.value){
+                newTaskTags.add(entry.key)
+            }
+        }
         val taskToSend =
             Task(
                 false,
                 text,
                 time.toLocalDateTime(TimeZone.currentSystemDefault()),
                 time.toLocalDateTime(TimeZone.currentSystemDefault()),
-                currentTag?.let{taskTags.filter{tag -> tag.title != it.title} + it}?:taskTags
+                newTaskTags.toList()
             )
         if (new) {
             coroutineScope.launch {
@@ -122,7 +142,9 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: List<Tag>, curren
                     // delete the task (note change to finished)
                     if (task != null) {
                         coroutineScope.launch {
-                            updateTasks(ApiClient.getInstance().editTask(0, task.id, task.copy(completed = !task.completed)))
+                            updateTasks(
+                                ApiClient.getInstance().editTask(0, task.id, task.copy(completed = !task.completed))
+                            )
                         }
                     }
                     // For new task
@@ -137,10 +159,9 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: List<Tag>, curren
                             if (isTaskFocused) Icons.Outlined.Circle else Icons.Default.Add
                         }
                         // For already created tasks, click to check off
-                        else if (task != null && task.completed){
+                        else if (task != null && task.completed) {
                             if (isCheckboxHovered) Icons.Outlined.Circle else Icons.Default.CheckCircle
-                        }
-                        else {
+                        } else {
                             if (isCheckboxHovered) Icons.Default.CheckCircle else Icons.Outlined.Circle
                         },
                         contentDescription = "Check mark",
@@ -206,14 +227,21 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: List<Tag>, curren
         }
         // Edit Options Tray
         if (new || edit) {
-            optionsTray(isTaskFocused, tags, new) { deleteTask() }
+            optionsTray(isTaskFocused, tags, new, setTags, tagStatus) { deleteTask() }
         }
     }
 
 }
 
 @Composable
-fun optionsTray(isTaskFocused: Boolean, tags: List<Tag>, isNewTask: Boolean, deleteTask: () -> Unit) {
+fun optionsTray(
+    isTaskFocused: Boolean,
+    tags: List<Tag>,
+    isNewTask: Boolean,
+    setTags: (List<Tag>) -> Unit,
+    tagStatus: SnapshotStateMap<Tag, Boolean>,
+    deleteTask: () -> Unit
+) {
     val (showCalendar, setShowCalendar) = remember { mutableStateOf(false) }
     val (showOccurrence, setShowOccurrence) = remember { mutableStateOf(false) }
     val (showTags, setShowTags) = remember { mutableStateOf(false) }
@@ -245,8 +273,7 @@ fun optionsTray(isTaskFocused: Boolean, tags: List<Tag>, isNewTask: Boolean, del
                         rootPos = coordinates.positionInRoot()
                     }) {
                     Icon(Icons.Default.Sell, contentDescription = "Tags")
-                    chooseTags(showTags, setShowTags, rootPos, tags)
-
+                    ChooseTagMenu(showTags, setShowTags, rootPos, tags, setTags, tagStatus)
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 if (!isNewTask)
@@ -293,25 +320,6 @@ fun chooseOccurrence(showOccurrence: Boolean, setShowOccurrence: (Boolean) -> Un
             Text("Every")
             BasicTextField(value = multi, onValueChange = { multi = it }, Modifier.width(10.dp))
             Text("Weeks")
-        }
-    }
-}
-
-@Composable
-fun chooseTags(showTags: Boolean, setShowTags: (Boolean) -> Unit, pos: Offset, tags: List<Tag>) {
-    var newTag by remember { mutableStateOf("") }
-    DropdownMenu(
-        expanded = showTags,
-        onDismissRequest = { setShowTags(false) }
-    ) {
-        Column {
-            tags.forEach { tag ->
-                Text(tag.title)
-            }
-            Row {
-                Icon(Icons.Default.Add, contentDescription = "Add Tag")
-                BasicTextField(value = newTag, onValueChange = { newTag = it }, Modifier.width(10.dp))
-            }
         }
     }
 }

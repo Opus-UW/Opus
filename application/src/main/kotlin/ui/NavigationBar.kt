@@ -1,7 +1,6 @@
 package ui
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -20,7 +19,6 @@ import api.ApiClient
 import kotlinx.coroutines.launch
 import org.opus.models.Colour
 import org.opus.models.Tag
-import org.opus.models.Task
 
 @Composable
 
@@ -57,11 +55,11 @@ fun NavigationBar(
                 }
 
                 Row {
-                    TextButton(onClick = { setScreen(tag.title) }, modifier = Modifier.fillMaxWidth()) {
+                    TextButton(onClick = { setScreen(tag.title) }, modifier = Modifier.width(IntrinsicSize.Max)) {
                         Text(tag.title, textAlign = TextAlign.Left, modifier = Modifier.fillMaxWidth())
                     }
                     Spacer(modifier = Modifier.weight(1f))
-                    IconButton(onClick = { moreStates[tag] = true; println(moreStates[tag] == true) }) {
+                    IconButton(onClick = { moreStates[tag] = true }) {
                         Icon(Icons.Default.MoreVert, contentDescription = "Tag Menu Button")
                         DropdownMenu(
                             expanded = moreStates[tag] == true, onDismissRequest = { moreStates[tag] = false }) {

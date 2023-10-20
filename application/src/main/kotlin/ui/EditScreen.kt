@@ -1,8 +1,6 @@
 package ui
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -20,7 +18,6 @@ import androidx.compose.ui.unit.dp
 import org.opus.models.Note
 import org.opus.models.Tag
 import org.opus.models.Task
-import ui.components.NotePreview
 import ui.components.noteList
 import ui.components.taskList
 
@@ -32,6 +29,7 @@ fun EditScreen(
     showMenu: Boolean,
     toggleMenu: () -> Unit,
     tags: List<Tag>,
+    setTags: (List<Tag>) -> Unit,
     notes: List<Note>,
     setNotes: (List<Note>) -> Unit,
     currentTag: Tag?
@@ -47,7 +45,7 @@ fun EditScreen(
         var showCompleted by remember { mutableStateOf(false) }
         // Task List
         Box (modifier = Modifier.fillMaxWidth().fillMaxHeight(if (showCompleted) 0.3f else 0.4f)){
-            taskList(tasks.filter { !it.completed }, setTasks, tags, true, currentTag)
+            taskList(tasks.filter { !it.completed }, setTasks, tags, setTags,true, currentTag)
         }
         Spacer(modifier = Modifier.size(10.dp))
         Row (verticalAlignment = Alignment.CenterVertically){
@@ -67,7 +65,7 @@ fun EditScreen(
         if (showCompleted){
             Box (modifier = Modifier.fillMaxWidth().fillMaxHeight(0.2f)){
                 Spacer(modifier = Modifier.size(10.dp))
-                taskList(tasks.filter { it.completed }, setTasks, tags, false, currentTag)
+                taskList(tasks.filter { it.completed }, setTasks, tags, setTags,false, currentTag)
             }
         }
         Spacer(modifier = Modifier.size(30.dp))
