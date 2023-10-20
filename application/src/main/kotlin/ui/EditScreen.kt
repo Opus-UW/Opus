@@ -28,7 +28,8 @@ fun EditScreen(
     toggleMenu: () -> Unit,
     tags: List<Tag>,
     notes: List<Note>,
-    setNotes: (List<Note>) -> Unit
+    setNotes: (List<Note>) -> Unit,
+    currentTag: Tag?
 ) {
     Column {
         // Title + Menu Button
@@ -39,7 +40,7 @@ fun EditScreen(
             Text(title)
         }
         // Task List
-        taskList(tasks.filter { !it.completed }, setTasks, tags)
+        taskList(tasks.filter { !it.completed }, setTasks, tags, currentTag)
         Spacer(modifier = Modifier.size(30.dp))
         // Insert notes here
         LazyVerticalGrid(

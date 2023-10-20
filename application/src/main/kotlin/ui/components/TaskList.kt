@@ -17,16 +17,17 @@ import org.opus.models.Task
 fun taskList(
     tasks: List<Task>,
     setTasks: (List<Task>) -> Unit,
-    tags: List<Tag>
+    tags: List<Tag>,
+    currentTag: Tag?
 ) {
     Column(
         modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
         verticalArrangement = Arrangement.spacedBy(5.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        task(null, setTasks, tags)
+        task(null, setTasks, tags, currentTag)
         tasks.forEach {
-            task(it, setTasks, tags)
+            task(it, setTasks, tags, currentTag)
         }
     }
 }

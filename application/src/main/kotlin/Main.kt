@@ -39,19 +39,21 @@ fun main() = application {
         val toggleMenu: () -> Unit = { setShowMenu(!showMenu) }
         var (screen, setScreen) = remember { mutableStateOf("All") }
 
-        val taskMap = remember(tasks) { mutableStateMapOf(*tags.map{it to Pair(mutableListOf<Task>(), mutableListOf<Note>())}.toTypedArray())}
+        val taskMap = remember(tasks,notes,tags) { mutableStateMapOf(*tags.map{it to Pair(mutableListOf<Task>(), mutableListOf<Note>())}.toTypedArray())}
         val allTag = Tag("All", Colour(255, 255, 255))
         taskMap[allTag] = Pair(tasks.toMutableList(), notes.toMutableList())
 
-        tasks.forEach{ task ->
-            task.tags.forEach { tag ->
-                taskMap[tag]?.first?.add(task)
+        LaunchedEffect(tasks,notes,tags) {
+            tasks.forEach { task ->
+                task.tags.forEach { tag ->
+                    taskMap[tag]?.first?.add(task)
+                }
             }
-        }
 
-        notes.forEach{ note ->
-            note.tags.forEach { tag ->
-                taskMap[tag]?.second?.add(note)
+            notes.forEach { note ->
+                note.tags.forEach { tag ->
+                    taskMap[tag]?.second?.add(note)
+                }
             }
         }
 
@@ -72,14 +74,15 @@ fun main() = application {
                 }
 
                 if (screen == "All"){
-                    EditScreen("All", tasks, setTasks, showMenu, toggleMenu, tags, notes, setNotes)
-                } else if (screen == "Calendar"){
+                    EditScreen("All", tasks, setTasks, showMenu, toggleMenu, tags, notes, setNotes, null)
+                } else if (screen == "Calendar") {
                     // Insert Calendar here
                 }
 
                 tags.forEach{ tag ->
                     if (screen == tag.title) {
-                        taskMap[tag]?.let { it1 -> EditScreen(tag.title, it1.first, setTasks, showMenu, toggleMenu, tags, it1.second, setNotes) }
+                        println(taskMap[tag])
+                        taskMap[tag]?.let { it1 -> EditScreen(tag.title, it1.first, setTasks, showMenu, toggleMenu, tags, it1.second, setNotes, tag) }
                     }
                 }
             }
