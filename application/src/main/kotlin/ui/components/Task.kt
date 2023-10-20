@@ -53,9 +53,13 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: List<Tag>, curren
     // Task variables
     var text by remember(task) { mutableStateOf(task?.action ?: "") }
     val taskTags = remember(task) { mutableStateListOf(*(task?.tags?.toTypedArray() ?: listOf<Tag>().toTypedArray()))}
-    //var taskDueDate by remember(task) { mutableStateOf(task?.dueDate ?: Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()))}
+    var taskDueDate by remember(task) { mutableStateOf(task?.dueDate ?: Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()))}
 
-    fun updateTask(dueDate: LocalDateTime? = null) {
+    fun updateDueDate(dueDate: LocalDateTime) {
+        taskDueDate = dueDate
+    }
+
+    fun updateTask() {
         // Get current time
         val time = Clock.System.now()
         val taskToSend =
@@ -63,7 +67,7 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: List<Tag>, curren
                 false,
                 text,
                 time.toLocalDateTime(TimeZone.currentSystemDefault()),
-                dueDate,
+                taskDueDate,
                 currentTag?.let{taskTags.filter{tag -> tag.title != it.title} + it}?:taskTags
             )
         if (new) {
@@ -212,14 +216,14 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: List<Tag>, curren
         }
         // Edit Options Tray
         if (new || edit) {
-            optionsTray(isTaskFocused, tags, new, { deleteTask() }, { updateTask() })
+            optionsTray(isTaskFocused, tags, new, { deleteTask() }, { updateDueDate(taskDueDate) })
         }
     }
 
 }
 
 @Composable
-fun optionsTray(isTaskFocused: Boolean, tags: List<Tag>, isNewTask: Boolean, deleteTask: () -> Unit, updateTask: (LocalDateTime) -> Unit) {
+fun optionsTray(isTaskFocused: Boolean, tags: List<Tag>, isNewTask: Boolean, deleteTask: () -> Unit, updateDueDate: (LocalDateTime) -> Unit) {
     val (showCalendar, setShowCalendar) = remember { mutableStateOf(false) }
     val (showOccurrence, setShowOccurrence) = remember { mutableStateOf(false) }
     val (showTags, setShowTags) = remember { mutableStateOf(false) }
@@ -235,7 +239,7 @@ fun optionsTray(isTaskFocused: Boolean, tags: List<Tag>, isNewTask: Boolean, del
                         rootPos = coordinates.positionInRoot()
                     }) {
                     Icon(Icons.Default.CalendarMonth, contentDescription = "Calendar")
-                    chooseDate(showCalendar, setShowCalendar, rootPos, updateTask)
+                    chooseDate(showCalendar, setShowCalendar, rootPos, updateDueDate)
 
                 }
                 TextButton(onClick = { setShowOccurrence(true) },
@@ -269,11 +273,13 @@ fun optionsTray(isTaskFocused: Boolean, tags: List<Tag>, isNewTask: Boolean, del
 }
 
 @Composable
-fun chooseDate(showCalendar: Boolean, setShowCalendar: (Boolean) -> Unit, pos: Offset, updateTask: (dueDate: LocalDateTime) -> Unit) {
-    //val currTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+fun chooseDate(showCalendar: Boolean, setShowCalendar: (Boolean) -> Unit, pos: Offset, updateDueDate: (dueDate: LocalDateTime) -> Unit) {
+    val currTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
     DropdownMenu(
         expanded = showCalendar, onDismissRequest = { setShowCalendar(false) }) {
-        DropdownMenuItem(onClick = {/*updateTask(currTime)*/}) {
+        DropdownMenuItem(onClick = {
+            updateDueDate(currTime)
+            setShowCalendar(false)} ) {
             Text("Today")
         }
         DropdownMenuItem(onClick = {}) {
