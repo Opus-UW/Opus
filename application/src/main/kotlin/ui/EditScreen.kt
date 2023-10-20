@@ -33,7 +33,8 @@ fun EditScreen(
     toggleMenu: () -> Unit,
     tags: List<Tag>,
     notes: List<Note>,
-    setNotes: (List<Note>) -> Unit
+    setNotes: (List<Note>) -> Unit,
+    currentTag: Tag?
 ) {
     Column {
         // Title + Menu Button
@@ -46,7 +47,7 @@ fun EditScreen(
         var showCompleted by remember { mutableStateOf(false) }
         // Task List
         Box (modifier = Modifier.fillMaxWidth().fillMaxHeight(if (showCompleted) 0.3f else 0.4f)){
-            taskList(tasks.filter { !it.completed }, setTasks, tags)
+            taskList(tasks.filter { !it.completed }, setTasks, tags, true, currentTag)
         }
         Spacer(modifier = Modifier.size(10.dp))
         Row (verticalAlignment = Alignment.CenterVertically){
@@ -66,13 +67,13 @@ fun EditScreen(
         if (showCompleted){
             Box (modifier = Modifier.fillMaxWidth().fillMaxHeight(0.2f)){
                 Spacer(modifier = Modifier.size(10.dp))
-                taskList(tasks.filter { it.completed }, setTasks, tags, false)
+                taskList(tasks.filter { it.completed }, setTasks, tags, false, currentTag)
             }
         }
         Spacer(modifier = Modifier.size(30.dp))
         // Insert notes here
         Box (modifier = Modifier.fillMaxWidth().fillMaxHeight()) {
-            noteList(notes, setNotes)
+            noteList(notes, setNotes, tags, currentTag)
         }
     }
 }

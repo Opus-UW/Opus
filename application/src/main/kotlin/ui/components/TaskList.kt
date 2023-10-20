@@ -25,11 +25,12 @@ fun taskList(
     tasks: List<Task>,
     setTasks: (List<Task>) -> Unit,
     tags: List<Tag>,
-    showAddTask: Boolean = true
+    showAddTask: Boolean = true,
+    currentTag: Tag?
 ) {
     Column {
         if (showAddTask) {
-            task(null, setTasks, tags)
+            task(null, setTasks, tags, currentTag)
         }
         val listState = rememberLazyListState()
         LazyColumn(
@@ -39,7 +40,7 @@ fun taskList(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             items(tasks.size) {
-                task(tasks[it], setTasks, tags)
+                task(tasks[it], setTasks, tags, currentTag)
             }
         }
     }

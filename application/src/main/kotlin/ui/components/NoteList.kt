@@ -9,11 +9,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.opus.models.Note
+import org.opus.models.Tag
 
 @Composable
 fun noteList(
     notes: List<Note>,
-    setNotes: (List<Note>) -> Unit
+    setNotes: (List<Note>) -> Unit,
+    tags: List<Tag>,
+    currentTag: Tag?
 ) {
 //    val listState = rememberLazyGridState()
     LazyVerticalGrid(
@@ -23,7 +26,7 @@ fun noteList(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         columns = GridCells.Adaptive(minSize = 240.dp),
         content = {
-            items(notes.size) { NotePreview(notes[it], setNotes) }
+            items(notes.size) { NotePreview(notes[it], setNotes, tags, currentTag) }
         }
     )
 }
