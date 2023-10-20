@@ -29,7 +29,7 @@ fun dayPreview(previewDate: kotlinx.datetime.LocalDateTime, previewMonth: String
     val todayDate = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
     val cardBgColor = if (todayDate.date == previewDate.date && todayDate.month == previewDate.month && todayDate.year == previewDate.year)
         Color(0xFFE0FFFF) else Color.White
-    val cardTextColor = if (previewDate.month.name == previewMonth) Color.Black else Color.LightGray
+    val cardTextColor = if (previewDate.month.name == previewMonth) Color.Black else Color.Gray
 
     Box(
 //        elevation = CardDefaults.cardElevation(
@@ -48,7 +48,7 @@ fun dayPreview(previewDate: kotlinx.datetime.LocalDateTime, previewMonth: String
                 singleLine = true,
                 colors = TextFieldDefaults.textFieldColors(
                     textColor = cardTextColor,
-                    disabledTextColor = Color.Black,
+                    //disabledTextColor = Color.Black,
                     backgroundColor = Color.Transparent,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
