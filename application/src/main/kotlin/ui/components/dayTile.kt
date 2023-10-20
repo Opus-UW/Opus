@@ -7,15 +7,12 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun dayPreview(dow: String) {
-    var (title: String) = remember { mutableStateOf(dow) }
 
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
@@ -27,9 +24,9 @@ fun dayPreview(dow: String) {
     ) {
         Column {
             TextField(
-                value = title,
+                value = dow,
                 placeholder = { androidx.compose.material.Text("Title") },
-                onValueChange = { title = it },
+                onValueChange = { },
                 singleLine = true,
                 colors = TextFieldDefaults.textFieldColors(
                     textColor = Color.Black,

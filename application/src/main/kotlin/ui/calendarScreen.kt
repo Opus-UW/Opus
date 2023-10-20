@@ -20,7 +20,9 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import ui.components.dayPreview
 import utils.minus
+import utils.minusMonth
 import utils.plus
+import utils.plusMonth
 
 @Composable
 fun calendarScreen(toggleMenu: () -> Unit, showMenu: Boolean){
@@ -32,14 +34,16 @@ fun calendarScreen(toggleMenu: () -> Unit, showMenu: Boolean){
             IconButton(onClick = { toggleMenu() }, enabled = !showMenu) {
                 Icon(if (showMenu) Icons.Default.CalendarMonth else Icons.Default.Menu, contentDescription = "Menu Button")
             }
-            Text("Calendar $tempMonth")
-            TextButton(onClick = { curDate += 30}) {Text("Next ->")}
+            Text("Calendar     ")
+            TextButton(onClick = { curDate = curDate.minusMonth(1)}) {Text("<- Prev")}
+            Text(tempMonth)
+            TextButton(onClick = { curDate = curDate.plusMonth(1)}) {Text("Next ->")}
         }
 
         // Insert days here
         val list = (1..42).map { it.toString() }
         tempDate -= (tempDate.dayOfMonth - 1)
-        tempDate -= (tempDate.dayOfWeek.ordinal - 6)
+        tempDate -= ((tempDate.dayOfWeek.ordinal + 1) % 7 )
         LazyVerticalGrid(
             verticalArrangement = Arrangement.spacedBy(10.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -50,6 +54,7 @@ fun calendarScreen(toggleMenu: () -> Unit, showMenu: Boolean){
                         dayPreview("${tempDate.dayOfWeek} ${tempDate.dayOfMonth}")
                     else
                         dayPreview("x ${tempDate.dayOfWeek} ${tempDate.dayOfMonth}")
+                    println(tempDate)
                     tempDate += 1
                 }
             }
