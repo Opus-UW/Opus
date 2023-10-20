@@ -5,14 +5,15 @@ pluginManagement {
     }
 
     plugins {
-        kotlin("jvm").version(extra["kotlin.version"] as String)
-        id("org.jetbrains.compose").version(extra["compose.version"] as String)
+        id("org.gradle.toolchains.foojay-resolver-convention") version("0.7.0")
+        kotlin("jvm").version(extra["kotlinVersion"] as String)
+        id("org.jetbrains.compose").version(extra["composeVersion"] as String)
 
-        kotlin("plugin.serialization").version(extra["serialization.version"] as String)
-        id("io.ktor.plugin").version(extra["ktor.version"] as String)
+        kotlin("plugin.serialization").version(extra["serializationVersion"] as String)
+        id("io.ktor.plugin").version(extra["ktorVersion"] as String)
     }
 }
 
 rootProject.name = "Opus"
 
-include("application", "models")
+include("application", "models", "server")
