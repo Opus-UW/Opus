@@ -37,7 +37,7 @@ import org.opus.models.Task
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: MutableList<Tag>) {
+fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: List<Tag>) {
     // Indicates if it's a new task creation bar or not
     val new = task == null
     // Focus variable for task
@@ -184,7 +184,7 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: MutableList<Tag>)
 }
 
 @Composable
-fun optionsTray(isTaskFocused: Boolean, tags: MutableList<Tag>) {
+fun optionsTray(isTaskFocused: Boolean, tags: List<Tag>) {
     val (showCalendar, setShowCalendar) = remember { mutableStateOf(false) }
     val (showOccurrence, setShowOccurrence) = remember { mutableStateOf(false) }
     val (showTags, setShowTags) = remember { mutableStateOf(false) }
@@ -266,7 +266,7 @@ fun chooseOccurrence(showOccurrence: Boolean, setShowOccurrence: (Boolean) -> Un
 }
 
 @Composable
-fun chooseTags(showTags: Boolean, setShowTags: (Boolean) -> Unit, pos: Offset, tags: MutableList<Tag>) {
+fun chooseTags(showTags: Boolean, setShowTags: (Boolean) -> Unit, pos: Offset, tags: List<Tag>) {
     var newTag by remember { mutableStateOf("") }
     DropdownMenu(
         expanded = showTags,
