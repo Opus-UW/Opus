@@ -1,6 +1,7 @@
 package ui.components
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
@@ -124,6 +125,7 @@ fun EditNoteDialog(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(IntrinsicSize.Min)
+                .defaultMinSize(minHeight = 400.dp)
                 .padding(16.dp),
             shape = RoundedCornerShape(16.dp)
         ) {
@@ -268,3 +270,5 @@ fun EditNoteDialog(
         }
     }
 }
+
+

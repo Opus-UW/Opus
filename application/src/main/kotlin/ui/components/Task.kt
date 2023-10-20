@@ -24,12 +24,12 @@ import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import api.ApiClient
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
-import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.opus.models.Tag
@@ -122,7 +122,7 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: List<Tag>) {
                     // delete the task (note change to finished)
                     if (task != null) {
                         coroutineScope.launch {
-                            updateTasks(ApiClient.getInstance().editTask(0, task.id, task.copy(completed = true)))
+                            updateTasks(ApiClient.getInstance().editTask(0, task.id, task.copy(completed = !task.completed)))
                         }
                     }
                     // For new task
@@ -137,6 +137,9 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: List<Tag>) {
                             if (isTaskFocused) Icons.Outlined.Circle else Icons.Default.Add
                         }
                         // For already created tasks, click to check off
+                        else if (task != null && task.completed){
+                            if (isCheckboxHovered) Icons.Outlined.Circle else Icons.Default.CheckCircle
+                        }
                         else {
                             if (isCheckboxHovered) Icons.Default.CheckCircle else Icons.Outlined.Circle
                         },
@@ -165,6 +168,7 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: List<Tag>) {
                         unfocusedIndicatorColor = Color.Transparent,
                         disabledIndicatorColor = Color.Transparent
                     ),
+                    textStyle = TextStyle(textDecoration = if (task != null && task.completed) TextDecoration.LineThrough else TextDecoration.None),
                     readOnly = !(new || edit),
                     modifier = Modifier
                         .onKeyEvent { keyEvent ->
@@ -225,27 +229,24 @@ fun optionsTray(isTaskFocused: Boolean, tags: List<Tag>, isNewTask: Boolean, del
                         rootPos = coordinates.positionInRoot()
                     }) {
                     Icon(Icons.Default.CalendarMonth, contentDescription = "Calendar")
-                    if (showCalendar) {
-                        chooseDate(showCalendar, setShowCalendar, rootPos)
-                    }
+                    chooseDate(showCalendar, setShowCalendar, rootPos)
+
                 }
                 TextButton(onClick = { setShowOccurrence(true) },
                     modifier = Modifier.onGloballyPositioned { coordinates ->
                         rootPos = coordinates.positionInRoot()
                     }) {
                     Icon(Icons.Default.Repeat, contentDescription = "Occurring")
-                    if (showOccurrence) {
-                        chooseOccurrence(showOccurrence, setShowOccurrence, rootPos)
-                    }
+                    chooseOccurrence(showOccurrence, setShowOccurrence, rootPos)
+
                 }
                 TextButton(onClick = { setShowTags(true) },
                     modifier = Modifier.onGloballyPositioned { coordinates ->
                         rootPos = coordinates.positionInRoot()
                     }) {
                     Icon(Icons.Default.Sell, contentDescription = "Tags")
-                    if (showTags) {
-                        chooseTags(showTags, setShowTags, rootPos, tags)
-                    }
+                    chooseTags(showTags, setShowTags, rootPos, tags)
+
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 if (!isNewTask)

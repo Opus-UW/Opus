@@ -1,12 +1,19 @@
 package ui.components
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import api.ApiClient
 import kotlinx.coroutines.launch
@@ -17,16 +24,23 @@ import org.opus.models.Task
 fun taskList(
     tasks: List<Task>,
     setTasks: (List<Task>) -> Unit,
-    tags: List<Tag>
+    tags: List<Tag>,
+    showAddTask: Boolean = true
 ) {
-    Column(
-        modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
-        verticalArrangement = Arrangement.spacedBy(5.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        task(null, setTasks, tags)
-        tasks.forEach {
-            task(it, setTasks, tags)
+    Column {
+        if (showAddTask) {
+            task(null, setTasks, tags)
+        }
+        val listState = rememberLazyListState()
+        LazyColumn(
+            state = listState,
+            modifier = Modifier.fillMaxWidth().fillMaxHeight().SimpleVerticalScrollbar(listState),
+            verticalArrangement = Arrangement.spacedBy(5.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            items(tasks.size) {
+                task(tasks[it], setTasks, tags)
+            }
         }
     }
 }
