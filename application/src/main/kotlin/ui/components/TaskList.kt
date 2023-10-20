@@ -1,28 +1,39 @@
 package ui.components
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import api.ApiClient
-import kotlinx.coroutines.launch
 import org.opus.models.Tag
 import org.opus.models.Task
 
 @Composable
-fun taskList(tasks: List<Task>, setTasks: (List<Task>) -> Unit, tags: MutableList<Tag>){
-    Column(
-        modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
-        verticalArrangement = Arrangement.spacedBy(5.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        task(null, setTasks, tags)
-        tasks.forEach {
-            task(it, setTasks, tags)
+fun taskList(
+    tasks: List<Task>,
+    setTasks: (List<Task>) -> Unit,
+    tags: List<Tag>,
+    setTags: (List<Tag>) -> Unit,
+    showAddTask: Boolean = true,
+    currentTag: Tag?
+) {
+    Column {
+        if (showAddTask) {
+            task(null, setTasks, null, tags, setTags, currentTag,  tasks)
+        }
+        Spacer(modifier = Modifier.size(10.dp))
+        val listState = rememberLazyListState()
+        LazyColumn(
+            state = listState,
+            modifier = Modifier.fillMaxWidth().fillMaxHeight().SimpleVerticalScrollbar(listState),
+            verticalArrangement = Arrangement.spacedBy(5.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            items(tasks.size) {
+                task(tasks[it], setTasks, tasks[it].dueDate, tags, setTags, currentTag, tasks)
+            }
         }
     }
 }
