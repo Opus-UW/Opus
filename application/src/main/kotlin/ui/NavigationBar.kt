@@ -7,9 +7,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import api.ApiClient
-import kotlinx.coroutines.launch
 import org.opus.models.Colour
 import org.opus.models.Tag
 import org.opus.models.Task
@@ -64,7 +61,7 @@ fun NavigationBar(tasks: List<Task>, setTasks: (List<Task>) -> Unit) {
                 }
             }
             if (screen == "Calendar") {
-                CalendarScreen(toggleMenu, showMenu)
+                calendarScreen(toggleMenu, showMenu)
             }
         }
     }
