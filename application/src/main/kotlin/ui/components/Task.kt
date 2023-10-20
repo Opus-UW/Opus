@@ -19,6 +19,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
+import androidx.compose.ui.input.key.Key.Companion.Calendar
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -29,11 +30,11 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import api.ApiClient
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.*
 import org.opus.models.Tag
 import org.opus.models.Task
+import java.time.format.DateTimeFormatter
+import javax.swing.text.DateFormatter
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
@@ -52,6 +53,11 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: List<Tag>, curren
     // Task variables
     var text by remember(task) { mutableStateOf(task?.action ?: "") }
     val taskTags = remember(task) { mutableStateListOf(*(task?.tags?.toTypedArray() ?: listOf<Tag>().toTypedArray()))}
+    var taskDueDate by remember(task) { mutableStateOf(task?.dueDate ?: Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()))}
+
+    fun updateDueDate(dueDate: LocalDateTime) {
+        taskDueDate = dueDate
+    }
 
     fun updateTask() {
         // Get current time
@@ -61,7 +67,7 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: List<Tag>, curren
                 false,
                 text,
                 time.toLocalDateTime(TimeZone.currentSystemDefault()),
-                time.toLocalDateTime(TimeZone.currentSystemDefault()),
+                taskDueDate,
                 currentTag?.let{taskTags.filter{tag -> tag.title != it.title} + it}?:taskTags
             )
         if (new) {
@@ -188,6 +194,10 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: List<Tag>, curren
                             isTextboxHovered = false
                         }
                 )
+                if (task?.dueDate != null) {
+                    val date = task.dueDate?.dayOfMonth.toString() + "-" + task.dueDate?.monthNumber.toString() + "-" + task.dueDate?.year.toString()
+                    Text("Due on $date")
+                }
                 if (!new && isTaskFocused && !edit) {
                     IconButton(
                         onClick = { textFieldFocusRequester.requestFocus(); edit = true; },
@@ -206,14 +216,14 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: List<Tag>, curren
         }
         // Edit Options Tray
         if (new || edit) {
-            optionsTray(isTaskFocused, tags, new) { deleteTask() }
+            optionsTray(isTaskFocused, tags, new, { deleteTask() }, { updateDueDate(taskDueDate) })
         }
     }
 
 }
 
 @Composable
-fun optionsTray(isTaskFocused: Boolean, tags: List<Tag>, isNewTask: Boolean, deleteTask: () -> Unit) {
+fun optionsTray(isTaskFocused: Boolean, tags: List<Tag>, isNewTask: Boolean, deleteTask: () -> Unit, updateDueDate: (LocalDateTime) -> Unit) {
     val (showCalendar, setShowCalendar) = remember { mutableStateOf(false) }
     val (showOccurrence, setShowOccurrence) = remember { mutableStateOf(false) }
     val (showTags, setShowTags) = remember { mutableStateOf(false) }
@@ -229,7 +239,7 @@ fun optionsTray(isTaskFocused: Boolean, tags: List<Tag>, isNewTask: Boolean, del
                         rootPos = coordinates.positionInRoot()
                     }) {
                     Icon(Icons.Default.CalendarMonth, contentDescription = "Calendar")
-                    chooseDate(showCalendar, setShowCalendar, rootPos)
+                    chooseDate(showCalendar, setShowCalendar, rootPos, updateDueDate)
 
                 }
                 TextButton(onClick = { setShowOccurrence(true) },
@@ -263,10 +273,13 @@ fun optionsTray(isTaskFocused: Boolean, tags: List<Tag>, isNewTask: Boolean, del
 }
 
 @Composable
-fun chooseDate(showCalendar: Boolean, setShowCalendar: (Boolean) -> Unit, pos: Offset) {
+fun chooseDate(showCalendar: Boolean, setShowCalendar: (Boolean) -> Unit, pos: Offset, updateDueDate: (dueDate: LocalDateTime) -> Unit) {
+    val currTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
     DropdownMenu(
         expanded = showCalendar, onDismissRequest = { setShowCalendar(false) }) {
-        DropdownMenuItem(onClick = {}) {
+        DropdownMenuItem(onClick = {
+            updateDueDate(currTime)
+            setShowCalendar(false)} ) {
             Text("Today")
         }
         DropdownMenuItem(onClick = {}) {
