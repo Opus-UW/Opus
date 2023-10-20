@@ -37,7 +37,7 @@ import org.opus.models.Task
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
-fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: List<Tag>) {
+fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: List<Tag>, currentTag: Tag?) {
     // Indicates if it's a new task creation bar or not
     val new = task == null
     // Focus variable for task
@@ -51,7 +51,7 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: List<Tag>) {
 
     // Task variables
     var text by remember(task) { mutableStateOf(task?.action ?: "") }
-    var taskTags by remember(task) { mutableStateOf(task?.tags ?: listOf<Tag>()) }
+    val taskTags = remember(task) { mutableStateListOf(*(task?.tags?.toTypedArray() ?: listOf<Tag>().toTypedArray()))}
 
     fun updateTask() {
         // Get current time
@@ -62,7 +62,7 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: List<Tag>) {
                 text,
                 time.toLocalDateTime(TimeZone.currentSystemDefault()),
                 time.toLocalDateTime(TimeZone.currentSystemDefault()),
-                taskTags
+                currentTag?.let{taskTags.filter{tag -> tag.title != it.title} + it}?:taskTags
             )
         if (new) {
             coroutineScope.launch {
