@@ -61,7 +61,7 @@ fun NavigationBar(tasks: List<Task>, setTasks: (List<Task>) -> Unit) {
                 }
             }
             if (screen == "Calendar") {
-                calendarScreen(toggleMenu, showMenu)
+                calendarScreen(toggleMenu, showMenu, tasks)
             }
         }
     }
