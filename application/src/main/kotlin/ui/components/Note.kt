@@ -42,6 +42,7 @@ fun NotePreview(note: Note, setNotes: (List<Note>) -> Unit, tags: List<Tag>, set
     var (title, setTitle) = remember(note) { mutableStateOf(note.title) }
     val state = rememberRichTextState()
     var tagStatus = remember(tags) { mutableStateMapOf(*tags.map { it to false }.toTypedArray()) }
+
     LaunchedEffect(Unit){
         note?.tags?.forEach{ tag ->
             tagStatus[tag] = true
@@ -127,13 +128,14 @@ fun EditNoteDialog(
         onDismissRequest = {
             setTitle(newTitle);
             state.setHtml(newState.toHtml());
-            val newTaskTags = mutableListOf<Tag>()
-            tagStatus.forEach{ entry ->
-                if (entry.value){
-                    newTaskTags.add(entry.key)
-                }
-            }
             coroutineScope.launch {
+                val newTaskTags = mutableListOf<Tag>()
+                tagStatus.forEach{ entry ->
+                    if (entry.value){
+                        newTaskTags.add(entry.key)
+                    }
+                }
+
                 setNotes(
                     ApiClient.getInstance().editNote(0, note.id, note.copy(title = newTitle, body = newState.toHtml(), tags = newTaskTags.toList()))
                 )

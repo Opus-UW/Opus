@@ -32,10 +32,10 @@ fun ChooseTagMenu(
     tagStatus: SnapshotStateMap<Tag, Boolean>
 ) {
     val focusManager = LocalFocusManager.current
-    var newTag by remember { mutableStateOf("") }
+    var newTag by remember(tags) { mutableStateOf("") }
     var text by remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
-    val textFieldFocusRequester = remember(tags) { FocusRequester() }
+    val textFieldFocusRequester = remember { FocusRequester() }
 
     DropdownMenu(
         expanded = showTags,
