@@ -10,7 +10,7 @@ data class Task(
     val completed: Boolean,
     val action: String,
     val creationDate: LocalDateTime,
-    val dueDate: LocalDateTime,
+    val dueDate: LocalDateTime? = null,
     val tags: List<Tag> = listOf(),
     val id: Int = -1
 )
