@@ -9,10 +9,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontStyle
@@ -33,12 +37,19 @@ import org.opus.models.Tag
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotePreview(note: Note, setNotes: (List<Note>) -> Unit, tags: List<Tag>, currentTag: Tag?) {
+fun NotePreview(note: Note, setNotes: (List<Note>) -> Unit, tags: List<Tag>, setTags: (List<Tag>) -> Unit, currentTag: Tag?) {
     var editNote by remember(note) { mutableStateOf(false) }
     var (title, setTitle) = remember(note) { mutableStateOf(note.title) }
     val state = rememberRichTextState()
-    val noteTags = remember(note) { mutableStateListOf(*(note.tags.toTypedArray()))}
-
+    var tagStatus = remember(tags) { mutableStateMapOf(*tags.map { it to false }.toTypedArray()) }
+    LaunchedEffect(Unit){
+        note?.tags?.forEach{ tag ->
+            tagStatus[tag] = true
+        }
+        if (currentTag != null) {
+            tagStatus[currentTag] = true
+        }
+    }
     LaunchedEffect(Unit) {
         state.setHtml(note.body)
     }
@@ -91,7 +102,7 @@ fun NotePreview(note: Note, setNotes: (List<Note>) -> Unit, tags: List<Tag>, cur
         LaunchedEffect(editNote) {
             newState.setHtml(state.toHtml())
         }
-        EditNoteDialog({ editNote = false; }, title, setTitle, newState, state, note, setNotes)
+        EditNoteDialog({ editNote = false; }, title, setTitle, newState, state, note, setNotes, tags, setTags, tagStatus)
     }
 }
 
@@ -104,7 +115,10 @@ fun EditNoteDialog(
     newState: RichTextState,
     state: RichTextState,
     note: Note,
-    setNotes: (List<Note>) -> Unit
+    setNotes: (List<Note>) -> Unit,
+    tags: List<Tag>,
+    setTags: (List<Tag>) -> Unit,
+    tagStatus: SnapshotStateMap<Tag, Boolean>
 ) {
     var newTitle by remember { mutableStateOf(title) }
     val coroutineScope = rememberCoroutineScope()
@@ -113,10 +127,15 @@ fun EditNoteDialog(
         onDismissRequest = {
             setTitle(newTitle);
             state.setHtml(newState.toHtml());
-
+            val newTaskTags = mutableListOf<Tag>()
+            tagStatus.forEach{ entry ->
+                if (entry.value){
+                    newTaskTags.add(entry.key)
+                }
+            }
             coroutineScope.launch {
                 setNotes(
-                    ApiClient.getInstance().editNote(0, note.id, note.copy(title = newTitle, body = newState.toHtml()))
+                    ApiClient.getInstance().editNote(0, note.id, note.copy(title = newTitle, body = newState.toHtml(), tags = newTaskTags.toList()))
                 )
                 onDismissRequest()
             }
@@ -147,6 +166,15 @@ fun EditNoteDialog(
                     )
                 )
                 Spacer(modifier = Modifier.weight(1f))
+                var (showTags, setShowTags) = remember(tags) { mutableStateOf(false) }
+                var rootPos by remember { mutableStateOf(Offset.Zero) }
+                androidx.compose.material.TextButton(onClick = { setShowTags(true) },
+                    modifier = Modifier.onGloballyPositioned { coordinates ->
+                        rootPos = coordinates.positionInRoot()
+                    }) {
+                    androidx.compose.material.Icon(Icons.Default.Sell, contentDescription = "Tags")
+                    ChooseTagMenu(showTags, setShowTags, rootPos, tags, setTags, tagStatus)
+                }
                 IconButton(onClick = {
                     coroutineScope.launch {
                         setNotes(

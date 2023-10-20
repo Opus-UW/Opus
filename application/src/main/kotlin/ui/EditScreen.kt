@@ -71,7 +71,7 @@ fun EditScreen(
         Spacer(modifier = Modifier.size(30.dp))
         // Insert notes here
         Box (modifier = Modifier.fillMaxWidth().fillMaxHeight()) {
-            noteList(notes, setNotes, tags, currentTag)
+            noteList(notes, setNotes, tags, setTags, currentTag)
         }
     }
 }

@@ -64,6 +64,9 @@ fun task(
         task?.tags?.forEach{ tag ->
             tagStatus[tag] = true
         }
+        if (currentTag != null) {
+            tagStatus[currentTag] = true
+        }
     }
 
 

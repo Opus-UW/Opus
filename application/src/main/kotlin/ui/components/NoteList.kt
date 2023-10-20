@@ -16,6 +16,7 @@ fun noteList(
     notes: List<Note>,
     setNotes: (List<Note>) -> Unit,
     tags: List<Tag>,
+    setTags: (List<Tag>) -> Unit,
     currentTag: Tag?
 ) {
 //    val listState = rememberLazyGridState()
@@ -26,7 +27,7 @@ fun noteList(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         columns = GridCells.Adaptive(minSize = 240.dp),
         content = {
-            items(notes.size) { NotePreview(notes[it], setNotes, tags, currentTag) }
+            items(notes.size) { NotePreview(notes[it], setNotes, tags, setTags, currentTag) }
         }
     )
 }
