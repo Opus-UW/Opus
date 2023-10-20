@@ -30,7 +30,7 @@ fun taskList(
 ) {
     Column {
         if (showAddTask) {
-            task(null, setTasks, tags, currentTag)
+            task(null, setTasks, null, tags, currentTag, tasks)
         }
         val listState = rememberLazyListState()
         LazyColumn(
@@ -40,7 +40,8 @@ fun taskList(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             items(tasks.size) {
-                task(tasks[it], setTasks, tags, currentTag)
+                task(tasks[it], setTasks, tasks[it].dueDate, tags, currentTag, tasks)
+                println(tasks[it].dueDate)
             }
         }
     }

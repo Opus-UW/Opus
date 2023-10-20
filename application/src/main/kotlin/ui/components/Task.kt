@@ -38,7 +38,7 @@ import javax.swing.text.DateFormatter
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
-fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: List<Tag>, currentTag: Tag?) {
+fun task(task: Task?, updateTasks: (List<Task>) -> Unit, dueDate: LocalDateTime? = null, tags: List<Tag>, currentTag: Tag?, tasks: List<Task>) {
     // Indicates if it's a new task creation bar or not
     val new = task == null
     // Focus variable for task
@@ -53,10 +53,11 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: List<Tag>, curren
     // Task variables
     var text by remember(task) { mutableStateOf(task?.action ?: "") }
     val taskTags = remember(task) { mutableStateListOf(*(task?.tags?.toTypedArray() ?: listOf<Tag>().toTypedArray()))}
-    var taskDueDate by remember(task) { mutableStateOf(task?.dueDate ?: Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()))}
+    var taskDueDate by remember(task, tasks) { mutableStateOf(task?.dueDate) }
 
-    fun updateDueDate(dueDate: LocalDateTime) {
-        taskDueDate = dueDate
+    fun updateDueDate(dueDate: LocalDateTime? = null) {
+        println(dueDate?.date)
+        if (dueDate != null) taskDueDate = dueDate
     }
 
     fun updateTask() {
@@ -216,7 +217,7 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: List<Tag>, curren
         }
         // Edit Options Tray
         if (new || edit) {
-            optionsTray(isTaskFocused, tags, new, { deleteTask() }, { updateDueDate(taskDueDate) })
+            optionsTray(isTaskFocused, tags, new, { deleteTask() }, { d -> updateDueDate(d) })
         }
     }
 
@@ -272,6 +273,8 @@ fun optionsTray(isTaskFocused: Boolean, tags: List<Tag>, isNewTask: Boolean, del
 
 }
 
+operator fun LocalDateTime.plus(value: Int): LocalDateTime = LocalDateTime(this.date + DatePeriod(0,0, days = value), this.time )
+
 @Composable
 fun chooseDate(showCalendar: Boolean, setShowCalendar: (Boolean) -> Unit, pos: Offset, updateDueDate: (dueDate: LocalDateTime) -> Unit) {
     val currTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
@@ -279,10 +282,14 @@ fun chooseDate(showCalendar: Boolean, setShowCalendar: (Boolean) -> Unit, pos: O
         expanded = showCalendar, onDismissRequest = { setShowCalendar(false) }) {
         DropdownMenuItem(onClick = {
             updateDueDate(currTime)
+            println(currTime.date)
             setShowCalendar(false)} ) {
             Text("Today")
         }
-        DropdownMenuItem(onClick = {}) {
+        DropdownMenuItem(onClick = {
+            updateDueDate(currTime + 1)
+            setShowCalendar(false)
+        }) {
             Text("Tomorrow")
         }
         DropdownMenuItem(onClick = {}) {
