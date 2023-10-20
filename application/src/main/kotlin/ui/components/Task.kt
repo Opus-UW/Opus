@@ -82,6 +82,12 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: List<Tag>) {
         }
     }
 
+    fun deleteTask(){
+        coroutineScope.launch {
+            task?.let{updateTasks(ApiClient.getInstance().deleteTask(0, it.id))}
+        }
+    }
+
     // Column for task + options bar
     Column(
         modifier = Modifier
@@ -195,14 +201,14 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: List<Tag>) {
 //        println(edit)
         // Edit Options Tray
         if (new || edit) {
-            optionsTray(isTaskFocused, tags, new)
+            optionsTray(isTaskFocused, tags, new) { deleteTask() }
         }
     }
 
 }
 
 @Composable
-fun optionsTray(isTaskFocused: Boolean, tags: List<Tag>, isNewTask: Boolean) {
+fun optionsTray(isTaskFocused: Boolean, tags: List<Tag>, isNewTask: Boolean, deleteTask: () -> Unit) {
     val (showCalendar, setShowCalendar) = remember { mutableStateOf(false) }
     val (showOccurrence, setShowOccurrence) = remember { mutableStateOf(false) }
     val (showTags, setShowTags) = remember { mutableStateOf(false) }
@@ -231,12 +237,13 @@ fun optionsTray(isTaskFocused: Boolean, tags: List<Tag>, isNewTask: Boolean) {
                     }) {
                     Icon(Icons.Default.Sell, contentDescription = "Tags")
                 }
-                if(! isNewTask)
-                    TextButton(onClick = { println("me when delet") },
+                Spacer(modifier = Modifier.weight(1f))
+                if(!isNewTask)
+                    TextButton(onClick = { deleteTask() },
                         modifier = Modifier.onGloballyPositioned { coordinates ->
                             rootPos = coordinates.positionInRoot()
                         }) {
-                        Icon(Icons.Default.Delete, contentDescription = "Delete")
+                        Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color.Red)
                     }
             }
         }
