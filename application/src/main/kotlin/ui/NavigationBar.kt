@@ -14,6 +14,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import api.ApiClient
 import kotlinx.coroutines.launch
@@ -33,17 +34,17 @@ fun NavigationBar(
     var text by remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
     Box(modifier = Modifier.fillMaxHeight().width(IntrinsicSize.Min)) {
-        Column(modifier = Modifier) {
+        Column(horizontalAlignment = Alignment.Start) {
             IconButton(onClick = { toggleMenu() }) {
                 Icon(Icons.Default.Menu, contentDescription = "Menu Button")
             }
 
-            TextButton(onClick = { setScreen("All") }) {
-                Text("All")
+            TextButton(onClick = { setScreen("All") }, modifier = Modifier.fillMaxWidth()) {
+                Text("All", textAlign = TextAlign.Left, modifier = Modifier.fillMaxWidth())
             }
 
-            TextButton(onClick = { setScreen("Calendar") }) {
-                Text("Calendar")
+            TextButton(onClick = { setScreen("Calendar") }, modifier = Modifier.fillMaxWidth()) {
+                Text("Calendar", textAlign = TextAlign.Left, modifier = Modifier.fillMaxWidth())
             }
 
             Divider(color = Color.Black, thickness = 1.dp)
@@ -56,8 +57,8 @@ fun NavigationBar(
                 }
 
                 Row {
-                    TextButton(onClick = { setScreen(tag.title) }) {
-                        Text(tag.title)
+                    TextButton(onClick = { setScreen(tag.title) }, modifier = Modifier.fillMaxWidth()) {
+                        Text(tag.title, textAlign = TextAlign.Left, modifier = Modifier.fillMaxWidth())
                     }
                     Spacer(modifier = Modifier.weight(1f))
                     IconButton(onClick = { moreStates[tag] = true; println(moreStates[tag] == true) }) {
