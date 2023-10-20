@@ -1,8 +1,5 @@
 package ui.components
 
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.PressInteraction
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.TextField
@@ -11,7 +8,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
@@ -25,18 +21,24 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import api.ApiClient
 import com.mohamedrejeb.richeditor.model.RichTextState
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults
+import kotlinx.coroutines.launch
+import org.opus.models.Note
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotePreview() {
-    var editNote by remember { mutableStateOf(false) }
-    var (title, setTitle) = remember { mutableStateOf("") }
+fun NotePreview(note: Note, setNotes: (List<Note>) -> Unit) {
+    var editNote by remember(note) { mutableStateOf(false) }
+    var (title, setTitle) = remember(note) { mutableStateOf(note.title) }
     val state = rememberRichTextState()
 
+    LaunchedEffect(Unit) {
+        state.setHtml(note.body)
+    }
 
     ElevatedCard(
         onClick = { editNote = true },
@@ -86,7 +88,7 @@ fun NotePreview() {
         LaunchedEffect(editNote) {
             newState.setHtml(state.toHtml())
         }
-        EditNoteDialog({ editNote = false; }, title, setTitle, newState, state)
+        EditNoteDialog({ editNote = false; }, title, setTitle, newState, state, note, setNotes)
     }
 }
 
@@ -97,12 +99,25 @@ fun EditNoteDialog(
     title: String,
     setTitle: (String) -> Unit,
     newState: RichTextState,
-    state: RichTextState
+    state: RichTextState,
+    note: Note,
+    setNotes: (List<Note>) -> Unit
 ) {
     var newTitle by remember { mutableStateOf(title) }
+    val coroutineScope = rememberCoroutineScope()
 
     Dialog(
-        onDismissRequest = { setTitle(newTitle); state.setHtml(newState.toHtml()); onDismissRequest() },
+        onDismissRequest = {
+            setTitle(newTitle);
+            state.setHtml(newState.toHtml());
+
+            coroutineScope.launch {
+                setNotes(
+                    ApiClient.getInstance().editNote(0, note.id, note.copy(title = newTitle, body = newState.toHtml()))
+                )
+                onDismissRequest()
+            }
+        },
         properties = DialogProperties(dismissOnClickOutside = true)
     ) {
         Card(
@@ -112,20 +127,38 @@ fun EditNoteDialog(
                 .padding(16.dp),
             shape = RoundedCornerShape(16.dp)
         ) {
-            TextField(
-                value = newTitle,
-                placeholder = { androidx.compose.material.Text("Title") },
-                onValueChange = { newTitle = it },
-                singleLine = true,
-                colors = TextFieldDefaults.textFieldColors(
-                    textColor = Color.Black,
-                    disabledTextColor = Color.Black,
-                    backgroundColor = Color.Transparent,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    disabledIndicatorColor = Color.Transparent
+            Row {
+                TextField(
+                    value = newTitle,
+                    placeholder = { androidx.compose.material.Text("Title") },
+                    onValueChange = { newTitle = it },
+                    singleLine = true,
+                    colors = TextFieldDefaults.textFieldColors(
+                        textColor = Color.Black,
+                        disabledTextColor = Color.Black,
+                        backgroundColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        disabledIndicatorColor = Color.Transparent
+                    )
                 )
-            )
+                Spacer(modifier = Modifier.weight(1f))
+                IconButton(onClick = {
+                    coroutineScope.launch {
+                        setNotes(
+                            ApiClient.getInstance()
+                                .deleteNote(0, note.id)
+                        )
+                        onDismissRequest()
+                    }
+
+                }) {
+                    Icon(
+                        Icons.Default.Delete,
+                        contentDescription = "Delete Note"
+                    )
+                }
+            }
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -218,8 +251,7 @@ fun EditNoteDialog(
                         } else if (it.isCtrlPressed && it.isShiftPressed && it.key == Key.Eight && it.type == KeyEventType.KeyUp) {
                             newState.toggleUnorderedList()
                             true
-                        }
-                        else {
+                        } else {
                             // let other handlers receive this event
                             false
                         }

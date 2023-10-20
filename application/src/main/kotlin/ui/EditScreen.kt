@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.opus.models.Note
 import org.opus.models.Tag
 import org.opus.models.Task
 import ui.components.NotePreview
@@ -25,7 +26,9 @@ fun EditScreen(
     setTasks: (List<Task>) -> Unit,
     showMenu: Boolean,
     toggleMenu: () -> Unit,
-    tags: List<Tag>
+    tags: List<Tag>,
+    notes: List<Note>,
+    setNotes: (List<Note>) -> Unit
 ) {
     Column {
         // Title + Menu Button
@@ -39,13 +42,12 @@ fun EditScreen(
         taskList(tasks.filter { !it.completed }, setTasks, tags)
         Spacer(modifier = Modifier.size(30.dp))
         // Insert notes here
-        val list = (1..10).map { it.toString() }
         LazyVerticalGrid(
             verticalArrangement = Arrangement.spacedBy(10.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             columns = GridCells.Adaptive(minSize = 240.dp),
             content = {
-                items(list.size) { NotePreview() }
+                items(notes.size) { NotePreview(notes[it], setNotes) }
             }
         )
     }
