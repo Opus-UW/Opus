@@ -27,8 +27,7 @@ fun NavigationBar(
     tags: List<Tag>,
     setTags: (List<Tag>) -> Unit,
     setScreen: (String) -> Unit,
-    toggleMenu: () -> Unit,
-    taskMap: MutableMap<Tag, MutableList<Task>>
+    toggleMenu: () -> Unit
 ) {
     val addTagFocusRequester = remember { FocusRequester() }
     var text by remember { mutableStateOf("") }
@@ -49,7 +48,7 @@ fun NavigationBar(
 
             Divider(color = Color.Black, thickness = 1.dp)
 
-            var moreStates by remember(tags) { mutableStateOf(mutableMapOf<Tag, Boolean>()) }
+            val moreStates = remember(tags) { mutableStateMapOf<Tag, Boolean>() }
             // Display all tags
             tags.forEach { tag ->
                 LaunchedEffect(Unit) {
@@ -60,21 +59,21 @@ fun NavigationBar(
                     TextButton(onClick = { setScreen(tag.title) }) {
                         Text(tag.title)
                     }
+                    Spacer(modifier = Modifier.weight(1f))
                     IconButton(onClick = { moreStates[tag] = true; println(moreStates[tag] == true) }) {
                         Icon(Icons.Default.MoreVert, contentDescription = "Tag Menu Button")
-                    }
-                }
+                        DropdownMenu(
+                            expanded = moreStates[tag] == true, onDismissRequest = { moreStates[tag] = false }) {
+                            DropdownMenuItem(onClick = {
+                                coroutineScope.launch {
+                                    setTags(ApiClient.getInstance().deleteTag(0, tag.id))
+                                }
+                            }) {
+                                Text("Delete Tag")
+                            }
 
-                DropdownMenu(
-                    expanded = moreStates[tag] == true, onDismissRequest = { moreStates[tag] = false }) {
-                    DropdownMenuItem(onClick = {
-                        coroutineScope.launch {
-                            setTags(ApiClient.getInstance().deleteTag(0, tag.id))
                         }
-                    }) {
-                        Text("Delete Tag")
                     }
-
                 }
             }
 
@@ -107,7 +106,6 @@ fun NavigationBar(
                                 coroutineScope.launch {
                                     setTags(ApiClient.getInstance().postTag(0, tag))
                                 }
-                                taskMap[tag] = mutableListOf<Task>()
                                 text = ""
                             }
                             true

@@ -39,13 +39,19 @@ fun main() = application {
         val toggleMenu: () -> Unit = { setShowMenu(!showMenu) }
         var (screen, setScreen) = remember { mutableStateOf("All") }
 
-        val taskMap by remember(tasks) { mutableStateOf(mutableMapOf<Tag, MutableList<Task>>())}
+        val taskMap = remember(tasks) { mutableStateMapOf(*tags.map{it to Pair(mutableListOf<Task>(), mutableListOf<Note>())}.toTypedArray())}
         val allTag = Tag("All", Colour(255, 255, 255))
-        taskMap[allTag] = tasks.toMutableList()
+        taskMap[allTag] = Pair(tasks.toMutableList(), notes.toMutableList())
 
         tasks.forEach{ task ->
             task.tags.forEach { tag ->
-                taskMap[tag]?.add(task)
+                taskMap[tag]?.first?.add(task)
+            }
+        }
+
+        notes.forEach{ note ->
+            note.tags.forEach { tag ->
+                taskMap[tag]?.second?.add(note)
             }
         }
 
@@ -62,7 +68,7 @@ fun main() = application {
         ) {
             Row {
                 if (showMenu) {
-                    NavigationBar(tags, setTags, setScreen, toggleMenu, taskMap)
+                    NavigationBar(tags, setTags, setScreen, toggleMenu)
                 }
 
                 if (screen == "All"){
@@ -73,7 +79,7 @@ fun main() = application {
 
                 tags.forEach{ tag ->
                     if (screen == tag.title) {
-                        taskMap[tag]?.let { it1 -> EditScreen(tag.title, it1, setTasks, showMenu, toggleMenu, tags, notes, setNotes) }
+                        taskMap[tag]?.let { it1 -> EditScreen(tag.title, it1.first, setTasks, showMenu, toggleMenu, tags, it1.second, setNotes) }
                     }
                 }
             }
