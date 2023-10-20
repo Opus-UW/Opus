@@ -25,7 +25,7 @@ fun EditScreen(
     setTasks: (List<Task>) -> Unit,
     showMenu: Boolean,
     toggleMenu: () -> Unit,
-    tags: MutableList<Tag>
+    tags: List<Tag>
 ) {
     Column {
         // Title + Menu Button

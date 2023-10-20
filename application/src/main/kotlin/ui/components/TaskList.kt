@@ -14,7 +14,11 @@ import org.opus.models.Tag
 import org.opus.models.Task
 
 @Composable
-fun taskList(tasks: List<Task>, setTasks: (List<Task>) -> Unit, tags: MutableList<Tag>){
+fun taskList(
+    tasks: List<Task>,
+    setTasks: (List<Task>) -> Unit,
+    tags: List<Tag>
+) {
     Column(
         modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
         verticalArrangement = Arrangement.spacedBy(5.dp),
