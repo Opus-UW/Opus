@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -19,7 +20,6 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
-import androidx.compose.ui.input.key.Key.Companion.Calendar
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -30,15 +30,25 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import api.ApiClient
 import kotlinx.coroutines.launch
-import kotlinx.datetime.*
+import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import org.opus.models.Colour
 import org.opus.models.Tag
 import org.opus.models.Task
-import java.time.format.DateTimeFormatter
-import javax.swing.text.DateFormatter
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
-fun task(task: Task?, updateTasks: (List<Task>) -> Unit, dueDate: LocalDateTime? = null, tags: List<Tag>, currentTag: Tag?, tasks: List<Task>) {
+fun task(
+    task: Task?,
+    updateTasks: (List<Task>) -> Unit,
+    dueDate: LocalDateTime? = null,
+    tags: List<Tag>,
+    setTags: (List<Tag>) -> Unit,
+    currentTag: Tag?,
+    tasks: List<Task>
+) {
     // Indicates if it's a new task creation bar or not
     val new = task == null
     // Focus variable for task
@@ -52,7 +62,6 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, dueDate: LocalDateTime?
 
     // Task variables
     var text by remember(task) { mutableStateOf(task?.action ?: "") }
-    val taskTags = remember(task) { mutableStateListOf(*(task?.tags?.toTypedArray() ?: listOf<Tag>().toTypedArray()))}
     var taskDueDate by remember(task, tasks) { mutableStateOf(task?.dueDate) }
 
     fun updateDueDate(dueDate: LocalDateTime? = null) {
@@ -60,16 +69,33 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, dueDate: LocalDateTime?
         if (dueDate != null) taskDueDate = dueDate
     }
 
+    var tagStatus = remember(tags) { mutableStateMapOf(*tags.map { it to false }.toTypedArray()) }
+    LaunchedEffect(Unit) {
+        task?.tags?.forEach { tag ->
+            tagStatus[tag] = true
+        }
+        if (currentTag != null) {
+            tagStatus[currentTag] = true
+        }
+    }
+
+
     fun updateTask() {
         // Get current time
         val time = Clock.System.now()
+        val newTaskTags = mutableListOf<Tag>()
+        tagStatus.forEach { entry ->
+            if (entry.value) {
+                newTaskTags.add(entry.key)
+            }
+        }
         val taskToSend =
             Task(
                 false,
                 text,
                 time.toLocalDateTime(TimeZone.currentSystemDefault()),
                 taskDueDate,
-                currentTag?.let{taskTags.filter{tag -> tag.title != it.title} + it}?:taskTags
+                newTaskTags.toList()
             )
         if (new) {
             coroutineScope.launch {
@@ -117,7 +143,12 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, dueDate: LocalDateTime?
                 .border(
                     1.dp,
                     if (isTaskFocused) Color.Blue else Color.Transparent,
-                    shape = if (edit || new) RoundedCornerShape(8.dp, 8.dp, 0.dp, 0.dp) else RoundedCornerShape(8.dp)
+                    shape = if (edit || new) RoundedCornerShape(
+                        8.dp,
+                        8.dp,
+                        0.dp,
+                        0.dp
+                    ) else RoundedCornerShape(8.dp)
                 )
         ) {
             Row(
@@ -129,7 +160,9 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, dueDate: LocalDateTime?
                     // delete the task (note change to finished)
                     if (task != null) {
                         coroutineScope.launch {
-                            updateTasks(ApiClient.getInstance().editTask(0, task.id, task.copy(completed = !task.completed)))
+                            updateTasks(
+                                ApiClient.getInstance().editTask(0, task.id, task.copy(completed = !task.completed))
+                            )
                         }
                     }
                     // For new task
@@ -144,10 +177,9 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, dueDate: LocalDateTime?
                             if (isTaskFocused) Icons.Outlined.Circle else Icons.Default.Add
                         }
                         // For already created tasks, click to check off
-                        else if (task != null && task.completed){
+                        else if (task != null && task.completed) {
                             if (isCheckboxHovered) Icons.Outlined.Circle else Icons.Default.CheckCircle
-                        }
-                        else {
+                        } else {
                             if (isCheckboxHovered) Icons.Default.CheckCircle else Icons.Outlined.Circle
                         },
                         contentDescription = "Check mark",
@@ -195,9 +227,8 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, dueDate: LocalDateTime?
                             isTextboxHovered = false
                         }
                 )
-                if (task?.dueDate != null) {
-                    val date = task.dueDate?.dayOfMonth.toString() + "-" + task.dueDate?.monthNumber.toString() + "-" + task.dueDate?.year.toString()
-                    Text("Due on $date")
+                if (dueDate != null) {
+                    Text("Due on ${dueDate.date}")
                 }
                 if (!new && isTaskFocused && !edit) {
                     IconButton(
@@ -217,14 +248,21 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, dueDate: LocalDateTime?
         }
         // Edit Options Tray
         if (new || edit) {
-            optionsTray(isTaskFocused, tags, new, { deleteTask() }, { d -> updateDueDate(d) })
+            optionsTray(isTaskFocused, tags, new, setTags, tagStatus, { deleteTask() }, { d -> updateDueDate(d) })
         }
     }
-
 }
 
 @Composable
-fun optionsTray(isTaskFocused: Boolean, tags: List<Tag>, isNewTask: Boolean, deleteTask: () -> Unit, updateDueDate: (LocalDateTime) -> Unit) {
+fun optionsTray(
+    isTaskFocused: Boolean,
+    tags: List<Tag>,
+    isNewTask: Boolean,
+    setTags: (List<Tag>) -> Unit,
+    tagStatus: SnapshotStateMap<Tag, Boolean>,
+    deleteTask: () -> Unit,
+    updateDueDate: (LocalDateTime?) -> Unit
+) {
     val (showCalendar, setShowCalendar) = remember { mutableStateOf(false) }
     val (showOccurrence, setShowOccurrence) = remember { mutableStateOf(false) }
     val (showTags, setShowTags) = remember { mutableStateOf(false) }
@@ -256,8 +294,7 @@ fun optionsTray(isTaskFocused: Boolean, tags: List<Tag>, isNewTask: Boolean, del
                         rootPos = coordinates.positionInRoot()
                     }) {
                     Icon(Icons.Default.Sell, contentDescription = "Tags")
-                    chooseTags(showTags, setShowTags, rootPos, tags)
-
+                    ChooseTagMenu(showTags, setShowTags, rootPos, tags, setTags, tagStatus)
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 if (!isNewTask)
@@ -273,10 +310,8 @@ fun optionsTray(isTaskFocused: Boolean, tags: List<Tag>, isNewTask: Boolean, del
 
 }
 
-operator fun LocalDateTime.plus(value: Int): LocalDateTime = LocalDateTime(this.date + DatePeriod(0,0, days = value), this.time )
-
 @Composable
-fun chooseDate(showCalendar: Boolean, setShowCalendar: (Boolean) -> Unit, pos: Offset, updateDueDate: (dueDate: LocalDateTime) -> Unit) {
+fun chooseDate(showCalendar: Boolean, setShowCalendar: (Boolean) -> Unit, pos: Offset, updateDueDate:(LocalDateTime?) -> Unit) {
     val currTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
     DropdownMenu(
         expanded = showCalendar, onDismissRequest = { setShowCalendar(false) }) {
@@ -286,10 +321,7 @@ fun chooseDate(showCalendar: Boolean, setShowCalendar: (Boolean) -> Unit, pos: O
             setShowCalendar(false)} ) {
             Text("Today")
         }
-        DropdownMenuItem(onClick = {
-            updateDueDate(currTime + 1)
-            setShowCalendar(false)
-        }) {
+        DropdownMenuItem(onClick = {}) {
             Text("Tomorrow")
         }
         DropdownMenuItem(onClick = {}) {
@@ -313,25 +345,6 @@ fun chooseOccurrence(showOccurrence: Boolean, setShowOccurrence: (Boolean) -> Un
             Text("Every")
             BasicTextField(value = multi, onValueChange = { multi = it }, Modifier.width(10.dp))
             Text("Weeks")
-        }
-    }
-}
-
-@Composable
-fun chooseTags(showTags: Boolean, setShowTags: (Boolean) -> Unit, pos: Offset, tags: List<Tag>) {
-    var newTag by remember { mutableStateOf("") }
-    DropdownMenu(
-        expanded = showTags,
-        onDismissRequest = { setShowTags(false) }
-    ) {
-        Column {
-            tags.forEach { tag ->
-                Text(tag.title)
-            }
-            Row {
-                Icon(Icons.Default.Add, contentDescription = "Add Tag")
-                BasicTextField(value = newTag, onValueChange = { newTag = it }, Modifier.width(10.dp))
-            }
         }
     }
 }
