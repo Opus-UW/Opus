@@ -20,4 +20,4 @@ N/A
 ### Project Proposal
 https://git.uwaterloo.ca/d8tu/cs346-team-202-project/-/wikis/Project-Proposal
 ## Software Releases
-N/A
+https://git.uwaterloo.ca/d8tu/cs346-team-202-project/-/wikis/Releases
