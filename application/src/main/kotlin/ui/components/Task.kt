@@ -53,7 +53,7 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: List<Tag>) {
     var text by remember(task) { mutableStateOf(task?.action ?: "") }
     var taskTags by remember(task) { mutableStateOf(task?.tags ?: listOf<Tag>()) }
 
-    fun updateTask(){
+    fun updateTask() {
         // Get current time
         val time = Clock.System.now()
         val taskToSend =
@@ -82,9 +82,9 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: List<Tag>) {
         }
     }
 
-    fun deleteTask(){
+    fun deleteTask() {
         coroutineScope.launch {
-            task?.let{updateTasks(ApiClient.getInstance().deleteTask(0, it.id))}
+            task?.let { updateTasks(ApiClient.getInstance().deleteTask(0, it.id)) }
         }
     }
 
@@ -107,7 +107,11 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: List<Tag>) {
                 .height(IntrinsicSize.Min)
                 .background(Color.White)
                 .fillMaxWidth()
-                .border(1.dp, if (isTaskFocused) Color.Blue else Color.Transparent)
+                .border(
+                    1.dp,
+                    if (isTaskFocused) Color.Blue else Color.Transparent,
+                    shape = if (edit || new) RoundedCornerShape(8.dp, 8.dp, 0.dp, 0.dp) else RoundedCornerShape(8.dp)
+                )
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -184,8 +188,7 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: List<Tag>) {
                     IconButton(
                         onClick = { textFieldFocusRequester.requestFocus(); edit = true; },
                     ) { Icon(Icons.Default.Edit, contentDescription = "Edit") }
-                }
-                else if (!new && isTaskFocused) {
+                } else if (!new && isTaskFocused) {
                     IconButton(
                         onClick = {
                             updateTask()
@@ -197,8 +200,6 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: List<Tag>) {
                 Box(Modifier.fillMaxHeight().width(4.dp).background(Color.Blue))
             }
         }
-//        print("Edit: ")
-//        println(edit)
         // Edit Options Tray
         if (new || edit) {
             optionsTray(isTaskFocused, tags, new) { deleteTask() }
@@ -224,21 +225,30 @@ fun optionsTray(isTaskFocused: Boolean, tags: List<Tag>, isNewTask: Boolean, del
                         rootPos = coordinates.positionInRoot()
                     }) {
                     Icon(Icons.Default.CalendarMonth, contentDescription = "Calendar")
+                    if (showCalendar) {
+                        chooseDate(showCalendar, setShowCalendar, rootPos)
+                    }
                 }
                 TextButton(onClick = { setShowOccurrence(true) },
                     modifier = Modifier.onGloballyPositioned { coordinates ->
                         rootPos = coordinates.positionInRoot()
                     }) {
                     Icon(Icons.Default.Repeat, contentDescription = "Occurring")
+                    if (showOccurrence) {
+                        chooseOccurrence(showOccurrence, setShowOccurrence, rootPos)
+                    }
                 }
                 TextButton(onClick = { setShowTags(true) },
                     modifier = Modifier.onGloballyPositioned { coordinates ->
                         rootPos = coordinates.positionInRoot()
                     }) {
                     Icon(Icons.Default.Sell, contentDescription = "Tags")
+                    if (showTags) {
+                        chooseTags(showTags, setShowTags, rootPos, tags)
+                    }
                 }
                 Spacer(modifier = Modifier.weight(1f))
-                if(!isNewTask)
+                if (!isNewTask)
                     TextButton(onClick = { deleteTask() },
                         modifier = Modifier.onGloballyPositioned { coordinates ->
                             rootPos = coordinates.positionInRoot()
@@ -249,17 +259,6 @@ fun optionsTray(isTaskFocused: Boolean, tags: List<Tag>, isNewTask: Boolean, del
         }
     }
 
-    if (showCalendar) {
-        chooseDate(showCalendar, setShowCalendar, rootPos)
-    }
-
-    if (showOccurrence) {
-        chooseOccurrence(showOccurrence, setShowOccurrence, rootPos)
-    }
-
-    if (showTags) {
-        chooseTags(showTags, setShowTags, rootPos, tags)
-    }
 }
 
 @Composable
