@@ -48,7 +48,7 @@ fun EditScreen(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             columns = GridCells.Adaptive(minSize = 240.dp),
             content = {
-                items(notes.size) { NotePreview(notes[it], setNotes) }
+                items(notes.size) { NotePreview(notes[it], setNotes, tags, currentTag) }
             }
         )
     }

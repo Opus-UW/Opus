@@ -28,13 +28,15 @@ import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults
 import kotlinx.coroutines.launch
 import org.opus.models.Note
+import org.opus.models.Tag
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotePreview(note: Note, setNotes: (List<Note>) -> Unit) {
+fun NotePreview(note: Note, setNotes: (List<Note>) -> Unit, tags: List<Tag>, currentTag: Tag?) {
     var editNote by remember(note) { mutableStateOf(false) }
     var (title, setTitle) = remember(note) { mutableStateOf(note.title) }
     val state = rememberRichTextState()
+    val noteTags = remember(note) { mutableStateListOf(*(note.tags.toTypedArray()))}
 
     LaunchedEffect(Unit) {
         state.setHtml(note.body)

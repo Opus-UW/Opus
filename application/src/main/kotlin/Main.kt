@@ -19,6 +19,7 @@ fun main() = application {
     val (tasks,setTasks) = remember { mutableStateOf(listOf<Task>()) }
     val (notes, setNotes) = remember { mutableStateOf(listOf<Note>()) }
     val (tags, setTags) = remember { mutableStateOf(listOf<Tag>()) }
+    var currentTag by remember{mutableStateOf<Tag?>(null)}
     // Get tasks from server
     coroutineScope.launch {
         setTasks(ApiClient.getInstance().getTasks(0))
@@ -39,29 +40,28 @@ fun main() = application {
         val toggleMenu: () -> Unit = { setShowMenu(!showMenu) }
         var (screen, setScreen) = remember { mutableStateOf("All") }
 
-        val taskMap = remember(tasks,notes,tags) { mutableStateMapOf(*tags.map{it to Pair(mutableListOf<Task>(), mutableListOf<Note>())}.toTypedArray())}
+        val taskMap = remember(tasks,notes,tags) { mutableStateMapOf(*tags.map{it to Pair(mutableSetOf<Task>(), mutableSetOf<Note>())}.toTypedArray())}
         val allTag = Tag("All", Colour(255, 255, 255))
-        taskMap[allTag] = Pair(tasks.toMutableList(), notes.toMutableList())
+        taskMap[allTag] = Pair(tasks.toMutableSet(), notes.toMutableSet())
 
-        LaunchedEffect(tasks,notes,tags) {
-            tasks.forEach { task ->
-                task.tags.forEach { tag ->
-                    taskMap[tag]?.first?.add(task)
-                }
-            }
-
-            notes.forEach { note ->
-                note.tags.forEach { tag ->
-                    taskMap[tag]?.second?.add(note)
-                }
+        tasks.forEach { task ->
+            task.tags.forEach { tag ->
+                taskMap[tag]?.first?.add(task)
             }
         }
+
+        notes.forEach { note ->
+            note.tags.forEach { tag ->
+                taskMap[tag]?.second?.add(note)
+            }
+        }
+
 
         Scaffold(
             floatingActionButton = {
                 FloatingActionButton(onClick = {
                     coroutineScope.launch {
-                        setNotes(ApiClient.getInstance().postNote(0, Note("", "")))
+                        setNotes(ApiClient.getInstance().postNote(0, Note("", "", tags=currentTag?.let{listOf(it)}?:listOf())))
                     }
                 }) {
                     Icon(Icons.Default.Add, contentDescription = "Add Note")
@@ -74,6 +74,7 @@ fun main() = application {
                 }
 
                 if (screen == "All"){
+                    currentTag = null
                     EditScreen("All", tasks, setTasks, showMenu, toggleMenu, tags, notes, setNotes, null)
                 } else if (screen == "Calendar") {
                     // Insert Calendar here
@@ -81,8 +82,8 @@ fun main() = application {
 
                 tags.forEach{ tag ->
                     if (screen == tag.title) {
-                        println(taskMap[tag])
-                        taskMap[tag]?.let { it1 -> EditScreen(tag.title, it1.first, setTasks, showMenu, toggleMenu, tags, it1.second, setNotes, tag) }
+                        currentTag = tag
+                        taskMap[tag]?.let { it1 -> EditScreen(tag.title, it1.first.toMutableList(), setTasks, showMenu, toggleMenu, tags, it1.second.toMutableList(), setNotes, tag) }
                     }
                 }
             }
