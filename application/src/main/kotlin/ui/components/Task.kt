@@ -1,7 +1,6 @@
 package ui.components
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.focusable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -24,6 +23,7 @@ import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import api.ApiClient
@@ -35,15 +35,16 @@ import kotlinx.datetime.toLocalDateTime
 import org.opus.models.Tag
 import org.opus.models.Task
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: MutableList<Tag>) {
     // Indicates if it's a new task creation bar or not
     val new = task == null
     // Focus variable for task
+    val focusManager = LocalFocusManager.current
     val textFieldFocusRequester = remember(task) { FocusRequester() }
     var isTaskFocused by remember(task) { mutableStateOf(false) }
-    var edit by remember { mutableStateOf(false) }
+    var edit by remember(isTaskFocused) { mutableStateOf(false) }
     var isCheckboxHovered by remember { mutableStateOf(false) }
     var isTextboxHovered by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
@@ -52,13 +53,40 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: MutableList<Tag>)
     var text by remember(task) { mutableStateOf(task?.action ?: "") }
     var taskTags by remember(task) { mutableStateOf(task?.tags ?: listOf<Tag>()) }
 
+    fun updateTask(){
+        // Get current time
+        val time = Clock.System.now()
+        val taskToSend =
+            Task(
+                false,
+                text,
+                time.toLocalDateTime(TimeZone.currentSystemDefault()),
+                time.toLocalDateTime(TimeZone.currentSystemDefault()),
+                taskTags
+            )
+        if (new) {
+            coroutineScope.launch {
+                updateTasks(ApiClient.getInstance().postTask(0, taskToSend))
+            }
+            text = ""
+        } else {
+            // Insert update code here
+            coroutineScope.launch {
+                task?.let {
+                    updateTasks(
+                        ApiClient.getInstance()
+                            .editTask(0, it.id, taskToSend.copy(id = it.id))
+                    )
+                }
+            }
+        }
+    }
 
     // Column for task + options bar
     Column(
         modifier = Modifier
             .onFocusChanged {
-                isTaskFocused = it.isFocused;
-                edit = false
+                isTaskFocused = it.hasFocus;
             }
             .shadow(
                 elevation = 10.dp,
@@ -73,6 +101,7 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: MutableList<Tag>)
                 .height(IntrinsicSize.Min)
                 .background(Color.White)
                 .fillMaxWidth()
+                .border(1.dp, if (isTaskFocused) Color.Blue else Color.Transparent)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -83,7 +112,7 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: MutableList<Tag>)
                     // delete the task (note change to finished)
                     if (task != null) {
                         coroutineScope.launch {
-                            updateTasks(ApiClient.getInstance().deleteTask(0, task.id))
+                            updateTasks(ApiClient.getInstance().editTask(0, task.id, task.copy(completed = true)))
                         }
                     }
                     // For new task
@@ -94,11 +123,13 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: MutableList<Tag>)
                 }) {
                     Icon(
                         // If create new task, plus and circle icon
-                        if (new)
+                        if (new) {
                             if (isTaskFocused) Icons.Outlined.Circle else Icons.Default.Add
+                        }
                         // For already created tasks, click to check off
-                        else
-                            if (isCheckboxHovered) Icons.Default.CheckCircle else Icons.Outlined.Circle,
+                        else {
+                            if (isCheckboxHovered) Icons.Default.CheckCircle else Icons.Outlined.Circle
+                        },
                         contentDescription = "Check mark",
                         modifier = Modifier
                             .onPointerEvent(PointerEventType.Enter) {
@@ -113,7 +144,7 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: MutableList<Tag>)
                 // Text box
                 TextField(
                     value = text,
-                    placeholder = { Text("Add a task") },
+                    placeholder = { if (new) Text("Add a task") },
                     onValueChange = { text = it },
                     singleLine = true,
                     colors = TextFieldDefaults.textFieldColors(
@@ -124,26 +155,13 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: MutableList<Tag>)
                         unfocusedIndicatorColor = Color.Transparent,
                         disabledIndicatorColor = Color.Transparent
                     ),
-//                    readOnly = !(new || edit),
+                    readOnly = !(new || edit),
                     modifier = Modifier
                         .onKeyEvent { keyEvent ->
                             if (keyEvent.key != Key.Enter) return@onKeyEvent false
                             if (keyEvent.type == KeyEventType.KeyUp) {
-                                // Get current time
-                                val time = Clock.System.now()
-                                val taskToSend =
-                                    Task(false, text, time.toLocalDateTime(TimeZone.currentSystemDefault()), time.toLocalDateTime(TimeZone.currentSystemDefault()), taskTags)
-                                if (new) {
-                                    // Insert update code here
-                                    coroutineScope.launch {
-                                        updateTasks(ApiClient.getInstance().postTask(0, taskToSend))
-                                    }
-                                } else {
-                                    coroutineScope.launch {
-                                        updateTasks(ApiClient.getInstance().postTask(0, taskToSend))
-                                    }
-                                }
-                                text = ""
+                                updateTask()
+                                focusManager.clearFocus()
                             }
                             true
                         }
@@ -156,18 +174,18 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: MutableList<Tag>)
                             isTextboxHovered = false
                         }
                 )
-//                if (!new && isTextboxHovered) {
-//                    IconButton(
-//                        onClick = {textFieldFocusRequester.requestFocus(); edit = true; },
-//                        modifier = Modifier
-//                            .onPointerEvent(PointerEventType.Enter) {
-//                                isTextboxHovered = true
-//                            }
-//                            .onPointerEvent(PointerEventType.Exit) {
-//                                isTextboxHovered = false
-//                            }
-//                    ) { Icon(Icons.Default.Edit, contentDescription = "Edit") }
-//                }
+                if (!new && isTaskFocused && !edit) {
+                    IconButton(
+                        onClick = { textFieldFocusRequester.requestFocus(); edit = true; },
+                    ) { Icon(Icons.Default.Edit, contentDescription = "Edit") }
+                }
+                else if (!new && isTaskFocused) {
+                    IconButton(
+                        onClick = {
+                            updateTask()
+                        },
+                    ) { Icon(Icons.Default.Done, contentDescription = "Done") }
+                }
                 // tag colors
                 // change to rounded box? or not full width?
                 Box(Modifier.fillMaxHeight().width(4.dp).background(Color.Blue))
@@ -176,15 +194,15 @@ fun task(task: Task?, updateTasks: (List<Task>) -> Unit, tags: MutableList<Tag>)
 //        print("Edit: ")
 //        println(edit)
         // Edit Options Tray
-//        if (new || edit) {
-            optionsTray(isTaskFocused, tags)
-//        }
+        if (new || edit) {
+            optionsTray(isTaskFocused, tags, new)
+        }
     }
 
 }
 
 @Composable
-fun optionsTray(isTaskFocused: Boolean, tags: MutableList<Tag>) {
+fun optionsTray(isTaskFocused: Boolean, tags: MutableList<Tag>, isNewTask: Boolean) {
     val (showCalendar, setShowCalendar) = remember { mutableStateOf(false) }
     val (showOccurrence, setShowOccurrence) = remember { mutableStateOf(false) }
     val (showTags, setShowTags) = remember { mutableStateOf(false) }
@@ -213,6 +231,13 @@ fun optionsTray(isTaskFocused: Boolean, tags: MutableList<Tag>) {
                     }) {
                     Icon(Icons.Default.Sell, contentDescription = "Tags")
                 }
+                if(! isNewTask)
+                    TextButton(onClick = { println("me when delet") },
+                        modifier = Modifier.onGloballyPositioned { coordinates ->
+                            rootPos = coordinates.positionInRoot()
+                        }) {
+                        Icon(Icons.Default.Delete, contentDescription = "Delete")
+                    }
             }
         }
     }

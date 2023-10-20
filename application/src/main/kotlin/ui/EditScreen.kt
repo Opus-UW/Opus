@@ -36,7 +36,7 @@ fun EditScreen(
             Text(title)
         }
         // Task List
-        taskList(tasks, setTasks, tags)
+        taskList(tasks.filter { !it.completed }, setTasks, tags)
         Spacer(modifier = Modifier.size(30.dp))
         // Insert notes here
         val list = (1..10).map { it.toString() }

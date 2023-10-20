@@ -1,7 +1,8 @@
 package org.opus.models
 
-import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.*
 import kotlinx.serialization.Serializable
+import java.time.DateTimeException
 
 
 @Serializable
@@ -13,6 +14,7 @@ data class Task(
     val tags: List<Tag> = listOf(),
     val id: Int = -1
 )
+
 
 @Serializable
 data class Note(
