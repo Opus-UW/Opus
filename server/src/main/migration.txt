@@ -1,20 +1,54 @@
-DROP TABLE tags;
+PRAGMA foreign_keys = ON;
+
+DROP TABLE users;
 DROP TABLE tasks;
 DROP TABLE notes;
+DROP TABLE tags;
+DROP TABLE task_tags;
+DROP TABLE note_tags;
 
-CREATE TABLE tags (
-	tag_id int NOT NULL PRIMARY KEY,
-	data JSON
+CREATE TABLE users  (
+	user_id INTEGER NOT NULL PRIMARY KEY
 );
 
 CREATE TABLE tasks (
-	task_id int NOT NULL PRIMARY KEY,
-	data JSON
+	task_id INTEGER NOT NULL PRIMARY KEY,
+	completed INTEGER NOT NULL,
+	action TEXT,
+	creation_date TEXT,
+	due_date TEXT,
+	user_id INTEGER NOT NULL,
+	FOREIGN KEY(user_id) REFERENCES users(user_id)
 );
 
 CREATE TABLE notes (
-	note_id int NOT NULL PRIMARY KEY,
-	data JSON
+	task_id INTEGER NOT NULL PRIMARY KEY,
+	title TEXT,
+	body TEXT,
+	user_id INTEGER NOT NULL,
+	FOREIGN KEY(user_id) REFERENCES users(user_id)
+);
+
+CREATE TABLE tags (
+	tag_id INTEGER NOT NULL PRIMARY KEY,
+	title TEXT,
+	colour JSON,
+	user_id INTEGER NOT NULL,
+	FOREIGN KEY(user_id) REFERENCES users(user_id)
+);
+
+CREATE TABLE task_tags (
+	task_id INTEGER NOT NULL,
+	user_id INTEGER NOT NULL,
+	FOREIGN KEY(task_id) REFERENCES tasks(task_id),
+	FOREIGN KEY(user_id) REFERENCES users(user_id)
+);
+
+CREATE TABLE note_tags (
+	note_id INTEGER NOT NULL,
+	user_id INTEGER NOT NULL,
+	FOREIGN KEY(note_id) REFERENCES tasks(note_id),
+	FOREIGN KEY(user_id) REFERENCES users(user_id)
 );
 
 .quit
