@@ -1,0 +1,20 @@
+DROP TABLE tags;
+DROP TABLE tasks;
+DROP TABLE notes;
+
+CREATE TABLE tags (
+	tag_id int NOT NULL PRIMARY KEY,
+	data JSON
+);
+
+CREATE TABLE tasks (
+	task_id int NOT NULL PRIMARY KEY,
+	data JSON
+);
+
+CREATE TABLE notes (
+	note_id int NOT NULL PRIMARY KEY,
+	data JSON
+);
+
+.quit
