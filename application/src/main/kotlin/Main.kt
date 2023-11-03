@@ -75,7 +75,7 @@ fun main() = application {
                     currentTag = null
                     EditScreen("All", tasks, setTasks, showMenu, toggleMenu, tags, setTags, notes, setNotes, null)
                 } else if (screen == "Calendar") {
-                    calendarScreen(toggleMenu, showMenu, tasks)
+                    calendarScreen(toggleMenu, showMenu, tasks, setTasks, tags, setTags)
                 }
 
                 tags.forEach{ tag ->
