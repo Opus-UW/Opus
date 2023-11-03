@@ -27,12 +27,11 @@ fun DateDialog(date: kotlinx.datetime.LocalDateTime, showDateDialog: Boolean, se
                tags: List<Tag>,
                setTags: (List<Tag>) -> Unit) {
     if (showDateDialog) {
+        println(date)
         println(tasks)
         Dialog(onDismissRequest = { setDateDialog(false) }) {
             Card(
                 modifier = Modifier
-                    //.fillMaxWidth()
-                    //.fillMaxHeight()
                     .fillMaxSize()
                     .heightIn(0.dp, 300.dp)
                     .widthIn(0.dp, 300.dp)
@@ -47,14 +46,10 @@ fun DateDialog(date: kotlinx.datetime.LocalDateTime, showDateDialog: Boolean, se
                     Text(
                         text = date.month.name.plus(" ").plus(date.dayOfMonth).plus(", ").plus(date.year),
                         fontSize = 20.sp,
-//                        modifier = Modifier
-//                            .fillMaxSize(),
+                        modifier = Modifier.padding(20.dp),
                         textAlign = TextAlign.Center,
                     )
-                    taskList(tasks, setTasks, tags, setTags, true,null)
-                    Text(
-                        text = "YEREYRYER"
-                    )
+                    taskList(tasks, setTasks, tags, setTags, true,null, date)
                 }
             }
         }

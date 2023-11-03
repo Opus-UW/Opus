@@ -73,7 +73,7 @@ fun main() = application {
 
                 if (screen == "All"){
                     currentTag = null
-                    EditScreen("All", tasks, setTasks, showMenu, toggleMenu, tags, setTags, notes, setNotes, null)
+                    EditScreen("All", tasks, setTasks, showMenu, toggleMenu, tags, setTags, notes, setNotes, null, null)
                 } else if (screen == "Calendar") {
                     calendarScreen(toggleMenu, showMenu, tasks, setTasks, tags, setTags)
                 }
@@ -81,7 +81,7 @@ fun main() = application {
                 tags.forEach{ tag ->
                     if (screen == tag.title) {
                         currentTag = tag
-                        taskMap[tag]?.let { it1 -> EditScreen(tag.title, it1.first.toMutableList(), setTasks, showMenu, toggleMenu, tags, setTags, it1.second.toMutableList(), setNotes, tag) }
+                        taskMap[tag]?.let { it1 -> EditScreen(tag.title, it1.first.toMutableList(), setTasks, showMenu, toggleMenu, tags, setTags, it1.second.toMutableList(), setNotes, tag, null) }
                     }
                 }
             }

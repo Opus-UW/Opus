@@ -35,8 +35,8 @@ fun DayPreview(previewDate: kotlinx.datetime.LocalDateTime, previewMonth: String
         Color(0xFFE0FFFF) else Color.White
     val cardTextColor = if (previewDate.month.name == previewMonth) Color.Black else Color.Gray
     val (showDateDialog, setShowDateDialog) = remember { mutableStateOf(false) }
+    println(previewDate)
     DateDialog(previewDate, showDateDialog, setShowDateDialog, tasks, setTasks, tags, setTags)
-
     //println(tasks)
 
     Box(
@@ -71,9 +71,9 @@ fun DayPreview(previewDate: kotlinx.datetime.LocalDateTime, previewMonth: String
                 modifier = Modifier.fillMaxWidth(),
                 content = {
                     items(tasks.size) {
-                        if (tasks.get(it).completed) {
-                            Text(tasks.get(it).action, style = TextStyle(textDecoration = TextDecoration.LineThrough))
-                        } else Text(tasks.get(it).action)
+                        if (tasks[it].completed) {
+                            Text(tasks[it].action, style = TextStyle(textDecoration = TextDecoration.LineThrough))
+                        } else Text(tasks[it].action)
                     }
                 }
             )

@@ -17,11 +17,12 @@ fun taskList(
     tags: List<Tag>,
     setTags: (List<Tag>) -> Unit,
     showAddTask: Boolean = true,
-    currentTag: Tag?
+    currentTag: Tag?,
+    defaultDueDate: kotlinx.datetime.LocalDateTime?,
 ) {
     Column {
         if (showAddTask) {
-            task(null, setTasks, null, tags, setTags, currentTag,  tasks)
+            task(null, setTasks, null, tags, setTags, currentTag,  tasks, defaultDueDate)
         }
         Spacer(modifier = Modifier.size(10.dp))
         val listState = rememberLazyListState()
@@ -32,7 +33,7 @@ fun taskList(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             items(tasks.size) {
-                task(tasks[it], setTasks, tasks[it].dueDate, tags, setTags, currentTag, tasks)
+                task(tasks[it], setTasks, tasks[it].dueDate, tags, setTags, currentTag, tasks, defaultDueDate)
             }
         }
     }
