@@ -129,7 +129,7 @@ fun task(
     Column(
         modifier = Modifier
             .onFocusChanged {
-                isTaskFocused = it.hasFocus;
+                isTaskFocused = it.hasFocus
             }
             .shadow(
                 elevation = 10.dp,
@@ -316,7 +316,7 @@ fun optionsTray(
 
 @Composable
 fun chooseDate(showDueDatePicker: Boolean, setShowDueDatePickerPicker: (Boolean) -> Unit, pos: Offset, updateDueDate:(LocalDateTime?) -> Unit) {
-    var (selectedDate, setSelectedDate) = remember{ mutableStateOf(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()))}
+    var selectedDate = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
     val (showCalendar, setShowCalendar) = remember { mutableStateOf(false) }
     datePickerDialog(showCalendar, setShowCalendar, updateDueDate)
 
