@@ -8,6 +8,10 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Circle
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
@@ -30,13 +34,13 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import api.ApiClient
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
-import org.opus.models.Colour
+import kotlinx.datetime.*
 import org.opus.models.Tag
 import org.opus.models.Task
+import utils.plus
+import java.time.Instant
+import java.time.ZoneId
+
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
@@ -125,7 +129,7 @@ fun task(
     Column(
         modifier = Modifier
             .onFocusChanged {
-                isTaskFocused = it.hasFocus;
+                isTaskFocused = it.hasFocus
             }
             .shadow(
                 elevation = 10.dp,
@@ -263,7 +267,7 @@ fun optionsTray(
     deleteTask: () -> Unit,
     updateDueDate: (LocalDateTime?) -> Unit
 ) {
-    val (showCalendar, setShowCalendar) = remember { mutableStateOf(false) }
+    val (showDueDatePicker, setShowDueDatePickerPicker) = remember { mutableStateOf(false) }
     val (showOccurrence, setShowOccurrence) = remember { mutableStateOf(false) }
     val (showTags, setShowTags) = remember { mutableStateOf(false) }
 
@@ -273,12 +277,12 @@ fun optionsTray(
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                TextButton(onClick = { setShowCalendar(true) },
+                TextButton(onClick = { setShowDueDatePickerPicker(true) },
                     modifier = Modifier.onGloballyPositioned { coordinates ->
                         rootPos = coordinates.positionInRoot()
                     }) {
                     Icon(Icons.Default.CalendarMonth, contentDescription = "Calendar")
-                    chooseDate(showCalendar, setShowCalendar, rootPos, updateDueDate)
+                    chooseDate(showDueDatePicker, setShowDueDatePickerPicker, rootPos, updateDueDate)
 
                 }
                 TextButton(onClick = { setShowOccurrence(true) },
@@ -311,24 +315,82 @@ fun optionsTray(
 }
 
 @Composable
-fun chooseDate(showCalendar: Boolean, setShowCalendar: (Boolean) -> Unit, pos: Offset, updateDueDate:(LocalDateTime?) -> Unit) {
-    val currTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+fun chooseDate(showDueDatePicker: Boolean, setShowDueDatePickerPicker: (Boolean) -> Unit, pos: Offset, updateDueDate:(LocalDateTime?) -> Unit) {
+    var selectedDate = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+    val (showCalendar, setShowCalendar) = remember { mutableStateOf(false) }
+    datePickerDialog(showCalendar, setShowCalendar, updateDueDate)
+
     DropdownMenu(
-        expanded = showCalendar, onDismissRequest = { setShowCalendar(false) }) {
+        expanded = showDueDatePicker, onDismissRequest = { setShowDueDatePickerPicker(false) }) {
         DropdownMenuItem(onClick = {
-            updateDueDate(currTime)
-            println(currTime.date)
-            setShowCalendar(false)} ) {
+            updateDueDate(selectedDate)
+            println(selectedDate.date)
+            setShowDueDatePickerPicker(false)} ) {
             Text("Today")
         }
-        DropdownMenuItem(onClick = {}) {
+        DropdownMenuItem(onClick = {
+            selectedDate += 1
+            updateDueDate(selectedDate)
+            println(selectedDate.date)
+            setShowDueDatePickerPicker(false)
+        }) {
             Text("Tomorrow")
         }
-        DropdownMenuItem(onClick = {}) {
+        DropdownMenuItem(onClick = {
+            selectedDate += 7
+            updateDueDate(selectedDate)
+            println(selectedDate.date)
+            setShowDueDatePickerPicker(false)
+        }) {
             Text("Next Week")
         }
-        DropdownMenuItem(onClick = {}) {
+        DropdownMenuItem(onClick = {
+            setShowDueDatePickerPicker(false)
+            setShowCalendar(true)
+        }) {
             Text("Choose Date")
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun datePickerDialog(showCalendar: Boolean, setShowCalendar: (Boolean) -> Unit, updateDueDate:(LocalDateTime?) -> Unit) {
+    if (showCalendar) {
+        val datePickerState = rememberDatePickerState()
+        val confirmEnabled = derivedStateOf { datePickerState.selectedDateMillis != null }
+        DatePickerDialog(
+            onDismissRequest = {
+                setShowCalendar(false)
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        setShowCalendar(false)
+                        if (datePickerState.selectedDateMillis != null) {
+                            println(datePickerState.selectedDateMillis)
+                            val mill: Long = datePickerState.selectedDateMillis!!
+                            val chosenDate = Instant.ofEpochMilli(mill).atZone(ZoneId.systemDefault()).toLocalDateTime()
+                            val kotlinDate = chosenDate.toKotlinLocalDateTime() + 1
+                            updateDueDate(kotlinDate)
+                        }
+                    },
+                    enabled = confirmEnabled.value
+                ) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        setShowCalendar(false)
+                    }
+                ) {
+                    Text("Cancel")
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
         }
     }
 }
