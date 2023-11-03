@@ -22,7 +22,7 @@ CREATE TABLE tasks (
 );
 
 CREATE TABLE notes (
-	task_id INTEGER NOT NULL PRIMARY KEY,
+	note_id INTEGER NOT NULL PRIMARY KEY,
 	title TEXT,
 	body TEXT,
 	user_id INTEGER NOT NULL,
