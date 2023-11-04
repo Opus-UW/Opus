@@ -13,7 +13,10 @@ class DAOFacadeImpl : DAOFacade {
         completed = row[Tasks.completed],
         action = row[Tasks.action],
         creationDate = LocalDateTime.parse(row[Tasks.creationDate]),
-        dueDate =  row[Tasks.dueDate]?.let{LocalDateTime.parse(it)},
+        dueDate =  row[Tasks.dueDate]?.let{
+            println("text is: ${it}")
+            LocalDateTime.parse(it)
+                                          },
         tags = listOf()
     )
     private fun resultRowToNote(row: ResultRow) = Note(

@@ -14,8 +14,8 @@ CREATE TABLE users  (
 CREATE TABLE tasks (
 	task_id INTEGER NOT NULL PRIMARY KEY,
 	completed INTEGER NOT NULL,
-	action TEXT,
-	creation_date TEXT,
+	action TEXT NOT NULL,
+	creation_date TEXT NOT NULL,
 	due_date TEXT,
 	user_id INTEGER NOT NULL,
 	FOREIGN KEY(user_id) REFERENCES users(user_id)
@@ -23,32 +23,32 @@ CREATE TABLE tasks (
 
 CREATE TABLE notes (
 	note_id INTEGER NOT NULL PRIMARY KEY,
-	title TEXT,
-	body TEXT,
+	title TEXT NOT NULL,
+	body TEXT NOT NULL,
 	user_id INTEGER NOT NULL,
 	FOREIGN KEY(user_id) REFERENCES users(user_id)
 );
 
 CREATE TABLE tags (
 	tag_id INTEGER NOT NULL PRIMARY KEY,
-	title TEXT,
-	colour JSON,
+	title TEXT NOT NULL,
+	colour JSON NOT NULL,
 	user_id INTEGER NOT NULL,
 	FOREIGN KEY(user_id) REFERENCES users(user_id)
 );
 
 CREATE TABLE task_tags (
 	task_id INTEGER NOT NULL,
-	user_id INTEGER NOT NULL,
+	tag_id INTEGER NOT NULL,
 	FOREIGN KEY(task_id) REFERENCES tasks(task_id),
-	FOREIGN KEY(user_id) REFERENCES users(user_id)
+	FOREIGN KEY(tag_id) REFERENCES users(tag_id)
 );
 
 CREATE TABLE note_tags (
 	note_id INTEGER NOT NULL,
-	user_id INTEGER NOT NULL,
+	tag_id INTEGER NOT NULL,
 	FOREIGN KEY(note_id) REFERENCES tasks(note_id),
-	FOREIGN KEY(user_id) REFERENCES users(user_id)
+	FOREIGN KEY(tag_id) REFERENCES tags(tag_id)
 );
 
 .quit
