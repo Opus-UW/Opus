@@ -15,6 +15,8 @@ fun Routing.handleNotes() {
             val userId = call.parameters.getOrFail("user_id").toInt()
             call.respond(dao.userNotes(userId))
         } catch (e: Exception) {
+            println(e.message)
+            e.printStackTrace()
             call.response.status(HttpStatusCode.BadRequest)
         }
     }
@@ -25,6 +27,8 @@ fun Routing.handleNotes() {
             dao.addNewNote(note.title, note.body, note.tags, userId)
             call.respond(dao.userNotes(userId))
         } catch (e: Exception) {
+            println(e.message)
+            e.printStackTrace()
             call.response.status(HttpStatusCode.BadRequest)
         }
     }
@@ -38,6 +42,8 @@ fun Routing.handleNotes() {
             call.respond(dao.userNotes(userId))
 
         } catch (e: Exception) {
+            println(e.message)
+            e.printStackTrace()
             call.response.status(HttpStatusCode.BadRequest)
         }
     }
@@ -52,6 +58,8 @@ fun Routing.handleNotes() {
 
             call.respond(dao.userNotes(userId))
         } catch (e: Exception) {
+            println(e.message)
+            e.printStackTrace()
             call.response.status(HttpStatusCode.BadRequest)
         }
     }

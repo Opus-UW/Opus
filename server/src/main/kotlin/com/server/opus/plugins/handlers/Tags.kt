@@ -15,6 +15,8 @@ fun Routing.handleTags() {
             val userId = call.parameters.getOrFail("user_id").toInt()
             call.respond(dao.userTags(userId))
         } catch (e: Exception) {
+            println(e.message)
+            e.printStackTrace()
             call.response.status(HttpStatusCode.BadRequest)
         }
     }
@@ -25,6 +27,8 @@ fun Routing.handleTags() {
             dao.addNewTag(tag.title, tag.colour, userId)
             call.respond(dao.userTags(userId))
         } catch (e: Exception) {
+            println(e.message)
+            e.printStackTrace()
             call.response.status(HttpStatusCode.BadRequest)
         }
     }
@@ -38,6 +42,8 @@ fun Routing.handleTags() {
             call.respond(dao.userTags(userId))
 
         } catch (e: Exception) {
+            println(e.message)
+            e.printStackTrace()
             call.response.status(HttpStatusCode.BadRequest)
         }
     }
@@ -52,6 +58,8 @@ fun Routing.handleTags() {
 
             call.respond(dao.userTags(userId))
         } catch (e: Exception) {
+            println(e.message)
+            e.printStackTrace()
             call.response.status(HttpStatusCode.BadRequest)
         }
     }

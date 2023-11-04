@@ -25,6 +25,8 @@ fun Routing.handleTasks() {
             val userId = call.parameters.getOrFail("user_id").toInt()
             call.respond(dao.userTasks(userId).filter { !it.completed })
         } catch (e: Exception) {
+            println(e.message)
+            e.printStackTrace()
             call.response.status(HttpStatusCode.BadRequest)
         }
     }
@@ -33,6 +35,8 @@ fun Routing.handleTasks() {
             val userId = call.parameters.getOrFail("user_id").toInt()
             call.respond(dao.userTasks(userId).filter { it.completed })
         } catch (e: Exception) {
+            println(e.message)
+            e.printStackTrace()
             call.response.status(HttpStatusCode.BadRequest)
         }
     }
@@ -47,6 +51,8 @@ fun Routing.handleTasks() {
 
             call.respond(dao.userTasks(userId))
         } catch (e: Exception) {
+            println(e.message)
+            e.printStackTrace()
             call.response.status(HttpStatusCode.BadRequest)
         }
     }
@@ -60,6 +66,8 @@ fun Routing.handleTasks() {
             call.respond(dao.userTasks(userId))
 
         } catch (e: Exception) {
+            println(e.message)
+            e.printStackTrace()
             call.response.status(HttpStatusCode.BadRequest)
         }
     }
