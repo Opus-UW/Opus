@@ -18,6 +18,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.opus.models.Tag
@@ -25,19 +26,14 @@ import org.opus.models.Task
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DayPreview(previewDate: kotlinx.datetime.LocalDateTime, previewMonth: String,
+fun DayPreview(previewDate: LocalDateTime, previewMonth: String,
                tasks: List<Task>,
-               setTasks: (List<Task>) -> Unit,
-               tags: List<Tag>,
-               setTags: (List<Tag>) -> Unit) {
+               setShowDateDialog: (Boolean) -> Unit,
+               setSelectedDate: (LocalDateTime) -> Unit) {
     val todayDate = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
     val cardBgColor = if (todayDate.date == previewDate.date && todayDate.month == previewDate.month && todayDate.year == previewDate.year)
         Color(0xFFE0FFFF) else Color.White
     val cardTextColor = if (previewDate.month.name == previewMonth) Color.Black else Color.Gray
-    val (showDateDialog, setShowDateDialog) = remember { mutableStateOf(false) }
-    println(previewDate)
-    DateDialog(previewDate, showDateDialog, setShowDateDialog, tasks, setTasks, tags, setTags)
-    //println(tasks)
 
     Box(
 //        elevation = CardDefaults.cardElevation(
@@ -48,6 +44,7 @@ fun DayPreview(previewDate: kotlinx.datetime.LocalDateTime, previewMonth: String
             .aspectRatio(1.25f)
             .heightIn(0.dp, 30.dp)
             .clickable ( onClick = {
+                setSelectedDate(previewDate)
                 setShowDateDialog(true)
             })
     ) {

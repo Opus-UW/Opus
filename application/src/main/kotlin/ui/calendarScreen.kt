@@ -25,6 +25,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.opus.models.Tag
 import org.opus.models.Task
+import ui.components.DateDialog
 import ui.components.DayPreview
 import utils.minus
 import utils.minusMonth
@@ -38,6 +39,8 @@ fun calendarScreen(toggleMenu: () -> Unit, showMenu: Boolean,
                    tags: List<Tag>,
                    setTags: (List<Tag>) -> Unit){
     var curDate by remember { mutableStateOf(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())) }
+    val (showDateDialog, setShowDateDialog) = remember { mutableStateOf(false) }
+    val (selectedDate, setSelectedDate) = remember { mutableStateOf(curDate) }
     var tempDate = curDate
     val tempMonth = curDate.month.name
     Column {
@@ -90,10 +93,11 @@ fun calendarScreen(toggleMenu: () -> Unit, showMenu: Boolean,
                         it.dueDate?.dayOfYear == tempDate.dayOfYear
                                 && it.dueDate?.year == tempDate.year
                     }
-                    DayPreview(tempDate, curDate.month.name, tasksOnDay, setTasks, tags, setTags)
+                    DayPreview(tempDate, curDate.month.name, tasksOnDay, setShowDateDialog, setSelectedDate)
                     tempDate += 1
                 }
             }
         )
+        DateDialog(selectedDate, showDateDialog, setShowDateDialog, tasks, setTasks, tags, setTags)
     }
 }

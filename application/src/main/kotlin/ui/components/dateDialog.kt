@@ -21,21 +21,21 @@ import org.opus.models.Tag
 import org.opus.models.Task
 
 @Composable
-fun DateDialog(date: kotlinx.datetime.LocalDateTime, showDateDialog: Boolean, setDateDialog: (Boolean) -> Unit,
-               tasks: List<Task>,
-               setTasks: (List<Task>) -> Unit,
-               tags: List<Tag>,
-               setTags: (List<Tag>) -> Unit) {
+fun DateDialog(
+    date: kotlinx.datetime.LocalDateTime,
+    showDateDialog: Boolean,
+    setDateDialog: (Boolean) -> Unit,
+    tasks: List<Task>,
+    setTasks: (List<Task>) -> Unit,
+    tags: List<Tag>,
+    setTags: (List<Tag>) -> Unit
+) {
     if (showDateDialog) {
         println(date)
         println(tasks)
         Dialog(onDismissRequest = { setDateDialog(false) }) {
             Card(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .heightIn(0.dp, 300.dp)
-                    .widthIn(0.dp, 300.dp)
-                    .padding(16.dp),
+                modifier = Modifier.fillMaxSize().heightIn(0.dp, 300.dp).widthIn(0.dp, 300.dp).padding(16.dp),
                 shape = RoundedCornerShape(16.dp),
             ) {
                 Column(
@@ -49,7 +49,9 @@ fun DateDialog(date: kotlinx.datetime.LocalDateTime, showDateDialog: Boolean, se
                         modifier = Modifier.padding(20.dp),
                         textAlign = TextAlign.Center,
                     )
-                    taskList(tasks, setTasks, tags, setTags, true,null, date)
+                    taskList(tasks.filter {
+                        it.dueDate?.dayOfYear == date.dayOfYear && it.dueDate?.year == date.year
+                    }, setTasks, tags, setTags, true, null, date)
                 }
             }
         }
