@@ -6,15 +6,14 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.util.*
-import org.opus.data.DataClient
-import org.opus.models.Note
+import org.models.opus.dao.dao
+import org.models.opus.models.Note
 
 fun Routing.handleNotes() {
-    val dataClient = DataClient.getInstance()
     get("/users/{user_id}/notes") {
         try {
             val userId = call.parameters.getOrFail("user_id").toInt()
-            call.respond(dataClient.getNotes(userId))
+            call.respond(dao.userNotes(userId))
         } catch (e: Exception) {
             call.response.status(HttpStatusCode.BadRequest)
         }
@@ -23,8 +22,8 @@ fun Routing.handleNotes() {
         try {
             val userId = call.parameters.getOrFail("user_id").toInt()
             val note = call.receive<Note>()
-            dataClient.addNote(userId, note)
-            call.respond(dataClient.getNotes(userId))
+            dao.addNewNote(note.title, note.body, note.tags, userId)
+            call.respond(dao.userNotes(userId))
         } catch (e: Exception) {
             call.response.status(HttpStatusCode.BadRequest)
         }
@@ -34,9 +33,9 @@ fun Routing.handleNotes() {
             val userId = call.parameters.getOrFail("user_id").toInt()
             val noteId = call.parameters.getOrFail("note_id").toInt()
 
-            dataClient.deleteNote(userId, noteId)
+            dao.deleteNote(noteId)
 
-            call.respond(dataClient.getNotes(userId))
+            call.respond(dao.userNotes(userId))
 
         } catch (e: Exception) {
             call.response.status(HttpStatusCode.BadRequest)
@@ -49,9 +48,9 @@ fun Routing.handleNotes() {
 
             val note = call.receive<Note>()
 
-            dataClient.updateNote(userId, noteId, note)
+            dao.editNote(noteId, note.title, note.body, note.tags)
 
-            call.respond(dataClient.getNotes(userId))
+            call.respond(dao.userNotes(userId))
         } catch (e: Exception) {
             call.response.status(HttpStatusCode.BadRequest)
         }

@@ -32,8 +32,8 @@ import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults
 import kotlinx.coroutines.launch
-import org.opus.models.Note
-import org.opus.models.Tag
+import org.models.opus.models.Note
+import org.models.opus.models.Tag
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

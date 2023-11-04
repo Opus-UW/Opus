@@ -1,4 +1,4 @@
-package org.opus.data
+package org.models.opus.dao
 
 import kotlinx.coroutines.Dispatchers
 import org.jetbrains.exposed.sql.Database
@@ -14,6 +14,5 @@ object DatabaseFactory {
         transaction(database) { }
     }
 
-    suspend fun <T> dbQuery(block: suspend () -> T): T =
-        newSuspendedTransaction(Dispatchers.IO) { block() }
+    suspend fun <T> dbQuery(block: suspend () -> T): T = newSuspendedTransaction(Dispatchers.IO) { block() }
 }

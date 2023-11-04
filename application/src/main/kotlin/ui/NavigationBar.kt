@@ -17,8 +17,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import api.ApiClient
 import kotlinx.coroutines.launch
-import org.opus.models.Colour
-import org.opus.models.Tag
+import org.models.opus.models.Colour
+import org.models.opus.models.Tag
 
 @Composable
 

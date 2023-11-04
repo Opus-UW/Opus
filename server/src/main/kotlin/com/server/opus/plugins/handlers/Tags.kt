@@ -6,15 +6,14 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.util.*
-import org.opus.data.DataClient
-import org.opus.models.Tag
+import org.models.opus.dao.dao
+import org.models.opus.models.Tag
 
 fun Routing.handleTags() {
-    val dataClient = DataClient.getInstance()
     get("/users/{user_id}/tags") {
         try {
             val userId = call.parameters.getOrFail("user_id").toInt()
-            call.respond(dataClient.getTags(userId))
+            call.respond(dao.userTags(userId))
         } catch (e: Exception) {
             call.response.status(HttpStatusCode.BadRequest)
         }
@@ -23,8 +22,8 @@ fun Routing.handleTags() {
         try {
             val userId = call.parameters.getOrFail("user_id").toInt()
             val tag = call.receive<Tag>()
-            dataClient.addTag(userId, tag)
-            call.respond(dataClient.getTags(userId))
+            dao.addNewTag(tag.title, tag.colour, userId)
+            call.respond(dao.userTags(userId))
         } catch (e: Exception) {
             call.response.status(HttpStatusCode.BadRequest)
         }
@@ -34,9 +33,9 @@ fun Routing.handleTags() {
             val userId = call.parameters.getOrFail("user_id").toInt()
             val tagId = call.parameters.getOrFail("tag_id").toInt()
 
-            dataClient.deleteTag(userId, tagId)
+            dao.deleteTag(tagId)
 
-            call.respond(dataClient.getTags(userId))
+            call.respond(dao.userTags(userId))
 
         } catch (e: Exception) {
             call.response.status(HttpStatusCode.BadRequest)
@@ -49,9 +48,9 @@ fun Routing.handleTags() {
 
             val tag = call.receive<Tag>()
 
-            dataClient.updateTag(userId, tagId, tag)
+            dao.editTag(tagId, tag.title, tag.colour)
 
-            call.respond(dataClient.getTags(userId))
+            call.respond(dao.userTags(userId))
         } catch (e: Exception) {
             call.response.status(HttpStatusCode.BadRequest)
         }

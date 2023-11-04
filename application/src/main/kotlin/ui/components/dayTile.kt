@@ -23,7 +23,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.skia.ColorSpace
-import org.opus.models.Task
+import org.models.opus.models.Task
 import utils.plus
 import java.time.LocalDateTime
 

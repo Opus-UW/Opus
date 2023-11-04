@@ -7,10 +7,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import api.ApiClient
 import kotlinx.coroutines.launch
-import org.opus.models.Colour
-import org.opus.models.Note
-import org.opus.models.Tag
-import org.opus.models.Task
+import org.models.opus.models.Colour
+import org.models.opus.models.Note
+import org.models.opus.models.Tag
+import org.models.opus.models.Task
 import ui.EditScreen
 import ui.NavigationBar
 import ui.calendarScreen

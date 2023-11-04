@@ -7,8 +7,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import org.opus.models.Tag
-import org.opus.models.Task
+import org.models.opus.models.Tag
+import org.models.opus.models.Task
 
 @Composable
 fun taskList(
