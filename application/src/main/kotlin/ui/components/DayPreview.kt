@@ -21,8 +21,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import org.opus.models.Tag
-import org.opus.models.Task
+import org.models.opus.models.Task
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

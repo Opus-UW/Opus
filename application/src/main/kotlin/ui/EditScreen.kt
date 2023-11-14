@@ -15,9 +15,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import org.opus.models.Note
-import org.opus.models.Tag
-import org.opus.models.Task
+import org.models.opus.models.Note
+import org.models.opus.models.Tag
+import org.models.opus.models.Task
 import ui.components.noteList
 import ui.components.taskList
 

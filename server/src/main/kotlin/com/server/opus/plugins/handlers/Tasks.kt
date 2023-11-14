@@ -6,32 +6,37 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.util.*
-import org.opus.data.DataClient
-import org.opus.models.Task
+import org.models.opus.dao.dao
+import org.models.opus.models.Task
 
 fun Routing.handleTasks() {
-    val dataClient = DataClient.getInstance()
     get("/users/{user_id}/tasks") {
         try {
             val userId = call.parameters.getOrFail("user_id").toInt()
-            call.respond(dataClient.getTasks(userId))
+            call.respond(dao.userTasks(userId))
         } catch (e: Exception) {
+            println(e.message)
+            e.printStackTrace()
             call.response.status(HttpStatusCode.BadRequest)
         }
     }
     get("/users/{user_id}/uncompleted-tasks") {
         try {
             val userId = call.parameters.getOrFail("user_id").toInt()
-            call.respond(dataClient.getTasks(userId).filter { !it.completed })
+            call.respond(dao.userTasks(userId).filter { !it.completed })
         } catch (e: Exception) {
+            println(e.message)
+            e.printStackTrace()
             call.response.status(HttpStatusCode.BadRequest)
         }
     }
     get("/users/{user_id}/completed-todos") {
         try {
             val userId = call.parameters.getOrFail("user_id").toInt()
-            call.respond(dataClient.getTasks(userId).filter { it.completed })
+            call.respond(dao.userTasks(userId).filter { it.completed })
         } catch (e: Exception) {
+            println(e.message)
+            e.printStackTrace()
             call.response.status(HttpStatusCode.BadRequest)
         }
     }
@@ -39,9 +44,15 @@ fun Routing.handleTasks() {
         try {
             val userId = call.parameters.getOrFail("user_id").toInt()
             val task = call.receive<Task>()
-            dataClient.addTask(userId, task)
-            call.respond(dataClient.getTasks(userId))
+
+            dao.addNewTask(
+                task.completed, task.action, task.creationDate.toString(), task.dueDate?.toString(), task.tags, userId
+            )
+
+            call.respond(dao.userTasks(userId))
         } catch (e: Exception) {
+            println(e.message)
+            e.printStackTrace()
             call.response.status(HttpStatusCode.BadRequest)
         }
     }
@@ -50,11 +61,13 @@ fun Routing.handleTasks() {
             val userId = call.parameters.getOrFail("user_id").toInt()
             val taskId = call.parameters.getOrFail("task_id").toInt()
 
-            dataClient.deleteTask(userId, taskId)
+            dao.deleteTask(taskId)
 
-            call.respond(dataClient.getTasks(userId))
+            call.respond(dao.userTasks(userId))
 
         } catch (e: Exception) {
+            println(e.message)
+            e.printStackTrace()
             call.response.status(HttpStatusCode.BadRequest)
         }
     }
@@ -65,10 +78,14 @@ fun Routing.handleTasks() {
 
             val task = call.receive<Task>()
 
-            dataClient.updateTask(userId, taskId, task)
+            dao.editTask(
+                taskId, task.completed, task.action, task.creationDate.toString(), task.dueDate?.toString(), task.tags
+            )
 
-            call.respond(dataClient.getTasks(userId))
+            call.respond(dao.userTasks(userId))
         } catch (e: Exception) {
+            println(e.message)
+            e.printStackTrace()
             call.response.status(HttpStatusCode.BadRequest)
         }
     }

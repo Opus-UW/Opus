@@ -35,8 +35,8 @@ import androidx.compose.ui.unit.dp
 import api.ApiClient
 import kotlinx.coroutines.launch
 import kotlinx.datetime.*
-import org.opus.models.Tag
-import org.opus.models.Task
+import org.models.opus.models.Tag
+import org.models.opus.models.Task
 import utils.plus
 import java.time.Instant
 import java.time.ZoneId
