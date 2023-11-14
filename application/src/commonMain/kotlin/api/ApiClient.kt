@@ -21,7 +21,7 @@ class ApiClient {
         }
     }
 
-    private val baseUrl = "http://0.0.0.0:8080"
+    private val baseUrl = "http://35.239.87.183:8080"
 
     private val httpClient = HttpClient {
         install(ContentNegotiation) {
@@ -33,11 +33,17 @@ class ApiClient {
     }
 
     suspend fun getTasks(userId: Int): List<Task> {
-        val url = URLBuilder().apply {
-            takeFrom("$baseUrl/users/$userId/tasks")
-        }
+        try {
+            val url = URLBuilder().apply {
+                takeFrom("$baseUrl/users/$userId/tasks")
+            }
 
-        return httpClient.get(url.build()).body()
+            return httpClient.get(url.build()).body()
+        } catch (e: Exception){
+            e.printStackTrace()
+            System.out.println(e.message)
+        }
+        return listOf()
     }
 
     suspend fun getCompletedTasks(userId: Int): List<Task> {
@@ -85,11 +91,17 @@ class ApiClient {
     }
 
     suspend fun getNotes(userId: Int): List<Note> {
+        try{
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId/notes")
         }
 
         return httpClient.get(url.build()).body()
+        } catch (e: Exception){
+            e.printStackTrace()
+            System.out.println(e.message)
+        }
+        return listOf()
     }
 
     suspend fun postNote(userId: Int, note: Note): List<Note> {
@@ -121,11 +133,17 @@ class ApiClient {
     }
 
     suspend fun getTags(userId: Int): List<Tag> {
+        try{
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId/tags")
         }
 
         return httpClient.get(url.build()).body()
+        } catch (e: Exception){
+            e.printStackTrace()
+            System.out.println(e.message)
+        }
+        return listOf()
     }
 
     suspend fun postTag(userId: Int, tag: Tag): List<Tag> {

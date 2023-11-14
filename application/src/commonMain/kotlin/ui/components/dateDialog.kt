@@ -17,8 +17,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import org.opus.models.Tag
-import org.opus.models.Task
+import org.models.opus.models.Tag
+import org.models.opus.models.Task
 
 @Composable
 fun DateDialog(
