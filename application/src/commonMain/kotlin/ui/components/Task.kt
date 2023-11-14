@@ -24,8 +24,8 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
-import androidx.compose.ui.input.pointer.PointerEventType
-import androidx.compose.ui.input.pointer.onPointerEvent
+//import androidx.compose.ui.input.pointer.PointerEventType
+//import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalFocusManager
@@ -195,12 +195,12 @@ fun task(
                         },
                         contentDescription = "Check mark",
                         modifier = Modifier
-                            .onPointerEvent(PointerEventType.Enter) {
-                                isCheckboxHovered = true
-                            }
-                            .onPointerEvent(PointerEventType.Exit) {
-                                isCheckboxHovered = false
-                            }
+//                            .onPointerEvent(PointerEventType.Enter) {
+//                                isCheckboxHovered = true
+//                            }
+//                            .onPointerEvent(PointerEventType.Exit) {
+//                                isCheckboxHovered = false
+//                            }
                     )
                 }
 
@@ -231,12 +231,12 @@ fun task(
                         }
                         .focusRequester(textFieldFocusRequester)
                         .weight(1f)
-                        .onPointerEvent(PointerEventType.Enter) {
-                            isTextboxHovered = true
-                        }
-                        .onPointerEvent(PointerEventType.Exit) {
-                            isTextboxHovered = false
-                        }
+//                        .onPointerEvent(PointerEventType.Enter) {
+//                            isTextboxHovered = true
+//                        }
+//                        .onPointerEvent(PointerEventType.Exit) {
+//                            isTextboxHovered = false
+//                        }
                 )
                 if (dueDate != null) {
                     Text("Due on ${dueDate.date}")

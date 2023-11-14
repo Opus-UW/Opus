@@ -2,6 +2,9 @@ pluginManagement {
     repositories {
         gradlePluginPortal()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        google()
+        gradlePluginPortal()
+        mavenCentral()
     }
 
     plugins {
@@ -11,6 +14,14 @@ pluginManagement {
 
         kotlin("plugin.serialization").version(extra["serializationVersion"] as String)
         id("io.ktor.plugin").version(extra["ktorVersion"] as String)
+    }
+}
+
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 }
 
