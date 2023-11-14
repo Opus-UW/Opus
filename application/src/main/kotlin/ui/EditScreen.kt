@@ -32,8 +32,9 @@ fun EditScreen(
     setTags: (List<Tag>) -> Unit,
     notes: List<Note>,
     setNotes: (List<Note>) -> Unit,
-    currentTag: Tag?
-) {
+    currentTag: Tag?,
+    defaultDueDate: kotlinx.datetime.LocalDateTime?,
+    ) {
     Column {
         // Title + Menu Button
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -45,7 +46,7 @@ fun EditScreen(
         var showCompleted by remember { mutableStateOf(false) }
         // Task List
         Box (modifier = Modifier.fillMaxWidth().fillMaxHeight(if (showCompleted) 0.3f else 0.4f)){
-            taskList(tasks.filter { !it.completed }, setTasks, tags, setTags,true, currentTag)
+            taskList(tasks.filter { !it.completed }, setTasks, tags, setTags,true, currentTag, defaultDueDate)
         }
         Spacer(modifier = Modifier.size(10.dp))
         Row (verticalAlignment = Alignment.CenterVertically){
@@ -65,7 +66,7 @@ fun EditScreen(
         if (showCompleted){
             Box (modifier = Modifier.fillMaxWidth().fillMaxHeight(0.2f)){
                 Spacer(modifier = Modifier.size(10.dp))
-                taskList(tasks.filter { it.completed }, setTasks, tags, setTags,false, currentTag)
+                taskList(tasks.filter { it.completed }, setTasks, tags, setTags,false, currentTag, null)
             }
         }
         Spacer(modifier = Modifier.size(30.dp))

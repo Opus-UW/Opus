@@ -51,7 +51,8 @@ fun task(
     tags: List<Tag>,
     setTags: (List<Tag>) -> Unit,
     currentTag: Tag?,
-    tasks: List<Task>
+    tasks: List<Task>,
+    defaultDueDate: kotlinx.datetime.LocalDateTime?,
 ) {
     // Indicates if it's a new task creation bar or not
     val new = task == null
@@ -66,7 +67,13 @@ fun task(
 
     // Task variables
     var text by remember(task) { mutableStateOf(task?.action ?: "") }
-    var taskDueDate by remember(task, tasks) { mutableStateOf(task?.dueDate) }
+    var initialDueDate: LocalDateTime?
+    if (defaultDueDate != null) {
+        initialDueDate = defaultDueDate
+    } else {
+        initialDueDate = task?.dueDate
+    }
+    var taskDueDate by remember(task, tasks) { mutableStateOf(initialDueDate) }
 
     fun updateDueDate(dueDate: LocalDateTime? = null) {
         println(dueDate?.date)
