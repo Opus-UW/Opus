@@ -8,8 +8,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import org.opus.models.Note
-import org.opus.models.Tag
+import org.models.opus.models.Note
+import org.models.opus.models.Tag
 
 @Composable
 fun noteList(

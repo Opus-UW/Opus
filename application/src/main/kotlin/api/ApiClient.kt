@@ -7,9 +7,9 @@ import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
-import org.opus.models.Note
-import org.opus.models.Tag
-import org.opus.models.Task
+import org.models.opus.models.Note
+import org.models.opus.models.Tag
+import org.models.opus.models.Task
 
 class ApiClient {
 

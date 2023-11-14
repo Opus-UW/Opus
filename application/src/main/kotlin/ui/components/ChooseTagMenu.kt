@@ -19,8 +19,8 @@ import androidx.compose.ui.input.key.*
 import androidx.compose.ui.platform.LocalFocusManager
 import api.ApiClient
 import kotlinx.coroutines.launch
-import org.opus.models.Colour
-import org.opus.models.Tag
+import org.models.opus.models.Colour
+import org.models.opus.models.Tag
 
 @Composable
 fun ChooseTagMenu(

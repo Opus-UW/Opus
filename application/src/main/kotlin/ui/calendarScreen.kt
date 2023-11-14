@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import org.opus.models.Task
+import org.models.opus.models.Task
 import ui.components.dayPreview
 import utils.minus
 import utils.minusMonth
