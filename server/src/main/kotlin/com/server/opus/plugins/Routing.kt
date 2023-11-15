@@ -1,5 +1,6 @@
 package com.server.opus.plugins
 
+import com.server.opus.plugins.handlers.handleCalendarApi
 import com.server.opus.plugins.handlers.handleNotes
 import com.server.opus.plugins.handlers.handleTags
 import com.server.opus.plugins.handlers.handleTasks
@@ -12,5 +13,6 @@ fun Application.configureRouting() {
         handleTasks()
         handleNotes()
         handleTags()
+        handleCalendarApi()
     }
 }
