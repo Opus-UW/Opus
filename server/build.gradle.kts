@@ -5,10 +5,20 @@ val slf4jVersion: String by project
 val exposedVersion: String by project
 
 plugins {
+    java
+    application
     kotlin("jvm")
     id("io.ktor.plugin")
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_13
+    targetCompatibility = JavaVersion.VERSION_13
+}
+
+repositories {
+    mavenCentral()
+}
 group = "com.server.opus"
 version = "0.0.1"
 
@@ -24,6 +34,9 @@ repositories {
 }
 
 dependencies {
+    implementation ("com.google.api-client:google-api-client:2.0.0")
+    implementation ("com.google.oauth-client:google-oauth-client-jetty:1.34.1")
+    implementation ("com.google.apis:google-api-services-calendar:v3-rev20220715-2.0.0")
     implementation("io.ktor:ktor-server-core-jvm")
     implementation("io.ktor:ktor-server-netty-jvm")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
