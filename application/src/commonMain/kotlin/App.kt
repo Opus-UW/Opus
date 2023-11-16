@@ -54,7 +54,7 @@ fun App() {
                             initialRoute = "/login"
                         ) {
                             scene(route = "/login") {
-                                LoginScreen(viewModel)
+                                LoginScreen(viewModel, navigator)
                             }
                             scene(route = "/tasks") {
                                 TaskScreen(viewModel)
