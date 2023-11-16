@@ -43,6 +43,7 @@ kotlin {
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
+            implementation("com.adonax:audiocue:2.1.0")
         }
         commonMain.dependencies {
             implementation(compose.runtime)
