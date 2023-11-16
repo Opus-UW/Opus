@@ -67,6 +67,8 @@ kotlin {
 
             implementation("moe.tlaster:precompose:$precomposeVersion")
             implementation("moe.tlaster:precompose-viewmodel:$precomposeVersion")
+
+            implementation ("com.google.oauth-client:google-oauth-client-jetty:1.34.1")
         }
     }
 }
