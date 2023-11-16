@@ -7,22 +7,19 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import org.models.opus.models.Tag
 import org.models.opus.models.Task
+import viewmodels.MainViewModel
 
 @Composable
 fun taskList(
+    viewModel: MainViewModel,
     tasks: List<Task>,
-    setTasks: (List<Task>) -> Unit,
-    tags: List<Tag>,
-    setTags: (List<Tag>) -> Unit,
     showAddTask: Boolean = true,
-    currentTag: Tag?,
     defaultDueDate: kotlinx.datetime.LocalDateTime?,
 ) {
     Column {
         if (showAddTask) {
-            task(null, setTasks, null, tags, setTags, currentTag,  tasks, defaultDueDate)
+            task(viewModel, null, null, defaultDueDate)
         }
         Spacer(modifier = Modifier.size(10.dp))
         val listState = rememberLazyListState()
@@ -33,7 +30,7 @@ fun taskList(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             items(tasks.size) {
-                task(tasks[it], setTasks, tasks[it].dueDate, tags, setTags, currentTag, tasks, defaultDueDate)
+                task(viewModel, tasks[it], tasks[it].dueDate, defaultDueDate)
             }
         }
     }
