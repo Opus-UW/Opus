@@ -1,97 +1,55 @@
 package ui
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
-import moe.tlaster.precompose.flow.collectAsStateWithLifecycle
-import moe.tlaster.precompose.navigation.Navigator
-import ui.components.OpusTopAppBar
-import ui.components.SimpleVerticalScrollbar
-import ui.components.task
+import androidx.compose.material.Button
+import androidx.compose.runtime.Composable
+import com.google.api.client.auth.oauth2.Credential
+import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp
+import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver
+import com.google.api.client.http.javanet.NetHttpTransport
+import com.google.api.client.util.store.FileDataStoreFactory
 import viewmodels.MainViewModel
-
+import java.io.File
+import java.io.FileNotFoundException
+import java.io.IOException
+import java.io.InputStreamReader
+import com.google.api.client.auth.oauth2.Credential
+import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp
+import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow
+import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
+import com.google.api.client.http.javanet.NetHttpTransport
+import com.google.api.client.json.JsonFactory
+import com.google.api.client.json.gson.GsonFactory
+import com.google.api.client.util.DateTime
+import com.google.api.client.util.store.FileDataStoreFactory
+import com.google.api.services.calendar.Calendar
+import com.google.api.services.calendar.CalendarScopes
+import com.google.api.services.calendar.model.Event
+import com.google.api.services.calendar.model.Events
+import java.io.File
+import java.io.FileNotFoundException
+import java.io.IOException
+import java.io.InputStreamReader
 @Composable
-fun TaskScreen(
+fun LoginScreen(
     viewModel: MainViewModel
 ) {
-    val tasks by viewModel.tasks.collectAsStateWithLifecycle()
-    val currentTag by viewModel.currentTag.collectAsStateWithLifecycle()
-    val defaultDueDate = null
-    val (showCompleted, setShowCompleted) = remember { mutableStateOf(false) }
-    val listState = rememberLazyListState()
-
-    val tagTasks = tasks.filter { if (currentTag != null) it.tags.contains(currentTag) else true }
-    val uncompletedTasks = tagTasks.filter { !it.completed }
-    val completedTasks = tagTasks.filter { it.completed }
-
-    Column(
-        modifier = Modifier.padding(5.dp)
-    ) {
-        task(viewModel, null, null, null)
-        Spacer(modifier = Modifier.size(5.dp))
-        LazyColumn(
-            state = listState,
-            modifier = Modifier.SimpleVerticalScrollbar(listState).fillMaxHeight(),
-            verticalArrangement = Arrangement.spacedBy(5.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            items(
-                items = uncompletedTasks,
-                key = { task ->
-                    task.id
-                }
-            ) { task ->
-                task(viewModel, task, task.dueDate, defaultDueDate)
-                if (task == uncompletedTasks.last()) {
-                    ToggleSortDivider(showCompleted, setShowCompleted, "Completed", completedTasks.size)
-                }
-            }
-            if (showCompleted) {
-                items(
-                    items = completedTasks,
-                    key = { task ->
-                        task.id
-                    }
-                ) { task ->
-                    task(viewModel, task, task.dueDate, defaultDueDate)
-                }
-            }
-        }
-
-    }
+    Button(onClick = getCre)
 }
 
-@Composable
-fun ToggleSortDivider(
-    show: Boolean,
-    setShow: (Boolean) -> Unit,
-    label: String,
-    amount: Int? = null
-) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        IconButton(onClick = { setShow(!show) }) {
-            if (show) {
-                Icon(Icons.Default.ExpandMore, contentDescription = "Show Completed Tasks")
-            } else {
-                Icon(Icons.Default.ChevronRight, contentDescription = "Show Completed Tasks")
-            }
-        }
-        Text(label, fontWeight = FontWeight.Bold)
-        Spacer(modifier = Modifier.size(10.dp))
-        if (amount != null) {
-            Text(amount.toString())
-        }
-        Spacer(modifier = Modifier.weight(1f))
-    }
+@Throws(IOException::class)
+private fun getCredentials(HTTP_TRANSPORT: NetHttpTransport): Credential { // Load client secrets.
+    val credentials = CalendarAPI::class.java.getResourceAsStream(CREDENTIALS_FILE_PATH) ?: throw FileNotFoundException("Resource not found: $CREDENTIALS_FILE_PATH")
+    val clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, InputStreamReader(credentials))
+
+    // Build flow and trigger user authorization request.
+    val flow = GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
+        .setDataStoreFactory(FileDataStoreFactory(File(TOKENS_DIRECTORY_PATH)))
+        .setAccessType("offline")
+        .build()
+
+    val receiver = LocalServerReceiver.Builder().setPort(8888).build()
+
+    return AuthorizationCodeInstalledApp(flow, receiver).authorize("user")
 }
