@@ -1,4 +1,4 @@
-package ui.components
+package ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -30,8 +30,6 @@ fun OpusTopAppBar(
     var noteState by remember { mutableStateOf(false) }
     var calendarState by remember { mutableStateOf(false) }
 
-
-    println()
     TopAppBar(
         backgroundColor = Color.White,
         contentColor = Color.Black,

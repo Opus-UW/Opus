@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
+import com.adonax.audiocue.AudioCue
 import org.models.opus.models.Task
 import viewmodels.MainViewModel
 
@@ -24,12 +25,22 @@ actual fun TaskCheckbox(
     isTaskFocused: Boolean,
     textFieldFocusRequester: FocusRequester
 ) {
-
     var isCheckboxHovered by remember { mutableStateOf(false) }
+    var audio by remember { mutableStateOf(AudioCue.makeStereoCue(object {}.javaClass.getResource("/complete.wav"), 1)) }
+
+    LaunchedEffect(Unit) {
+        audio.open();
+    }
+
+
     IconButton(onClick = {
         // delete the task (note change to finished)
         if (task != null) {
-            viewModel.updateTask(task = task, completed = !task.completed)
+            val complete = !task.completed
+            viewModel.updateTask(task = task, completed = complete)
+            if (complete)
+                audio.play()
+            println ("Audio Played")
         }
         // For new task
         // Clicking on the plus focuses text box

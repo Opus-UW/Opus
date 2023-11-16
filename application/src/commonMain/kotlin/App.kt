@@ -8,7 +8,7 @@ import moe.tlaster.precompose.navigation.NavHost
 import moe.tlaster.precompose.navigation.rememberNavigator
 import moe.tlaster.precompose.viewmodel.viewModel
 import ui.*
-import ui.components.OpusTopAppBar
+import ui.OpusTopAppBar
 import viewmodels.MainViewModel
 
 
