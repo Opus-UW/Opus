@@ -6,7 +6,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.ModalDrawerSheet
-import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
@@ -33,9 +32,9 @@ fun NavigationContent(
         Text("General", modifier = Modifier.padding(16.dp))
         NavigationEntry(viewModel, null)
 
-        TextButton(onClick = {  }, modifier = Modifier.fillMaxWidth()) {
-            Text("Calendar", textAlign = TextAlign.Left, modifier = Modifier.fillMaxWidth())
-        }
+//        TextButton(onClick = {  }, modifier = Modifier.fillMaxWidth()) {
+//            Text("Calendar", textAlign = TextAlign.Left, modifier = Modifier.fillMaxWidth())
+//        }
 
         Divider(color = Color.Black, thickness = 1.dp)
         Text("Tags", modifier = Modifier.padding(16.dp))
