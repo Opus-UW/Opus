@@ -15,12 +15,15 @@ import com.google.api.services.calendar.Calendar
 import com.google.api.services.calendar.CalendarScopes
 import com.google.api.services.calendar.model.Event
 import com.google.api.services.calendar.model.Events
+import com.google.api.services.tasks.Tasks
+import com.google.api.services.tasks.TasksScopes
+import com.google.api.services.tasks.model.Task
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.InputStreamReader
 
-object CalendarAPI {
+object TaskAPI {
 
     private const val APPLICATION_NAME = "Opus"
     private const val TOKENS_DIRECTORY_PATH = "tokens"
@@ -29,9 +32,9 @@ object CalendarAPI {
     private val JSON_FACTORY: JsonFactory = GsonFactory.getDefaultInstance()
 
     // If modifying these scopes, delete your previously saved tokens/ folder.
-    private val SCOPES = listOf(CalendarScopes.CALENDAR)
+    private val SCOPES = listOf(TasksScopes.TASKS)
 
-    private val calendarService: Calendar
+    private val taskService: Tasks
 
     /**
      * Creates an authorized Credential object.
@@ -41,7 +44,7 @@ object CalendarAPI {
      */
     @Throws(IOException::class)
     private fun getCredentials(HTTP_TRANSPORT: NetHttpTransport): Credential { // Load client secrets.
-        val credentials = CalendarAPI::class.java.getResourceAsStream(CREDENTIALS_FILE_PATH) ?: throw FileNotFoundException("Resource not found: $CREDENTIALS_FILE_PATH")
+        val credentials = TaskAPI::class.java.getResourceAsStream(CREDENTIALS_FILE_PATH) ?: throw FileNotFoundException("Resource not found: $CREDENTIALS_FILE_PATH")
         val clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, InputStreamReader(credentials))
 
         // Build flow and trigger user authorization request.
@@ -58,21 +61,24 @@ object CalendarAPI {
     init {
         val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
 
-        calendarService = Calendar.Builder(httpTransport, JSON_FACTORY, getCredentials(httpTransport))
+        taskService = Tasks.Builder(httpTransport, JSON_FACTORY, getCredentials(httpTransport))
             .setApplicationName(APPLICATION_NAME)
             .build()
     }
 
-    fun events(maxResults: Int = 100, timeMinimum: DateTime = DateTime(System.currentTimeMillis()), orderBy: String = "startTime"): Events {
-        return calendarService.events().list("75a3b9227dd4d38894bc9dc3183222527924c2e2283d4dbe425196ae6bad825c@group.calendar.google.com")
+    fun tasks(maxResults: Int = 100, timeMinimum: DateTime = DateTime(System.currentTimeMillis()), orderBy: String = "startTime"): com.google.api.services.tasks.model.Tasks {
+        println(taskService.tasklists().list().execute())
+
+        File(TOKENS_DIRECTORY_PATH).deleteRecursively()
+
+        getCredentials(GoogleNetHttpTransport.newTrustedTransport())
+
+        return taskService.tasks().list("MDU5MjcxNDc3MDc4NDg0Mjc3MjM6MDow")
             .setMaxResults(maxResults)
-            .setTimeMin(timeMinimum)
-            .setOrderBy(orderBy)
-            .setSingleEvents(true)
             .execute()
     }
 
-    fun patchEvent(event: Event) {
-        calendarService.events().patch("primary", event.id, event).execute()
+    fun patchEvent(task: Task) {
+        taskService.tasks().patch("MDU5MjcxNDc3MDc4NDg0Mjc3MjM6MDow", task.id, task).execute()
     }
 }
