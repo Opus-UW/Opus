@@ -141,16 +141,25 @@ fun EditNoteDialog(
 
     Dialog(
         onDismissRequest = {
-            setTitle(newTitle)
-            state.setHtml(newState.toHtml())
-            // Update tags
-            val newTaskTags = mutableListOf<Tag>()
-            tagStatus.forEach { entry ->
-                if (entry.value) {
-                    newTaskTags.add(entry.key)
+            if (title != newTitle || state.toHtml() != newState.toHtml()) {
+                // Update tags
+                val newTaskTags = mutableListOf<Tag>()
+                tagStatus.forEach { entry ->
+                    if (entry.value) {
+                        newTaskTags.add(entry.key)
+                    }
+                }
+                // Check if new note is to be created
+                if (note.id != -1) {
+                    setTitle(newTitle)
+                    state.setHtml(newState.toHtml())
+                    viewModel.updateNote(note, title = newTitle, body = newState.toHtml(), tags = newTaskTags.toList())
+                }
+                else {
+                    val newNote = Note(title, newState.toHtml(), newTaskTags)
+                    viewModel.createNote(newNote)
                 }
             }
-            viewModel.updateNote(note, title = newTitle, body = newState.toHtml(), tags = newTaskTags.toList())
             onDismissRequest()
         },
         properties = DialogProperties(dismissOnClickOutside = true)

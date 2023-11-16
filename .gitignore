@@ -43,3 +43,5 @@ bin/
 
 ### Databases ###
 *.db
+
+local.properties
