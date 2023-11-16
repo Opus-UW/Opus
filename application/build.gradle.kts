@@ -5,7 +5,7 @@ val ktorVersion: String by project
 val kotlinVersion: String by project
 val logbackVersion: String by project
 val slf4jVersion: String by project
-
+val precomposeVersion: String by project
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -64,6 +64,9 @@ kotlin {
             implementation("io.ktor:ktor-client-logging:$ktorVersion")
 
             implementation("com.mohamedrejeb.richeditor:richeditor-compose:1.0.0-beta03")
+
+            implementation("moe.tlaster:precompose:$precomposeVersion")
+            implementation("moe.tlaster:precompose-viewmodel:$precomposeVersion")
         }
     }
 }

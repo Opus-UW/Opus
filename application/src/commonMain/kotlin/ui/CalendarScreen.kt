@@ -3,58 +3,32 @@ package ui
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.Text
-import androidx.compose.material.TextButton
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
-import org.models.opus.models.Tag
-import org.models.opus.models.Task
+import moe.tlaster.precompose.flow.collectAsStateWithLifecycle
 import ui.components.DateDialog
 import ui.components.DayPreview
 import utils.minus
-import utils.minusMonth
 import utils.plus
-import utils.plusMonth
+import viewmodels.MainViewModel
 
 @Composable
-fun calendarScreen(toggleMenu: () -> Unit, showMenu: Boolean,
-                   tasks: List<Task>,
-                   setTasks: (List<Task>) -> Unit,
-                   tags: List<Tag>,
-                   setTags: (List<Tag>) -> Unit){
-    var curDate by remember { mutableStateOf(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())) }
+fun CalendarScreen(
+    viewModel: MainViewModel                   ){
+
+    val curDate by viewModel.curDate.collectAsStateWithLifecycle()
+    val tasks by viewModel.tasks.collectAsStateWithLifecycle()
+
     val (showDateDialog, setShowDateDialog) = remember { mutableStateOf(false) }
     val (selectedDate, setSelectedDate) = remember { mutableStateOf(curDate) }
     var tempDate = curDate
-    val tempMonth = curDate.month.name
     Column {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = { toggleMenu() }, enabled = !showMenu) {
-                Icon(if (showMenu) Icons.Default.CalendarMonth else Icons.Default.Menu, contentDescription = "Menu Button")
-            }
-            Text("Calendar")
-            Row(Modifier.fillMaxWidth().width(IntrinsicSize.Max), horizontalArrangement = Arrangement.SpaceAround, verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = { curDate = curDate.minusMonth(1)}, enabled = true) {Icon(Icons.Default.ArrowBack, contentDescription = "Calender Right")}
-                Text(tempMonth)
-                IconButton(onClick = { curDate = curDate.plusMonth(1)}, enabled = true) {Icon(Icons.Default.ArrowForward, contentDescription = "Calender Left")}
-            }
-        }
 
         //Days of the week
         val daysOfWeek = listOf("SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT")
@@ -98,6 +72,7 @@ fun calendarScreen(toggleMenu: () -> Unit, showMenu: Boolean,
                 }
             }
         )
-        DateDialog(selectedDate, showDateDialog, setShowDateDialog, tasks, setTasks, tags, setTags)
+
+        DateDialog(viewModel, selectedDate, showDateDialog, setShowDateDialog)
     }
 }
