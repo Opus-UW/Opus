@@ -1,7 +1,6 @@
 package ui.components
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
@@ -26,35 +25,42 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import api.ApiClient
 import com.mohamedrejeb.richeditor.model.RichTextState
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults
-import kotlinx.coroutines.launch
+import moe.tlaster.precompose.flow.collectAsStateWithLifecycle
 import org.models.opus.models.Note
 import org.models.opus.models.Tag
+import viewmodels.MainViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotePreview(note: Note, setNotes: (List<Note>) -> Unit, tags: List<Tag>, setTags: (List<Tag>) -> Unit, currentTag: Tag?) {
+fun NotePreview(
+    viewModel: MainViewModel,
+    note: Note
+) {
+    val tags by viewModel.tags.collectAsStateWithLifecycle()
+    val currentTag by viewModel.currentTag.collectAsStateWithLifecycle()
+
     var editNote by remember(note) { mutableStateOf(false) }
     var (title, setTitle) = remember(note) { mutableStateOf(note.title) }
     val state = rememberRichTextState()
-    var tagStatus = remember(tags) { mutableStateMapOf(*tags.map { it to false }.toTypedArray()) }
+    val tagStatus = remember(tags) { mutableStateMapOf(*tags.map { it to false }.toTypedArray()) }
 
-    LaunchedEffect(Unit){
-        note?.tags?.forEach{ tag ->
+    LaunchedEffect(Unit) {
+        note.tags.forEach { tag ->
             tagStatus[tag] = true
         }
         if (currentTag != null) {
-            tagStatus[currentTag] = true
+            tagStatus[currentTag!!] = true
         }
     }
     LaunchedEffect(Unit) {
         state.setHtml(note.body)
     }
 
+    // Note Base
     ElevatedCard(
         onClick = { editNote = true },
         elevation = CardDefaults.cardElevation(
@@ -67,6 +73,7 @@ fun NotePreview(note: Note, setNotes: (List<Note>) -> Unit, tags: List<Tag>, set
         )
     ) {
         Column {
+            // Title
             TextField(
                 value = title,
                 placeholder = { androidx.compose.material.Text("Title") },
@@ -82,6 +89,7 @@ fun NotePreview(note: Note, setNotes: (List<Note>) -> Unit, tags: List<Tag>, set
                 ),
                 enabled = false
             )
+            // Body
             RichTextEditor(
                 state = state,
                 modifier = Modifier.fillMaxWidth(),
@@ -103,44 +111,47 @@ fun NotePreview(note: Note, setNotes: (List<Note>) -> Unit, tags: List<Tag>, set
         LaunchedEffect(editNote) {
             newState.setHtml(state.toHtml())
         }
-        EditNoteDialog({ editNote = false; }, title, setTitle, newState, state, note, setNotes, tags, setTags, tagStatus)
+        EditNoteDialog(
+            viewModel,
+            { editNote = false; },
+            title,
+            setTitle,
+            newState,
+            state,
+            note,
+            tagStatus
+        )
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditNoteDialog(
+    viewModel: MainViewModel,
     onDismissRequest: () -> Unit,
     title: String,
     setTitle: (String) -> Unit,
     newState: RichTextState,
     state: RichTextState,
     note: Note,
-    setNotes: (List<Note>) -> Unit,
-    tags: List<Tag>,
-    setTags: (List<Tag>) -> Unit,
     tagStatus: SnapshotStateMap<Tag, Boolean>
 ) {
     var newTitle by remember { mutableStateOf(title) }
-    val coroutineScope = rememberCoroutineScope()
+    val tags by viewModel.tags.collectAsStateWithLifecycle()
 
     Dialog(
         onDismissRequest = {
-            setTitle(newTitle);
-            state.setHtml(newState.toHtml());
-            coroutineScope.launch {
-                val newTaskTags = mutableListOf<Tag>()
-                tagStatus.forEach{ entry ->
-                    if (entry.value){
-                        newTaskTags.add(entry.key)
-                    }
+            setTitle(newTitle)
+            state.setHtml(newState.toHtml())
+            // Update tags
+            val newTaskTags = mutableListOf<Tag>()
+            tagStatus.forEach { entry ->
+                if (entry.value) {
+                    newTaskTags.add(entry.key)
                 }
-
-                setNotes(
-                    ApiClient.getInstance().editNote(0, note.id, note.copy(title = newTitle, body = newState.toHtml(), tags = newTaskTags.toList()))
-                )
-                onDismissRequest()
             }
+            viewModel.updateNote(note, title = newTitle, body = newState.toHtml(), tags = newTaskTags.toList())
+            onDismissRequest()
         },
         properties = DialogProperties(dismissOnClickOutside = true)
     ) {
@@ -168,24 +179,17 @@ fun EditNoteDialog(
                     )
                 )
                 Spacer(modifier = Modifier.weight(1f))
-                var (showTags, setShowTags) = remember(tags) { mutableStateOf(false) }
+                val (showTags, setShowTags) = remember(tags) { mutableStateOf(false) }
                 var rootPos by remember { mutableStateOf(Offset.Zero) }
                 androidx.compose.material.TextButton(onClick = { setShowTags(true) },
                     modifier = Modifier.onGloballyPositioned { coordinates ->
                         rootPos = coordinates.positionInRoot()
                     }) {
                     androidx.compose.material.Icon(Icons.Default.Sell, contentDescription = "Tags")
-                    ChooseTagMenu(showTags, setShowTags, rootPos, tags, setTags, tagStatus)
+                    ChooseTagMenu(viewModel, showTags, setShowTags, tagStatus)
                 }
                 IconButton(onClick = {
-                    coroutineScope.launch {
-                        setNotes(
-                            ApiClient.getInstance()
-                                .deleteNote(0, note.id)
-                        )
-                        onDismissRequest()
-                    }
-
+                    viewModel.deleteNote(note)
                 }) {
                     Icon(
                         Icons.Default.Delete,

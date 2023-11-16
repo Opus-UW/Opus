@@ -13,28 +13,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
-import androidx.compose.ui.platform.LocalFocusManager
-import api.ApiClient
-import kotlinx.coroutines.launch
+import moe.tlaster.precompose.flow.collectAsStateWithLifecycle
 import org.models.opus.models.Colour
 import org.models.opus.models.Tag
+import viewmodels.MainViewModel
 
 @Composable
 fun ChooseTagMenu(
+    viewModel: MainViewModel,
     showTags: Boolean,
     setShowTags: (Boolean) -> Unit,
-    pos: Offset,
-    tags: List<Tag>,
-    setTags: (List<Tag>) -> Unit,
     tagStatus: SnapshotStateMap<Tag, Boolean>
 ) {
-    val focusManager = LocalFocusManager.current
+    val tags by viewModel.tags.collectAsStateWithLifecycle()
+
     var newTag by remember(tags) { mutableStateOf("") }
     var text by remember { mutableStateOf("") }
-    val coroutineScope = rememberCoroutineScope()
     val textFieldFocusRequester = remember { FocusRequester() }
 
     DropdownMenu(
@@ -77,9 +73,7 @@ fun ChooseTagMenu(
                         if (keyEvent.key != Key.Enter) return@onKeyEvent false
                         if (keyEvent.type == KeyEventType.KeyUp) {
                             val tag = Tag(newTag, Colour(237, 217, 229))
-                            coroutineScope.launch {
-                                setTags(ApiClient.getInstance().postTag(0, tag))
-                            }
+                            viewModel.createTag(tag)
                             text = ""
                         }
                         true
