@@ -26,18 +26,18 @@ actual fun TaskCheckbox(
     textFieldFocusRequester: FocusRequester
 ) {
     var isCheckboxHovered by remember { mutableStateOf(false) }
-    var audio by remember { mutableStateOf(AudioCue.makeStereoCue(object {}.javaClass.getResource("/complete.wav"), 1)) }
-
-    LaunchedEffect(Unit) {
-        audio.open();
-    }
-
+    var audio by remember (task) { mutableStateOf(AudioCue.makeStereoCue(object {}.javaClass.getResource("/complete.wav"), 1)) }
+    var isAudioOpen by remember (task) { mutableStateOf(false) }
 
     IconButton(onClick = {
         // delete the task (note change to finished)
         if (task != null) {
             val complete = !task.completed
             viewModel.updateTask(task = task, completed = complete)
+            if (!isAudioOpen){
+                audio.open()
+                isAudioOpen = true
+            }
             if (complete)
                 audio.play()
         }

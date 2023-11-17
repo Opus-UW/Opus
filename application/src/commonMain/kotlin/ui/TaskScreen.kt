@@ -33,7 +33,7 @@ fun TaskScreen(
     val completedTasks = tagTasks.filter { it.completed }
 
     Column(
-        modifier = Modifier.padding(5.dp)
+        modifier = Modifier.padding(20.dp)
     ) {
         task(viewModel, null, null, null)
         Spacer(modifier = Modifier.size(5.dp))
