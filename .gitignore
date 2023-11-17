@@ -50,3 +50,5 @@ local.properties
 .idea/gradle.xml
 .idea/misc.xml
 .idea/artifacts/application_desktop_1_0_SNAPSHOT.xml
+/.run/
+/.idea/
