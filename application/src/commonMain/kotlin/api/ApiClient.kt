@@ -4,12 +4,17 @@ import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
+import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
+import io.ktor.websocket.*
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.launch
 import org.models.opus.models.Note
 import org.models.opus.models.Tag
 import org.models.opus.models.Task
+import org.models.opus.models.User
 
 class ApiClient {
 
@@ -21,7 +26,7 @@ class ApiClient {
         }
     }
 
-    private val baseUrl = "http://35.239.87.183:8080"
+    private val baseUrl = "http://0.0.0.0:8080"
 
     private val httpClient = HttpClient {
         install(ContentNegotiation) {
@@ -30,147 +35,233 @@ class ApiClient {
         install(Logging) {
             level = LogLevel.ALL
         }
+        install(WebSockets)
     }
 
-    suspend fun getTasks(userId: Int): List<Task> {
+    suspend fun startClientConn() {
+        //runBlocking {
+            httpClient.webSocket(method = HttpMethod.Get, host = "0.0.0.0", port = 8080, path = "/chat") {
+                val messageOutputRoutine = launch { outputMessages() }
+                val userInputRoutine = launch { inputMessages() }
+
+                userInputRoutine.join() // Wait for completion; either "exit" or error
+                messageOutputRoutine.cancelAndJoin()
+            }
+        //}
+        httpClient.close()
+        println("Connection closed. Goodbye!")
+    }
+
+    suspend fun DefaultClientWebSocketSession.outputMessages() {
+        try {
+            for (message in incoming) {
+                message as? Frame.Text ?: continue
+                println(message.readText())
+            }
+        } catch (e: Exception) {
+            println("Error while receiving: " + e.localizedMessage)
+        }
+    }
+
+    suspend fun DefaultClientWebSocketSession.inputMessages() {
+        var counter = 0;
+        while (true) {
+            Thread.sleep(3000L)
+            val message = (counter++).toString()
+            if (message.equals("exit", true)) return
+            try {
+                send(message)
+            } catch (e: Exception) {
+                println("Error while sending: " + e.localizedMessage)
+                return
+            }
+        }
+    }
+
+    private var accessToken: String = ""
+    fun setAccessToken(value: String) {
+        accessToken = value
+    }
+
+    private var userId: String = ""
+    fun setUserId(value: String) {
+        userId = value
+    }
+
+
+    suspend fun getTasks(): List<Task> {
         try {
             val url = URLBuilder().apply {
                 takeFrom("$baseUrl/users/$userId/tasks")
             }
 
-            return httpClient.get(url.build()).body()
-        } catch (e: Exception){
+            return httpClient.get(url.build()) {
+                bearerAuth(accessToken)
+            }.body()
+        } catch (e: Exception) {
             e.printStackTrace()
             System.out.println(e.message)
         }
         return listOf()
     }
 
-    suspend fun getCompletedTasks(userId: Int): List<Task> {
+    suspend fun getCompletedTasks(): List<Task> {
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId/completed-tasks")
         }
 
-        return httpClient.get(url.build()).body()
+        return httpClient.get(url.build()) {
+            bearerAuth(accessToken)
+        }.body()
     }
 
-    suspend fun getUncompletedTasks(userId: Int): List<Task> {
+    suspend fun getUncompletedTasks(): List<Task> {
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId/uncompleted-tasks")
         }
 
-        return httpClient.get(url.build()).body()
+        return httpClient.get(url.build()) {
+            bearerAuth(accessToken)
+        }.body()
     }
 
-    suspend fun postTask(userId: Int, task: Task): List<Task> {
+    suspend fun postTask(task: Task): List<Task> {
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId/tasks")
         }
 
+
         return httpClient.post(url.build()) {
+            bearerAuth(accessToken)
             contentType(ContentType.Application.Json)
             setBody(task)
         }.body()
     }
 
-    suspend fun deleteTask(userId: Int, taskId: Int): List<Task> {
+    suspend fun deleteTask(taskId: Int): List<Task> {
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId/tasks/$taskId")
         }
-        return httpClient.delete(url.build()).body()
+        return httpClient.delete(url.build()) {
+            bearerAuth(accessToken)
+        }.body()
     }
 
-    suspend fun editTask(userId: Int, taskId: Int, newTask: Task): List<Task> {
+    suspend fun editTask(taskId: Int, newTask: Task): List<Task> {
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId/tasks/$taskId")
         }
         return httpClient.put(url.build()) {
+            bearerAuth(accessToken)
             contentType(ContentType.Application.Json)
             setBody(newTask)
         }.body()
     }
 
-    suspend fun getNotes(userId: Int): List<Note> {
-        try{
-        val url = URLBuilder().apply {
-            takeFrom("$baseUrl/users/$userId/notes")
-        }
+    suspend fun getNotes(): List<Note> {
+        try {
+            val url = URLBuilder().apply {
+                takeFrom("$baseUrl/users/$userId/notes")
+            }
 
-        return httpClient.get(url.build()).body()
-        } catch (e: Exception){
+            return httpClient.get(url.build()) {
+                bearerAuth(accessToken)
+            }.body()
+        } catch (e: Exception) {
             e.printStackTrace()
-            System.out.println(e.message)
+            println(e.message)
         }
         return listOf()
     }
 
-    suspend fun postNote(userId: Int, note: Note): List<Note> {
+    suspend fun postNote(note: Note): List<Note> {
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId/notes")
         }
 
         return httpClient.post(url.build()) {
+            bearerAuth(accessToken)
             contentType(ContentType.Application.Json)
             setBody(note)
         }.body()
     }
 
-    suspend fun deleteNote(userId: Int, noteId: Int): List<Note> {
+    suspend fun deleteNote(noteId: Int): List<Note> {
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId/notes/$noteId")
         }
-        return httpClient.delete(url.build()).body()
+        return httpClient.delete(url.build()) {
+            bearerAuth(accessToken)
+        }.body()
     }
 
-    suspend fun editNote(userId: Int, noteId: Int, newNote: Note): List<Note> {
+    suspend fun editNote(noteId: Int, newNote: Note): List<Note> {
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId/notes/$noteId")
         }
         return httpClient.put(url.build()) {
+            bearerAuth(accessToken)
             contentType(ContentType.Application.Json)
             setBody(newNote)
         }.body()
     }
 
-    suspend fun getTags(userId: Int): List<Tag> {
-        try{
-        val url = URLBuilder().apply {
-            takeFrom("$baseUrl/users/$userId/tags")
-        }
+    suspend fun getTags(): List<Tag> {
+        try {
+            val url = URLBuilder().apply {
+                takeFrom("$baseUrl/users/$userId/tags")
+            }
 
-        return httpClient.get(url.build()).body()
-        } catch (e: Exception){
+            return httpClient.get(url.build()) {
+                bearerAuth(accessToken)
+            }.body()
+        } catch (e: Exception) {
             e.printStackTrace()
-            System.out.println(e.message)
+            println(e.message)
         }
         return listOf()
     }
 
-    suspend fun postTag(userId: Int, tag: Tag): List<Tag> {
+    suspend fun postTag(tag: Tag): List<Tag> {
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId/tags")
         }
 
         return httpClient.post(url.build()) {
+            bearerAuth(accessToken)
             contentType(ContentType.Application.Json)
             setBody(tag)
         }.body()
     }
 
-    suspend fun deleteTag(userId: Int, tagId: Int): List<Tag> {
+    suspend fun deleteTag(tagId: Int): List<Tag> {
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId/tags/$tagId")
         }
-        return httpClient.delete(url.build()).body()
+        return httpClient.delete(url.build()) {
+            bearerAuth(accessToken)
+        }.body()
     }
 
-    suspend fun editTag(userId: Int, tagId: Int, newTag: Tag): List<Tag> {
+    suspend fun editTag(tagId: Int, newTag: Tag): List<Tag> {
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId/tags/$tagId")
         }
         return httpClient.put(url.build()) {
+            bearerAuth(accessToken)
             contentType(ContentType.Application.Json)
             setBody(newTag)
+        }.body()
+    }
+
+
+    suspend fun getOrCreateUser(): User {
+        val url = URLBuilder().apply {
+            takeFrom("$baseUrl/users/$userId")
+        }
+        return httpClient.post(url.build()) {
+            bearerAuth(accessToken)
+            contentType(ContentType.Application.Json)
         }.body()
     }
 

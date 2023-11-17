@@ -1,35 +1,41 @@
 package org.models.opus.dao
 
-import org.models.opus.models.Colour
-import org.models.opus.models.Note
-import org.models.opus.models.Tag
-import org.models.opus.models.Task
+import org.models.opus.models.*
 
 interface DAOFacade {
     suspend fun allTasks(): List<Task>
     suspend fun task(id: Int): Task?
-    suspend fun userTasks(userId: Int): List<Task>
+
+    suspend fun taskGId(id: Int): String?
+    suspend fun userTasks(userId: String): List<Task>
     suspend fun addNewTask(
-        completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>, userId: Int
+        completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>, gTaskId: String?, userId: String
     ): Task
 
     suspend fun editTask(
-        id: Int, completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>
+        id: Int, completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>, gTaskId: String?
     ): Boolean
 
     suspend fun deleteTask(id: Int): Boolean
 
     suspend fun allNotes(): List<Note>
     suspend fun note(id: Int): Note?
-    suspend fun userNotes(userId: Int): List<Note>
-    suspend fun addNewNote(title: String, body: String, tags: List<Tag>, userId: Int): Note
+    suspend fun userNotes(userId: String): List<Note>
+    suspend fun addNewNote(title: String, body: String, tags: List<Tag>, userId: String): Note
     suspend fun editNote(id: Int, title: String, body: String, tags: List<Tag>): Boolean
     suspend fun deleteNote(id: Int): Boolean
 
     suspend fun allTags(): List<Tag>
     suspend fun tag(id: Int): Tag?
-    suspend fun userTags(userId: Int): List<Tag>
-    suspend fun addNewTag(title: String, colour: Colour, userId: Int): Tag
+    suspend fun userTags(userId: String): List<Tag>
+    suspend fun addNewTag(title: String, colour: Colour, userId: String): Tag
     suspend fun editTag(id: Int, title: String, colour: Colour): Boolean
     suspend fun deleteTag(id: Int): Boolean
+
+
+    suspend fun allUsers(): List<User>
+    suspend fun user(id: String): User?
+    suspend fun addNewUser(id: String): User
+    suspend fun editUser(id: String): Boolean
+    suspend fun deleteUser(id: String): Boolean
 }

@@ -58,6 +58,7 @@ fun OpusTopAppBar(
                             taskState = true
                             noteState = false
                             calendarState = false
+                            viewModel.setCurrentScreen("/tasks")
                             navigator.navigate("/tasks")
                         }
                     }
@@ -74,6 +75,7 @@ fun OpusTopAppBar(
                             taskState = false
                             noteState = true
                             calendarState = false
+                            viewModel.setCurrentScreen("/notes")
                             navigator.navigate("/notes")
                         }
                     }
@@ -90,6 +92,7 @@ fun OpusTopAppBar(
                             taskState = false
                             noteState = false
                             calendarState = true
+                            viewModel.setCurrentScreen("/calendar")
                             navigator.navigate("/calendar")
                         }
                     }

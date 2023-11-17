@@ -1,6 +1,7 @@
 package viewmodels
 
 import api.ApiClient
+import com.google.api.client.auth.oauth2.Credential
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -12,6 +13,7 @@ import org.models.opus.models.Note
 import org.models.opus.models.Tag
 import org.models.opus.models.Task
 import kotlinx.datetime.Clock
+import org.models.opus.models.User
 
 
 class MainViewModel(
@@ -33,6 +35,15 @@ class MainViewModel(
     private var _curDate = MutableStateFlow(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()))
     val curDate = _curDate.asStateFlow()
 
+    private var _currentScreen = MutableStateFlow(savedStateHolder.consumeRestored("currentScreen") as String? ?: "/login")
+    val currentScreen = _currentScreen.asStateFlow()
+
+    private var _credential = MutableStateFlow(savedStateHolder.consumeRestored("credential") as Credential?)
+    val credential = _credential.asStateFlow()
+
+    private var _user = MutableStateFlow(savedStateHolder.consumeRestored("user") as User?)
+    val user = _user.asStateFlow()
+
     fun setCurDate(value: LocalDateTime){
         _curDate.value = value
     }
@@ -49,6 +60,18 @@ class MainViewModel(
         _notes.value = value
     }
 
+    fun setCurrentScreen(value: String) {
+        _currentScreen.value = value
+    }
+
+    fun setCredential(value: Credential) {
+        _credential.value = value
+    }
+
+    fun setUser(value: User) {
+        _user.value = value
+    }
+
     fun updateNote(
         note: Note,
         title: String? = null,
@@ -62,19 +85,19 @@ class MainViewModel(
             note.id
         )
         viewModelScope.launch {
-            setNotes(ApiClient.getInstance().editNote(0, note.id, updatedNote))
+            setNotes(ApiClient.getInstance().editNote(note.id, updatedNote))
         }
     }
 
     fun createNote(value: Note){
         viewModelScope.launch {
-            setNotes(ApiClient.getInstance().postNote(0, value))
+            setNotes(ApiClient.getInstance().postNote(value))
         }
     }
 
     fun deleteNote(value: Note){
         viewModelScope.launch {
-            setNotes(ApiClient.getInstance().deleteNote(0, value.id))
+            setNotes(ApiClient.getInstance().deleteNote(value.id))
         }
     }
 
@@ -84,13 +107,13 @@ class MainViewModel(
 
     fun createTag(value: Tag){
         viewModelScope.launch {
-            setTags(ApiClient.getInstance().postTag(0, value))
+            setTags(ApiClient.getInstance().postTag(value))
         }
     }
 
     fun deleteTag(value: Tag){
         viewModelScope.launch {
-            setTags(ApiClient.getInstance().deleteTag(0, value.id))
+            setTags(ApiClient.getInstance().deleteTag(value.id))
         }
     }
 
@@ -122,7 +145,7 @@ class MainViewModel(
                 if (tagStatus != null) taskTags else task.tags
             )
             viewModelScope.launch {
-                setTasks(ApiClient.getInstance().editTask(0, task.id, taskToSend))
+                setTasks(ApiClient.getInstance().editTask(task.id, taskToSend))
             }
         // If creating new task
         } else {
@@ -134,7 +157,7 @@ class MainViewModel(
                 taskTags.toList()
             )
             viewModelScope.launch {
-                setTasks(ApiClient.getInstance().postTask(0, taskToSend))
+                setTasks(ApiClient.getInstance().postTask(taskToSend))
             }
         }
     }
@@ -144,16 +167,16 @@ class MainViewModel(
     ) {
         if (task != null){
             viewModelScope.launch {
-                setTasks(ApiClient.getInstance().deleteTask(0, task.id))
+                setTasks(ApiClient.getInstance().deleteTask(task.id))
             }
         }
     }
 
     fun fetchAllData() {
         viewModelScope.launch {
-            setTasks(ApiClient.getInstance().getTasks(0))
-            setNotes(ApiClient.getInstance().getNotes(0))
-            setTags(ApiClient.getInstance().getTags(0))
+            setTasks(ApiClient.getInstance().getTasks())
+            setNotes(ApiClient.getInstance().getNotes())
+            setTags(ApiClient.getInstance().getTags())
         }
     }
 
@@ -166,6 +189,12 @@ class MainViewModel(
         }
         savedStateHolder.registerProvider("tags") {
             tags.value
+        }
+        savedStateHolder.registerProvider("currentScreen"){
+            currentScreen.value
+        }
+        savedStateHolder.registerProvider("credential"){
+            credential.value
         }
     }
 }

@@ -1,5 +1,5 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.ExperimentalComposeLibrary
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 val ktorVersion: String by project
 val kotlinVersion: String by project
@@ -58,6 +58,7 @@ kotlin {
 
             implementation("io.ktor:ktor-client-core:$ktorVersion")
             implementation("io.ktor:ktor-client-cio:$ktorVersion")
+            implementation("io.ktor:ktor-client-auth:$ktorVersion")
             implementation("org.slf4j:slf4j-simple:$slf4jVersion")
             implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
             implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
@@ -67,6 +68,16 @@ kotlin {
 
             implementation("moe.tlaster:precompose:$precomposeVersion")
             implementation("moe.tlaster:precompose-viewmodel:$precomposeVersion")
+
+            implementation ("com.google.api-client:google-api-client:2.0.0")
+            implementation ("com.google.oauth-client:google-oauth-client-jetty:1.34.1")
+            implementation ("com.google.apis:google-api-services-calendar:v3-rev20220715-2.0.0")
+            implementation ("com.google.apis:google-api-services-tasks:v1-rev20210709-2.0.0")
+
+            implementation("io.ktor:ktor-client-websockets:$ktorVersion")
+            implementation ("com.google.auth:google-auth-library-oauth2-http:1.19.0")
+            implementation ("com.google.auth:google-auth-library-oauth2-http:1.19.0")
+            implementation("com.google.apis:google-api-services-oauth2:v2-rev20200213-2.0.0")
         }
     }
 }
@@ -94,7 +105,7 @@ android {
     }
     packaging {
         resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "/META-INF/{AL2.0,LGPL2.1,DEPENDENCIES}"
         }
     }
     buildTypes {
@@ -122,6 +133,9 @@ android {
     dependencies {
         debugImplementation(libs.compose.ui.tooling)
     }
+}
+dependencies {
+    implementation("io.ktor:ktor-client-auth:2.3.5")
 }
 
 compose.desktop {
