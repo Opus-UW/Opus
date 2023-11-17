@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
@@ -39,7 +40,7 @@ fun DayPreview(previewDate: LocalDateTime, previewMonth: String,
     Box(
         modifier = Modifier.background(cardBgColor)
             .border(1.dp, Color.LightGray)
-            .aspectRatio(aspectRatio)
+            //.aspectRatio(aspectRatio)
             .heightIn(0.dp, 30.dp)
             .clickable ( onClick = {
                 setSelectedDate(previewDate)
@@ -47,27 +48,27 @@ fun DayPreview(previewDate: LocalDateTime, previewMonth: String,
             })
     ) {
         Column {
-            TextField(
-                value = "${previewDate.dayOfMonth}",
-                placeholder = { androidx.compose.material.Text("Title") },
-                onValueChange = {},
-                singleLine = true,
-                colors = TextFieldDefaults.textFieldColors(
-                    textColor = cardTextColor,
-                    backgroundColor = Color.Transparent,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    disabledIndicatorColor = Color.Transparent
-                ),
-                enabled = false
-            )
+            Box(
+                modifier = Modifier.padding(5.dp)
+            ) {Text(text="${previewDate.dayOfMonth}", color=cardTextColor)}
             LazyColumn(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(5.dp),
+                verticalArrangement = Arrangement.spacedBy(1.dp),
                 content = {
                     items(tasks.size) {
                         if (tasks[it].completed) {
-                            Text(tasks[it].action, style = TextStyle(textDecoration = TextDecoration.LineThrough))
-                        } else Text(tasks[it].action)
+                            Box(
+                                modifier = Modifier.background(color=Color.LightGray, shape = RoundedCornerShape(5.dp))
+                            ) {
+                                Text(tasks[it].action,
+                                    style = TextStyle(textDecoration = TextDecoration.LineThrough),
+                                    modifier=Modifier.padding(horizontal = 5.dp))
+                            }
+                        } else Box(
+                            modifier = Modifier.background(color=Color.Cyan, shape = RoundedCornerShape(5.dp))
+                        ) {
+                            Text(tasks[it].action, modifier=Modifier.padding(horizontal = 5.dp))
+                        }
                     }
                 }
             )

@@ -32,8 +32,7 @@ fun CalendarScreen(
     BoxWithConstraints (
         modifier = Modifier.fillMaxSize()
     ) {
-        println(maxWidth)
-        var compact = if (maxWidth < 600.dp) true else false
+        var compact = (maxWidth < 600.dp)
 
         Column {
 
