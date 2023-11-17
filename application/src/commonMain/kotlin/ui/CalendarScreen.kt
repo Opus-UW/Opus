@@ -9,6 +9,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import moe.tlaster.precompose.flow.collectAsStateWithLifecycle
@@ -46,12 +47,8 @@ fun CalendarScreen(
                 modifier = Modifier.fillMaxWidth().padding(2.dp).padding(5.dp),
                 content = {
                     items(daysOfWeek.size) {
-                        Card(
-                            colors = CardDefaults.cardColors(
-                                containerColor = Color.White, //Card background color
-                            )
-                        ) {
-                            Text(modifier = Modifier.fillMaxWidth(), text = daysOfWeek.get(it), textAlign = TextAlign.Center)
+                        Card (shape = RectangleShape){
+                            Text(modifier = Modifier.fillMaxWidth(), text = daysOfWeek.get(day), textAlign = TextAlign.Center)
                         }
                     }
                 }

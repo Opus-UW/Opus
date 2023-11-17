@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Text
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,13 +34,13 @@ fun DayPreview(previewDatee: LocalDateTime, previewMonth: String,
     val previewDate by remember(previewMonth) { mutableStateOf(previewDatee) }
     val todayDate = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
     val cardBgColor = if (todayDate.date == previewDate.date && todayDate.month == previewDate.month && todayDate.year == previewDate.year)
-        Color(0xFFE0FFFF) else Color.White
-    val cardTextColor = if (previewDate.month.name == previewMonth) Color.Black else Color.Gray
+        MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.secondaryContainer
+    val cardTextColor = if (previewDate.month.name == previewMonth) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSecondaryContainer
     val aspectRatio = if (compact) 0.8f else 1.25f
 
     Box(
         modifier = Modifier.background(cardBgColor)
-            .border(1.dp, Color.LightGray)
+            .border(1.dp, MaterialTheme.colorScheme.outline)
             .aspectRatio(aspectRatio)
             .heightIn(0.dp, 30.dp)
             .clickable ( onClick = {
@@ -58,16 +59,16 @@ fun DayPreview(previewDatee: LocalDateTime, previewMonth: String,
                     items(tasks.size) {
                         if (tasks[it].completed) {
                             Box(
-                                modifier = Modifier.background(color=Color.LightGray, shape = RoundedCornerShape(5.dp))
+                                modifier = Modifier.background(color=MaterialTheme.colorScheme.secondary, shape = RoundedCornerShape(5.dp))
                             ) {
                                 Text(tasks[it].action,
-                                    style = TextStyle(textDecoration = TextDecoration.LineThrough),
+                                    style = TextStyle(textDecoration = TextDecoration.LineThrough, color = MaterialTheme.colorScheme.onSecondary),
                                     modifier=Modifier.padding(horizontal = 5.dp))
                             }
                         } else Box(
-                            modifier = Modifier.background(color=Color.Cyan, shape = RoundedCornerShape(5.dp))
+                            modifier = Modifier.background(color= MaterialTheme.colorScheme.tertiary, shape = RoundedCornerShape(5.dp))
                         ) {
-                            Text(tasks[it].action, modifier=Modifier.padding(horizontal = 5.dp))
+                            Text(tasks[it].action, modifier=Modifier.padding(horizontal = 5.dp), color = MaterialTheme.colorScheme.onTertiary)
                         }
                     }
                 }
