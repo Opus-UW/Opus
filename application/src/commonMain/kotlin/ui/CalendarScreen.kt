@@ -32,7 +32,7 @@ fun CalendarScreen(
 
         //Days of the week
         val daysOfWeek = listOf("SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT")
-        var day = 0
+
         LazyVerticalGrid(
             verticalArrangement = Arrangement.spacedBy(0.dp),
             horizontalArrangement = Arrangement.spacedBy(0.dp),
@@ -45,9 +45,8 @@ fun CalendarScreen(
                             containerColor = Color.White, //Card background color
                         )
                     ) {
-                        Text(modifier = Modifier.fillMaxWidth(), text = daysOfWeek.get(day), textAlign = TextAlign.Center)
+                        Text(modifier = Modifier.fillMaxWidth(), text = daysOfWeek.get(it), textAlign = TextAlign.Center)
                     }
-                    day += 1
                 }
             }
         )
@@ -62,13 +61,12 @@ fun CalendarScreen(
             columns = GridCells.Fixed(7),
             modifier = Modifier.fillMaxWidth().padding(2.dp).padding(5.dp),
             content = {
-                items(list.size) {
+                items(list.size) {idx ->
                     val tasksOnDay = tasks.filter{
-                        it.dueDate?.dayOfYear == tempDate.dayOfYear
-                                && it.dueDate?.year == tempDate.year
+                        it.dueDate?.dayOfYear == ((tempDate + idx).dayOfYear)
+                                && it.dueDate?.year == (tempDate + idx).year
                     }
-                    DayPreview(tempDate, curDate.month.name, tasksOnDay, setShowDateDialog, setSelectedDate)
-                    tempDate += 1
+                    DayPreview((tempDate + idx), curDate.month.name, tasksOnDay, setShowDateDialog, setSelectedDate)
                 }
             }
         )

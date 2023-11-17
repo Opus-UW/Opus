@@ -8,7 +8,7 @@ import io.ktor.server.util.*
 import org.models.opus.dao.dao
 
 fun Routing.handleUsers() {
-    get("/users/{user_id}/tags") {
+    get("/users/{user_id}") {
         try {
 
         } catch (e: Exception) {
