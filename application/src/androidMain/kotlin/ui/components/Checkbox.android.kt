@@ -1,7 +1,7 @@
 package ui.components
 
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.Circle
@@ -21,7 +21,8 @@ actual fun TaskCheckbox(
     textFieldFocusRequester: FocusRequester
 ) {
     val context = LocalContext.current
-    val taskComplete = MediaPlayer.create(context, com.team202.opus.R.raw.complete)
+    val taskComplete by remember (task) { mutableStateOf(MediaPlayer.create(context, com.team202.opus.R.raw.complete)) }
+
     IconButton(onClick = {
         // delete the task (note change to finished)
         if (task != null) {

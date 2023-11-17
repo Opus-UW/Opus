@@ -3,7 +3,7 @@ package ui
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.*
@@ -20,7 +20,8 @@ import viewmodels.MainViewModel
 
 @Composable
 fun CalendarScreen(
-    viewModel: MainViewModel                   ){
+    viewModel: MainViewModel
+) {
 
     val curDate by viewModel.curDate.collectAsStateWithLifecycle()
     val tasks by viewModel.tasks.collectAsStateWithLifecycle()
@@ -45,7 +46,11 @@ fun CalendarScreen(
                             containerColor = Color.White, //Card background color
                         )
                     ) {
-                        Text(modifier = Modifier.fillMaxWidth(), text = daysOfWeek.get(day), textAlign = TextAlign.Center)
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = daysOfWeek.get(day),
+                            textAlign = TextAlign.Center
+                        )
                     }
                     day += 1
                 }
@@ -55,7 +60,7 @@ fun CalendarScreen(
         // Insert days here
         val list = (1..42).map { it.toString() }
         tempDate -= (tempDate.dayOfMonth - 1)
-        tempDate -= ((tempDate.dayOfWeek.ordinal + 1) % 7 )
+        tempDate -= ((tempDate.dayOfWeek.ordinal + 1) % 7)
         LazyVerticalGrid(
             verticalArrangement = Arrangement.spacedBy(0.dp),
             horizontalArrangement = Arrangement.spacedBy(0.dp),
@@ -63,7 +68,7 @@ fun CalendarScreen(
             modifier = Modifier.fillMaxWidth().padding(2.dp).padding(5.dp),
             content = {
                 items(list.size) {
-                    val tasksOnDay = tasks.filter{
+                    val tasksOnDay = tasks.filter {
                         it.dueDate?.dayOfYear == tempDate.dayOfYear
                                 && it.dueDate?.year == tempDate.year
                     }

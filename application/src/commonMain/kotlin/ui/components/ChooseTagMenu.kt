@@ -2,11 +2,11 @@ package ui.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
@@ -61,13 +61,12 @@ fun ChooseTagMenu(
                     placeholder = { Text("Add tag") },
                     onValueChange = { newTag = it },
                     singleLine = true,
-                    colors = TextFieldDefaults.textFieldColors(
-                        textColor = Color.Black,
-                        disabledTextColor = Color.Black,
-                        backgroundColor = Color.White,
+                    colors = TextFieldDefaults.colors(
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
-                        disabledIndicatorColor = Color.Transparent
+                        disabledIndicatorColor = Color.Transparent,
                     ),
                     modifier = Modifier.onKeyEvent { keyEvent ->
                         if (keyEvent.key != Key.Enter) return@onKeyEvent false
