@@ -1,9 +1,15 @@
 package ui
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import com.google.api.client.auth.oauth2.Credential
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver
@@ -36,16 +42,30 @@ fun LoginScreen(
     viewModel: MainViewModel,
     navigator: Navigator
 ) {
-    val coroutineScope = rememberCoroutineScope()
-    Button(onClick = {
-        coroutineScope.launch {
-            val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
-            println(Cred.getCredentials(httpTransport))
-            navigator.navigate("/tasks")
-            viewModel.setCurrentScreen("/tasks")
+    Column{
+        Spacer(modifier = Modifier.weight(1f))
+        Row{
+            Spacer(modifier = Modifier.weight(1f))
+            Text("OPUS", fontWeight = FontWeight.Bold, fontSize = 50.sp)
+            Spacer(modifier = Modifier.weight(1f))
         }
-    }){
-        Text("Login")
+        Spacer(modifier = Modifier.weight(1f))
+        Row{
+            Spacer(modifier = Modifier.weight(1f))
+            val coroutineScope = rememberCoroutineScope()
+            Button(onClick = {
+                coroutineScope.launch {
+                    val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
+                    Cred.getCredentials(httpTransport)
+                    navigator.navigate("/tasks")
+                    viewModel.setCurrentScreen("/tasks")
+                }
+            }){
+                Text("Login")
+            }
+            Spacer(modifier = Modifier.weight(1f))
+        }
+        Spacer(modifier = Modifier.weight(1f))
     }
 }
 object Cred {
