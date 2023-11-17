@@ -52,10 +52,8 @@ class ApiClient {
                 takeFrom("$baseUrl/users/$userId/tasks")
             }
 
-            return httpClient.get(url.build()){
-                headers{
-                    append("gtoken", accessToken)
-                }
+            return httpClient.get(url.build()) {
+                bearerAuth(accessToken)
             }.body()
         } catch (e: Exception) {
             e.printStackTrace()
@@ -69,10 +67,8 @@ class ApiClient {
             takeFrom("$baseUrl/users/$userId/completed-tasks")
         }
 
-        return httpClient.get(url.build()){
-            headers{
-                append("gtoken", accessToken)
-            }
+        return httpClient.get(url.build()) {
+            bearerAuth(accessToken)
         }.body()
     }
 
@@ -81,10 +77,8 @@ class ApiClient {
             takeFrom("$baseUrl/users/$userId/uncompleted-tasks")
         }
 
-        return httpClient.get(url.build()){
-            headers{
-                append("gtoken", accessToken)
-            }
+        return httpClient.get(url.build()) {
+            bearerAuth(accessToken)
         }.body()
     }
 
@@ -93,10 +87,9 @@ class ApiClient {
             takeFrom("$baseUrl/users/$userId/tasks")
         }
 
+
         return httpClient.post(url.build()) {
-            headers{
-                append("gtoken", accessToken)
-            }
+            bearerAuth(accessToken)
             contentType(ContentType.Application.Json)
             setBody(task)
         }.body()
@@ -106,10 +99,8 @@ class ApiClient {
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId/tasks/$taskId")
         }
-        return httpClient.delete(url.build()){
-            headers{
-                append("gtoken", accessToken)
-            }
+        return httpClient.delete(url.build()) {
+            bearerAuth(accessToken)
         }.body()
     }
 
@@ -118,9 +109,7 @@ class ApiClient {
             takeFrom("$baseUrl/users/$userId/tasks/$taskId")
         }
         return httpClient.put(url.build()) {
-            headers{
-                append("gtoken", accessToken)
-            }
+            bearerAuth(accessToken)
             contentType(ContentType.Application.Json)
             setBody(newTask)
         }.body()
@@ -132,14 +121,12 @@ class ApiClient {
                 takeFrom("$baseUrl/users/$userId/notes")
             }
 
-            return httpClient.get(url.build()){
-                headers{
-                    append("gtoken", accessToken)
-                }
+            return httpClient.get(url.build()) {
+                bearerAuth(accessToken)
             }.body()
         } catch (e: Exception) {
             e.printStackTrace()
-            System.out.println(e.message)
+            println(e.message)
         }
         return listOf()
     }
@@ -150,9 +137,7 @@ class ApiClient {
         }
 
         return httpClient.post(url.build()) {
-            headers{
-                append("gtoken", accessToken)
-            }
+            bearerAuth(accessToken)
             contentType(ContentType.Application.Json)
             setBody(note)
         }.body()
@@ -162,10 +147,8 @@ class ApiClient {
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId/notes/$noteId")
         }
-        return httpClient.delete(url.build()){
-            headers{
-                append("gtoken", accessToken)
-            }
+        return httpClient.delete(url.build()) {
+            bearerAuth(accessToken)
         }.body()
     }
 
@@ -174,9 +157,7 @@ class ApiClient {
             takeFrom("$baseUrl/users/$userId/notes/$noteId")
         }
         return httpClient.put(url.build()) {
-            headers{
-                append("gtoken", accessToken)
-            }
+            bearerAuth(accessToken)
             contentType(ContentType.Application.Json)
             setBody(newNote)
         }.body()
@@ -189,29 +170,22 @@ class ApiClient {
             }
 
             return httpClient.get(url.build()) {
-                headers{
-                    append("gtoken", accessToken)
-                }
+                bearerAuth(accessToken)
             }.body()
         } catch (e: Exception) {
             e.printStackTrace()
-            System.out.println(e.message)
+            println(e.message)
         }
         return listOf()
     }
 
     suspend fun postTag(tag: Tag): List<Tag> {
         val url = URLBuilder().apply {
-            headers{
-                append("gtoken", accessToken)
-            }
             takeFrom("$baseUrl/users/$userId/tags")
         }
 
         return httpClient.post(url.build()) {
-            headers{
-                append("gtoken", accessToken)
-            }
+            bearerAuth(accessToken)
             contentType(ContentType.Application.Json)
             setBody(tag)
         }.body()
@@ -219,12 +193,11 @@ class ApiClient {
 
     suspend fun deleteTag(tagId: Int): List<Tag> {
         val url = URLBuilder().apply {
-            headers{
-                append("gtoken", accessToken)
-            }
             takeFrom("$baseUrl/users/$userId/tags/$tagId")
         }
-        return httpClient.delete(url.build()).body()
+        return httpClient.delete(url.build()) {
+            bearerAuth(accessToken)
+        }.body()
     }
 
     suspend fun editTag(tagId: Int, newTag: Tag): List<Tag> {
@@ -232,9 +205,7 @@ class ApiClient {
             takeFrom("$baseUrl/users/$userId/tags/$tagId")
         }
         return httpClient.put(url.build()) {
-            headers{
-                append("gtoken", accessToken)
-            }
+            bearerAuth(accessToken)
             contentType(ContentType.Application.Json)
             setBody(newTag)
         }.body()
@@ -246,9 +217,7 @@ class ApiClient {
             takeFrom("$baseUrl/users/$userId")
         }
         return httpClient.post(url.build()) {
-            headers{
-                append("gtoken", accessToken)
-            }
+            bearerAuth(accessToken)
             contentType(ContentType.Application.Json)
         }.body()
     }

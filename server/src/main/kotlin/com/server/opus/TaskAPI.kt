@@ -30,7 +30,7 @@ import java.io.InputStreamReader
 class TaskAPI(private val accessTokenString: String) {
 
     private val APPLICATION_NAME = "Opus"
-    private val accessToken = AccessToken.newBuilder().setTokenValue(accessTokenString).build()
+    private val accessToken: AccessToken
 
     private val JSON_FACTORY: JsonFactory = GsonFactory.getDefaultInstance()
 
@@ -43,6 +43,8 @@ class TaskAPI(private val accessTokenString: String) {
     init {
         val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
 
+        accessToken = AccessToken.newBuilder().setTokenValue(accessTokenString).build()
+
         val credential = GoogleCredentials.create(accessToken)
 
         taskService = Tasks.Builder(httpTransport, JSON_FACTORY, HttpCredentialsAdapter(credential))
@@ -53,18 +55,22 @@ class TaskAPI(private val accessTokenString: String) {
 
     }
 
-    fun tasks(maxResults: Int = 100, timeMinimum: DateTime = DateTime(System.currentTimeMillis()), orderBy: String = "startTime"): com.google.api.services.tasks.model.Tasks {
+    fun tasks(
+        maxResults: Int = 100,
+        timeMinimum: DateTime = DateTime(System.currentTimeMillis()),
+        orderBy: String = "startTime"
+    ): com.google.api.services.tasks.model.Tasks {
 
         return taskService.tasks().list("MDU5MjcxNDc3MDc4NDg0Mjc3MjM6MDow")
             .setMaxResults(maxResults)
             .execute()
     }
 
-    fun patchTask(task: Task) : Task {
+    fun patchTask(task: Task): Task {
         return taskService.tasks().patch(taskListId, task.id, task).execute()
     }
 
-    fun createTask(task: Task) : Task {
+    fun createTask(task: Task): Task {
         return taskService.tasks().insert(taskListId, task).execute()
     }
 
