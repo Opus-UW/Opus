@@ -21,12 +21,14 @@ actual fun TaskCheckbox(
     textFieldFocusRequester: FocusRequester
 ) {
     val context = LocalContext.current
-    //val taskComplete = MediaPlayer.create(context, R.raw.complete)
+    val taskComplete = MediaPlayer.create(context, com.team202.opus.R.raw.complete)
     IconButton(onClick = {
         // delete the task (note change to finished)
         if (task != null) {
-            viewModel.updateTask(task = task, completed = !task.completed)
-            //taskComplete.start()
+            val complete = !task.completed
+            viewModel.updateTask(task = task, completed = complete)
+            if (complete)
+                taskComplete.start()
         }
         // For new task
         // Clicking on the plus focuses text box

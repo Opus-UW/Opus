@@ -13,8 +13,8 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import com.adonax.audiocue.AudioCue
-import org.models.opus.models.Task
 import viewmodels.MainViewModel
+import org.models.opus.models.Task
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -40,7 +40,6 @@ actual fun TaskCheckbox(
             viewModel.updateTask(task = task, completed = complete)
             if (complete)
                 audio.play()
-            println ("Audio Played")
         }
         // For new task
         // Clicking on the plus focuses text box
