@@ -15,6 +15,8 @@ build/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+.idea/*
+.run/*
 
 ### Eclipse ###
 .apt_generated
@@ -49,3 +51,5 @@ local.properties
 .idea/gradle.xml
 .idea/misc.xml
 .idea/artifacts/application_desktop_1_0_SNAPSHOT.xml
+/.run/
+/.idea/

@@ -26,7 +26,7 @@ fun NoteScreen(
     val notes by viewModel.notes.collectAsStateWithLifecycle()
     val listState = rememberLazyGridState()
 
-    Column(modifier = Modifier.padding(5.dp)) {
+    Column(modifier = Modifier.padding(20.dp).fillMaxWidth().fillMaxHeight()) {
         AddNote(viewModel)
         Spacer(modifier = Modifier.height(5.dp))
         LazyVerticalGrid(

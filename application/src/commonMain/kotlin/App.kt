@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import api.ApiClient
+import ui.theme.OpusTheme
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.PreComposeApp
 import moe.tlaster.precompose.flow.collectAsStateWithLifecycle
@@ -14,14 +15,14 @@ import moe.tlaster.precompose.navigation.NavHost
 import moe.tlaster.precompose.navigation.rememberNavigator
 import moe.tlaster.precompose.viewmodel.viewModel
 import ui.*
-import ui.components.OpusTopAppBar
+import ui.OpusTopAppBar
 import viewmodels.MainViewModel
 
 
 @Composable
 fun App() {
     PreComposeApp {
-        MaterialTheme {
+        OpusTheme (useDarkTheme = true) {
             val viewModel = viewModel(modelClass = MainViewModel::class, keys = listOf("main")) {
                 MainViewModel(it)
             }
@@ -52,7 +53,8 @@ fun App() {
                                 }
                             }
                         }
-                    }
+                    },
+                    containerColor = MaterialTheme.colorScheme.onBackground
                 ) {
                     Surface(modifier = Modifier.padding(top = it.calculateTopPadding())) {
                         NavHost(
