@@ -7,22 +7,10 @@
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="modules">
           <set>
-            <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/application" />
-            <option value="$PROJECT_DIR$/models" />
-            <option value="$PROJECT_DIR$/server" />
-          </set>
-        </option>
-      </GradleProjectSettings>
-      <GradleProjectSettings>
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleHome" value="/usr/share/java/gradle" />
-        <option name="modules">
-          <set>
-            <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/application" />
-            <option value="$PROJECT_DIR$/models" />
-            <option value="$PROJECT_DIR$/server" />
+            <option value="/storage/Documents/CS346/cs346-team-202-project" />
+            <option value="/storage/Documents/CS346/cs346-team-202-project/application" />
+            <option value="/storage/Documents/CS346/cs346-team-202-project/models" />
+            <option value="/storage/Documents/CS346/cs346-team-202-project/server" />
           </set>
         </option>
       </GradleProjectSettings>
