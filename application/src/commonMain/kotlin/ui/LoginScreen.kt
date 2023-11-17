@@ -6,10 +6,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import api.ApiClient
 import com.google.api.client.auth.oauth2.Credential
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver
@@ -19,7 +21,10 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.JsonFactory
 import com.google.api.client.json.gson.GsonFactory
+import com.google.api.client.util.store.DataStoreFactory
 import com.google.api.client.util.store.FileDataStoreFactory
+import com.google.api.services.oauth2.Oauth2
+import com.google.api.services.oauth2.Oauth2Scopes
 import com.google.api.services.tasks.TasksScopes
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.navigation.Navigator
@@ -36,7 +41,7 @@ private const val CREDENTIALS_FILE_PATH = "/credentials.json"
 private val JSON_FACTORY: JsonFactory = GsonFactory.getDefaultInstance()
 
 // If modifying these scopes, delete your previously saved tokens/ folder.
-private val SCOPES = listOf(TasksScopes.TASKS)
+private val SCOPES = listOf(TasksScopes.TASKS) + Oauth2Scopes.all()
 @Composable
 fun LoginScreen(
     viewModel: MainViewModel,
@@ -56,7 +61,17 @@ fun LoginScreen(
             Button(onClick = {
                 coroutineScope.launch {
                     val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
-                    Cred.getCredentials(httpTransport)
+                    val cred = Cred.getCredentials(httpTransport)
+                    ApiClient.getInstance().setAccessToken(cred.accessToken)
+                    val oauth2 = Oauth2.Builder(httpTransport, JSON_FACTORY, cred).build()
+
+                    ApiClient.getInstance().getOrCreateUser(oauth2.userinfo().get().execute().id)
+
+                    // Grab Data from server
+                    LaunchedEffect(Unit) {
+                        viewModel.fetchAllData()
+                    }
+
                     navigator.navigate("/tasks")
                     viewModel.setCurrentScreen("/tasks")
                 }

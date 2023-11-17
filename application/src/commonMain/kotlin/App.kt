@@ -23,10 +23,7 @@ fun App() {
             val viewModel = viewModel(modelClass = MainViewModel::class, keys = listOf("main")) {
                 MainViewModel(it)
             }
-            // Grab Data from server
-            LaunchedEffect(Unit) {
-                viewModel.fetchAllData()
-            }
+
             val navigator = rememberNavigator()
             val coroutineScope = rememberCoroutineScope()
 
