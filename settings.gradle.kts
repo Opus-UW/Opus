@@ -27,4 +27,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Opus"
 
-include("application", "models", "server")
+include("application", "server", "models" )

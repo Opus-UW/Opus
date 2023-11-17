@@ -3,10 +3,7 @@ package org.models.opus.dao
 import kotlinx.datetime.LocalDateTime
 import org.models.opus.dao.DatabaseFactory.dbQuery
 import org.models.opus.db.*
-import org.models.opus.models.Colour
-import org.models.opus.models.Note
-import org.models.opus.models.Tag
-import org.models.opus.models.Task
+import org.models.opus.models.*
 
 class DAOFacadeImpl : DAOFacade {
     private fun entityToTask(entity: TaskEntity) = Task(
@@ -29,6 +26,11 @@ class DAOFacadeImpl : DAOFacade {
         id = entity.id.value, title = entity.title, colour = entity.colour
     )
 
+    private fun entityToUser(entity: UserEntity) = User(
+        id = entity.id.value
+    )
+
+
     override suspend fun allTasks(): List<Task> = dbQuery {
         TaskEntity.all().map(::entityToTask)
     }
@@ -37,12 +39,16 @@ class DAOFacadeImpl : DAOFacade {
         TaskEntity.find { Tasks.id eq id }.map(::entityToTask).singleOrNull()
     }
 
-    override suspend fun userTasks(userId: Int): List<Task> = dbQuery {
+    override suspend fun taskGId(id: Int): String? = dbQuery {
+        TaskEntity.find { Tasks.id eq id }.firstOrNull()?.gTaskId
+    }
+
+    override suspend fun userTasks(userId: String): List<Task> = dbQuery {
         TaskEntity.find { Tasks.userId eq userId }.map(::entityToTask)
     }
 
     override suspend fun addNewTask(
-        completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>, userId: Int
+        completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>, gTaskId: String?, userId: String
     ): Task = dbQuery {
         entityToTask(TaskEntity.new {
             this.completed = completed
@@ -51,11 +57,12 @@ class DAOFacadeImpl : DAOFacade {
             this.dueDate = dueDate
             this.user = UserEntity.findById(userId) ?: throw Exception()
             this.tags = TagEntity.forIds(tags.map { it.id })
+            this.gTaskId = gTaskId
         })
     }
 
     override suspend fun editTask(
-        id: Int, completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>
+        id: Int, completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>, gTaskId: String?
     ): Boolean = dbQuery {
         val entity = TaskEntity.find { Tasks.id eq id }.singleOrNull() ?: return@dbQuery false
         entity.apply {
@@ -64,6 +71,7 @@ class DAOFacadeImpl : DAOFacade {
             this.creationDate = creationDate
             this.dueDate = dueDate
             this.tags = TagEntity.forIds(tags.map { it.id })
+            this.gTaskId = gTaskId
         }
 
         return@dbQuery true
@@ -84,11 +92,11 @@ class DAOFacadeImpl : DAOFacade {
         NoteEntity.find { Notes.id eq id }.map(::entityToNote).singleOrNull()
     }
 
-    override suspend fun userNotes(userId: Int): List<Note> = dbQuery {
+    override suspend fun userNotes(userId: String): List<Note> = dbQuery {
         NoteEntity.find { Notes.userId eq userId }.map(::entityToNote)
     }
 
-    override suspend fun addNewNote(title: String, body: String, tags: List<Tag>, userId: Int): Note = dbQuery {
+    override suspend fun addNewNote(title: String, body: String, tags: List<Tag>, userId: String): Note = dbQuery {
         entityToNote(NoteEntity.new {
             this.title = title
             this.body = body
@@ -123,11 +131,11 @@ class DAOFacadeImpl : DAOFacade {
         TagEntity.find { Tags.id eq id }.map(::entityToTag).singleOrNull()
     }
 
-    override suspend fun userTags(userId: Int): List<Tag> = dbQuery {
+    override suspend fun userTags(userId: String): List<Tag> = dbQuery {
         TagEntity.find { Tags.userId eq userId }.map(::entityToTag)
     }
 
-    override suspend fun addNewTag(title: String, colour: Colour, userId: Int): Tag = dbQuery {
+    override suspend fun addNewTag(title: String, colour: Colour, userId: String): Tag = dbQuery {
         entityToTag(TagEntity.new {
             this.title = title
             this.colour = colour
@@ -148,6 +156,31 @@ class DAOFacadeImpl : DAOFacade {
         val tags = TagEntity.find { Tags.id eq id }
         if (tags.count().toInt() == 0) return@dbQuery false
         tags.forEach { it.delete() }
+        return@dbQuery true
+    }
+
+    override suspend fun allUsers(): List<User> = dbQuery {
+        UserEntity.all().map(::entityToUser)
+    }
+
+    override suspend fun user(id: String): User? = dbQuery {
+        UserEntity.find { Users.id eq id }.map(::entityToUser).singleOrNull()
+    }
+
+    override suspend fun addNewUser(id: String): User = dbQuery {
+        entityToUser(UserEntity.new(id){})
+    }
+
+    override suspend fun editUser(id: String): Boolean = dbQuery {
+        val entity = UserEntity.find { Users.id eq id }.singleOrNull() ?: return@dbQuery false
+        entity.apply {} // Does nothing for now, change when user has more data
+        return@dbQuery true
+    }
+
+    override suspend fun deleteUser(id: String): Boolean = dbQuery {
+        val users = UserEntity.find { Users.id eq id }
+        if (users.count().toInt() == 0) return@dbQuery false
+        users.forEach { it.delete() }
         return@dbQuery true
     }
 }

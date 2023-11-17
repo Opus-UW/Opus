@@ -12,7 +12,7 @@ import org.models.opus.models.Note
 fun Routing.handleNotes() {
     get("/users/{user_id}/notes") {
         try {
-            val userId = call.parameters.getOrFail("user_id").toInt()
+            val userId = call.parameters.getOrFail("user_id")
             call.respond(dao.userNotes(userId))
         } catch (e: Exception) {
             println(e.message)
@@ -22,7 +22,7 @@ fun Routing.handleNotes() {
     }
     post("/users/{user_id}/notes") {
         try {
-            val userId = call.parameters.getOrFail("user_id").toInt()
+            val userId = call.parameters.getOrFail("user_id")
             val note = call.receive<Note>()
             dao.addNewNote(note.title, note.body, note.tags, userId)
             call.respond(dao.userNotes(userId))
@@ -34,7 +34,7 @@ fun Routing.handleNotes() {
     }
     delete("/users/{user_id}/notes/{note_id}") {
         try {
-            val userId = call.parameters.getOrFail("user_id").toInt()
+            val userId = call.parameters.getOrFail("user_id")
             val noteId = call.parameters.getOrFail("note_id").toInt()
 
             dao.deleteNote(noteId)
@@ -49,7 +49,7 @@ fun Routing.handleNotes() {
     }
     put("/users/{user_id}/notes/{note_id}") {
         try {
-            val userId = call.parameters.getOrFail("user_id").toInt()
+            val userId = call.parameters.getOrFail("user_id")
             val noteId = call.parameters.getOrFail("note_id").toInt()
 
             val note = call.receive<Note>()

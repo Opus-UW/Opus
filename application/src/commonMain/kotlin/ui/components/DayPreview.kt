@@ -10,6 +10,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -23,11 +26,12 @@ import org.models.opus.models.Task
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DayPreview(previewDate: LocalDateTime, previewMonth: String,
+fun DayPreview(previewDatee: LocalDateTime, previewMonth: String,
                tasks: List<Task>,
                setShowDateDialog: (Boolean) -> Unit,
                setSelectedDate: (LocalDateTime) -> Unit,
                compact: Boolean) {
+    val previewDate by remember(previewMonth) { mutableStateOf(previewDatee) }
     val todayDate = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
     val cardBgColor = if (todayDate.date == previewDate.date && todayDate.month == previewDate.month && todayDate.year == previewDate.year)
         MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.secondaryContainer

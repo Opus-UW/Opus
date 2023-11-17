@@ -12,7 +12,7 @@ import org.models.opus.models.Tag
 fun Routing.handleTags() {
     get("/users/{user_id}/tags") {
         try {
-            val userId = call.parameters.getOrFail("user_id").toInt()
+            val userId = call.parameters.getOrFail("user_id")
             call.respond(dao.userTags(userId))
         } catch (e: Exception) {
             println(e.message)
@@ -22,7 +22,7 @@ fun Routing.handleTags() {
     }
     post("/users/{user_id}/tags") {
         try {
-            val userId = call.parameters.getOrFail("user_id").toInt()
+            val userId = call.parameters.getOrFail("user_id")
             val tag = call.receive<Tag>()
             dao.addNewTag(tag.title, tag.colour, userId)
             call.respond(dao.userTags(userId))
@@ -34,7 +34,7 @@ fun Routing.handleTags() {
     }
     delete("/users/{user_id}/tags/{tag_id}") {
         try {
-            val userId = call.parameters.getOrFail("user_id").toInt()
+            val userId = call.parameters.getOrFail("user_id")
             val tagId = call.parameters.getOrFail("tag_id").toInt()
 
             dao.deleteTag(tagId)
@@ -49,7 +49,7 @@ fun Routing.handleTags() {
     }
     put("/users/{user_id}/tags/{tag_id}") {
         try {
-            val userId = call.parameters.getOrFail("user_id").toInt()
+            val userId = call.parameters.getOrFail("user_id")
             val tagId = call.parameters.getOrFail("tag_id").toInt()
 
             val tag = call.receive<Tag>()
