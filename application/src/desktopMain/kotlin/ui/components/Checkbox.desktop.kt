@@ -26,7 +26,7 @@ actual fun TaskCheckbox(
     textFieldFocusRequester: FocusRequester
 ) {
     var isCheckboxHovered by remember { mutableStateOf(false) }
-    var audio by remember (task) { mutableStateOf(AudioCue.makeStereoCue(object {}.javaClass.getResource("/complete.wav"), 1)) }
+    val audio by remember (task) { mutableStateOf(AudioCue.makeStereoCue(object {}.javaClass.getResource("/complete.wav"), 1)) }
     var isAudioOpen by remember (task) { mutableStateOf(false) }
 
     IconButton(onClick = {
