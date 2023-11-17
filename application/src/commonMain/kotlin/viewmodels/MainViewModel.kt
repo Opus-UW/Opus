@@ -74,9 +74,9 @@ class MainViewModel(
 
     fun updateNote(
         note: Note,
-        title: String?,
-        body: String?,
-        tags: List<Tag>
+        title: String? = null,
+        body: String? = null,
+        tags: List<Tag>? = null
     ){
         val updatedNote = Note(
             title ?: note.title,
@@ -86,6 +86,12 @@ class MainViewModel(
         )
         viewModelScope.launch {
             setNotes(ApiClient.getInstance().editNote(note.id, updatedNote))
+        }
+    }
+
+    fun createNote(value: Note){
+        viewModelScope.launch {
+            setNotes(ApiClient.getInstance().postNote(value))
         }
     }
 

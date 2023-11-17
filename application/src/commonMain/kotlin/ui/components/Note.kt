@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
@@ -124,6 +125,21 @@ fun NotePreview(
     }
 }
 
+
+data class keyboardShortcut(
+    val name: String,
+    val icon: ImageVector,
+    val spanStyle: SpanStyle? = null,
+    val paragraphStyle: ParagraphStyle? = null,
+    val bulletList: Boolean = false,
+    val numberList: Boolean = false,
+    val ctrl: Boolean = false,
+    val alt: Boolean = false,
+    val shift: Boolean = false,
+    val keys: List<Key>
+)
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditNoteDialog(
@@ -139,18 +155,89 @@ fun EditNoteDialog(
     var newTitle by remember { mutableStateOf(title) }
     val tags by viewModel.tags.collectAsStateWithLifecycle()
 
+    val keyboardShortcuts = listOf<keyboardShortcut>(
+        keyboardShortcut(
+            "Bold Text", Icons.Default.FormatBold, spanStyle = SpanStyle(fontWeight = FontWeight.Bold),
+            ctrl = true, keys = listOf<Key>(Key.B)
+        ),
+        keyboardShortcut(
+            "Italic Text", Icons.Default.FormatItalic, spanStyle = SpanStyle(fontStyle = FontStyle.Italic),
+            ctrl = true, keys = listOf<Key>(Key.I)
+        ),
+        keyboardShortcut(
+            "Underlined Text",
+            Icons.Default.FormatUnderlined,
+            spanStyle = SpanStyle(textDecoration = TextDecoration.Underline),
+            ctrl = true,
+            keys = listOf<Key>(Key.U)
+        ),
+        keyboardShortcut(
+            "Strikethrough Text",
+            Icons.Default.FormatStrikethrough,
+            spanStyle = SpanStyle(textDecoration = TextDecoration.LineThrough),
+            alt = true,
+            shift = true,
+            keys = listOf<Key>(Key.Five)
+        ),
+        keyboardShortcut(
+            "Left Align Text",
+            Icons.Default.FormatAlignLeft,
+            paragraphStyle = ParagraphStyle(textAlign = TextAlign.Start),
+            ctrl = true,
+            shift = true,
+            keys = listOf<Key>(Key.L)
+        ),
+        keyboardShortcut(
+            "Center Align Text",
+            Icons.Default.FormatAlignCenter,
+            paragraphStyle = ParagraphStyle(textAlign = TextAlign.Center),
+            ctrl = true,
+            shift = true,
+            keys = listOf<Key>(Key.E)
+        ),
+        keyboardShortcut(
+            "Right Align Text",
+            Icons.Default.FormatAlignRight,
+            paragraphStyle = ParagraphStyle(textAlign = TextAlign.End),
+            ctrl = true,
+            shift = true,
+            keys = listOf<Key>(Key.R)
+        ),
+        keyboardShortcut(
+            "Numbered List Text", Icons.Default.FormatListNumbered, numberList = true,
+            ctrl = true, shift = true, keys = listOf<Key>(Key.Seven)
+        ),
+        keyboardShortcut(
+            "Bullet List Text", Icons.Default.FormatListBulleted, bulletList = true,
+            ctrl = true, shift = true, keys = listOf<Key>(Key.Eight)
+        )
+    )
+
     Dialog(
         onDismissRequest = {
-            setTitle(newTitle)
-            state.setHtml(newState.toHtml())
-            // Update tags
-            val newTaskTags = mutableListOf<Tag>()
-            tagStatus.forEach { entry ->
-                if (entry.value) {
-                    newTaskTags.add(entry.key)
+            if (title != newTitle || state.toHtml() != newState.toHtml()) {
+                // Update tags
+                val newTaskTags = mutableListOf<Tag>()
+                tagStatus.forEach { entry ->
+                    if (entry.value) {
+                        newTaskTags.add(entry.key)
+                    }
+                }
+                // Check if new note is to be created
+                if (note.id != -1) {
+                    setTitle(newTitle)
+                    state.setHtml(newState.toHtml())
+                    viewModel.updateNote(
+                        note,
+                        title = newTitle,
+                        body = newState.toHtml(),
+                        tags = newTaskTags.toList()
+                    )
+                } else {
+                    val newNote = Note(title, newState.toHtml(), newTaskTags)
+                    viewModel.createNote(newNote)
                 }
             }
-            viewModel.updateNote(note, title = newTitle, body = newState.toHtml(), tags = newTaskTags.toList())
             onDismissRequest()
         },
         properties = DialogProperties(dismissOnClickOutside = true)
@@ -202,59 +289,25 @@ fun EditNoteDialog(
                     .fillMaxWidth()
                     .height(IntrinsicSize.Min)
             ) {
-                IconButton(onClick = { newState.toggleSpanStyle(SpanStyle(fontWeight = FontWeight.Bold)) }) {
-                    Icon(
-                        Icons.Default.FormatBold,
-                        contentDescription = "Bold Text"
-                    )
-                }
-                IconButton(onClick = { newState.toggleSpanStyle(SpanStyle(fontStyle = FontStyle.Italic)) }) {
-                    Icon(
-                        Icons.Default.FormatItalic,
-                        contentDescription = "Italic Text"
-                    )
-                }
-                IconButton(onClick = { newState.toggleSpanStyle(SpanStyle(textDecoration = TextDecoration.Underline)) }) {
-                    Icon(
-                        Icons.Default.FormatUnderlined,
-                        contentDescription = "Underlined Text"
-                    )
-                }
-                IconButton(onClick = { newState.toggleSpanStyle(SpanStyle(textDecoration = TextDecoration.LineThrough)) }) {
-                    Icon(
-                        Icons.Default.FormatStrikethrough,
-                        contentDescription = "Strikethrough Text"
-                    )
-                }
-                IconButton(onClick = { newState.toggleParagraphStyle(ParagraphStyle(textAlign = TextAlign.Start)) }) {
-                    Icon(
-                        Icons.Default.FormatAlignLeft,
-                        contentDescription = "Left Align Text"
-                    )
-                }
-                IconButton(onClick = { newState.toggleParagraphStyle(ParagraphStyle(textAlign = TextAlign.Center)) }) {
-                    Icon(
-                        Icons.Default.FormatAlignCenter,
-                        contentDescription = "Center Align Text"
-                    )
-                }
-                IconButton(onClick = { newState.toggleParagraphStyle(ParagraphStyle(textAlign = TextAlign.End)) }) {
-                    Icon(
-                        Icons.Default.FormatAlignRight,
-                        contentDescription = "Right Align Text"
-                    )
-                }
-                IconButton(onClick = { newState.toggleOrderedList() }) {
-                    Icon(
-                        Icons.Default.FormatListNumbered,
-                        contentDescription = "Numbered List Text"
-                    )
-                }
-                IconButton(onClick = { newState.toggleUnorderedList() }) {
-                    Icon(
-                        Icons.Default.FormatListBulleted,
-                        contentDescription = "Bullet List Text"
-                    )
+                keyboardShortcuts.forEach { shortcut ->
+                    IconButton(
+                        onClick =
+                        {
+                            if (shortcut.spanStyle != null) {
+                                newState.toggleSpanStyle(shortcut.spanStyle)
+                            } else if (shortcut.paragraphStyle != null) {
+                                newState.toggleParagraphStyle(shortcut.paragraphStyle)
+                            } else if (shortcut.bulletList) {
+                                newState.toggleUnorderedList()
+                            } else if (shortcut.numberList) {
+                                newState.toggleOrderedList()
+                            }
+                        }
+
+                    ) {
+                        Icon(shortcut.icon, contentDescription = shortcut.name)
+                    }
+
                 }
             }
             RichTextEditor(
@@ -262,32 +315,27 @@ fun EditNoteDialog(
                 modifier = Modifier
                     .fillMaxWidth()
                     .onKeyEvent {
-                        if (it.isCtrlPressed && it.key == Key.B && it.type == KeyEventType.KeyUp) {
-                            newState.toggleSpanStyle(SpanStyle(fontWeight = FontWeight.Bold))
-                            true
-                        } else if (it.isCtrlPressed && it.key == Key.I && it.type == KeyEventType.KeyUp) {
-                            newState.toggleSpanStyle(SpanStyle(fontStyle = FontStyle.Italic))
-                            true
-                        } else if (it.isCtrlPressed && it.key == Key.U && it.type == KeyEventType.KeyUp) {
-                            newState.toggleSpanStyle(SpanStyle(textDecoration = TextDecoration.Underline))
-                            true
-                        } else if (it.isAltPressed && it.isShiftPressed && it.key == Key.Five && it.type == KeyEventType.KeyUp) {
-                            newState.toggleSpanStyle(SpanStyle(textDecoration = TextDecoration.LineThrough))
-                            true
-                        } else if (it.isCtrlPressed && it.isShiftPressed && it.key == Key.L && it.type == KeyEventType.KeyUp) {
-                            newState.toggleParagraphStyle(ParagraphStyle(textAlign = TextAlign.Start))
-                            true
-                        } else if (it.isCtrlPressed && it.isShiftPressed && it.key == Key.E && it.type == KeyEventType.KeyUp) {
-                            newState.toggleParagraphStyle(ParagraphStyle(textAlign = TextAlign.Center))
-                            true
-                        } else if (it.isCtrlPressed && it.isShiftPressed && it.key == Key.R && it.type == KeyEventType.KeyUp) {
-                            newState.toggleParagraphStyle(ParagraphStyle(textAlign = TextAlign.End))
-                            true
-                        } else if (it.isCtrlPressed && it.isShiftPressed && it.key == Key.Seven && it.type == KeyEventType.KeyUp) {
-                            newState.toggleOrderedList()
-                            true
-                        } else if (it.isCtrlPressed && it.isShiftPressed && it.key == Key.Eight && it.type == KeyEventType.KeyUp) {
-                            newState.toggleUnorderedList()
+                        if (it.type == KeyEventType.KeyUp) {
+                            keyboardShortcuts.forEach { shortcut ->
+                                val ctrlPressed = (shortcut.ctrl && it.isCtrlPressed) || !shortcut.ctrl
+                                val shiftPressed = (shortcut.shift && it.isShiftPressed) || !shortcut.shift
+                                val altPressed = (shortcut.alt && it.isAltPressed) || !shortcut.alt
+                                var keysPressed = true
+                                shortcut.keys.forEach { key ->
+                                    keysPressed = keysPressed && it.key == key
+                                }
+                                if (ctrlPressed && shiftPressed && altPressed && keysPressed) {
+                                    if (shortcut.spanStyle != null) {
+                                        newState.toggleSpanStyle(shortcut.spanStyle)
+                                    } else if (shortcut.paragraphStyle != null) {
+                                        newState.toggleParagraphStyle(shortcut.paragraphStyle)
+                                    } else if (shortcut.bulletList) {
+                                        newState.toggleUnorderedList()
+                                    } else if (shortcut.numberList) {
+                                        newState.toggleOrderedList()
+                                    }
+                                }
+                            }
                             true
                         } else {
                             // let other handlers receive this event
