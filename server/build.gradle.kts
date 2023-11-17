@@ -46,7 +46,6 @@ dependencies {
     implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
 
-
     testImplementation("io.ktor:ktor-server-tests-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
@@ -54,6 +53,8 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
+
+    implementation("io.ktor:ktor-server-websockets-jvm")
 
     implementation(project(mapOf("path" to ":models")))
 }
