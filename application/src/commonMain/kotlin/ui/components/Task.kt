@@ -18,6 +18,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
@@ -132,6 +133,7 @@ fun task(
                             interactionSource = interactionSource,
                             visualTransformation = visualTransformation,
                             readOnly = !(new || edit),
+                            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                             textStyle = LocalTextStyle.current.merge(TextStyle(color = LocalContentColor.current, textDecoration = if (task != null && task.completed) TextDecoration.LineThrough else TextDecoration.None)),
                             modifier = Modifier
                                 .onKeyEvent { keyEvent ->
@@ -149,7 +151,8 @@ fun task(
                                     }
                                     true
                                 }
-                                .focusRequester(textFieldFocusRequester).fillMaxWidth()
+                                .focusRequester(textFieldFocusRequester).fillMaxWidth(),
+                            singleLine = true
                         ){ innerTextField ->
                             TextFieldDefaults.DecorationBox(
                                 value = text,

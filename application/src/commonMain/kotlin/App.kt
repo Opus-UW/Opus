@@ -16,7 +16,7 @@ import viewmodels.MainViewModel
 @Composable
 fun App() {
     PreComposeApp {
-        OpusTheme (useDarkTheme = true) {
+        OpusTheme  {
             val viewModel = viewModel(modelClass = MainViewModel::class, keys = listOf("main")) {
                 MainViewModel(it)
             }
