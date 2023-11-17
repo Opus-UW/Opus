@@ -40,7 +40,7 @@ fun DayPreview(previewDate: LocalDateTime, previewMonth: String,
     Box(
         modifier = Modifier.background(cardBgColor)
             .border(1.dp, Color.LightGray)
-            //.aspectRatio(aspectRatio)
+            .aspectRatio(aspectRatio)
             .heightIn(0.dp, 30.dp)
             .clickable ( onClick = {
                 setSelectedDate(previewDate)
