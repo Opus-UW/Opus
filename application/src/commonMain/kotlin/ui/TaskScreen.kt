@@ -50,9 +50,9 @@ fun TaskScreen(
                 }
             ) { task ->
                 task(viewModel, task, task.dueDate, defaultDueDate)
-                if (task == uncompletedTasks.last()) {
-                    ToggleSortDivider(showCompleted, setShowCompleted, "Completed", completedTasks.size)
-                }
+            }
+            item{
+                ToggleSortDivider(showCompleted, setShowCompleted, "Completed", completedTasks.size)
             }
             if (showCompleted) {
                 items(

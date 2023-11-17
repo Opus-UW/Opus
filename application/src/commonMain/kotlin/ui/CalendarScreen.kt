@@ -48,7 +48,7 @@ fun CalendarScreen(
                 content = {
                     items(daysOfWeek.size) {
                         Card (shape = RectangleShape){
-                            Text(modifier = Modifier.fillMaxWidth(), text = daysOfWeek.get(day), textAlign = TextAlign.Center)
+                            Text(modifier = Modifier.fillMaxWidth(), text = daysOfWeek.get(it), textAlign = TextAlign.Center)
                         }
                     }
                 }
