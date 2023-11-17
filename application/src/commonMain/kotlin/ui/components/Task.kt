@@ -127,7 +127,7 @@ fun task(
                         .onKeyEvent { keyEvent ->
                             if (keyEvent.key != Key.Enter) return@onKeyEvent false
                             if (keyEvent.type == KeyEventType.KeyUp) {
-                                viewModel.updateTask(text = text, task = task)
+                                viewModel.updateTask(text = text, task = task, dueDate = taskDueDate, tagStatus = tagStatus)
                                 text = ""
                                 focusManager.clearFocus()
                             }
@@ -135,12 +135,6 @@ fun task(
                         }
                         .focusRequester(textFieldFocusRequester)
                         .weight(1f)
-//                        .onPointerEvent(PointerEventType.Enter) {
-//                            isTextboxHovered = true
-//                        }
-//                        .onPointerEvent(PointerEventType.Exit) {
-//                            isTextboxHovered = false
-//                        }
                 )
                 if (dueDate != null) {
                     Text("Due on ${dueDate.date}")
