@@ -33,16 +33,16 @@ class DAOFacadeImpl : DAOFacade {
         TaskEntity.all().map(::entityToTask)
     }
 
-    override suspend fun task(id: Int): Task? = dbQuery {
+    override suspend fun task(id: String): Task? = dbQuery {
         TaskEntity.find { Tasks.id eq id }.map(::entityToTask).singleOrNull()
     }
 
-    override suspend fun userTasks(userId: Int): List<Task> = dbQuery {
+    override suspend fun userTasks(userId: String): List<Task> = dbQuery {
         TaskEntity.find { Tasks.userId eq userId }.map(::entityToTask)
     }
 
     override suspend fun addNewTask(
-        completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>, userId: Int
+        completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>, userId: String
     ): Task = dbQuery {
         entityToTask(TaskEntity.new {
             this.completed = completed
@@ -55,7 +55,7 @@ class DAOFacadeImpl : DAOFacade {
     }
 
     override suspend fun editTask(
-        id: Int, completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>
+        id: String, completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>
     ): Boolean = dbQuery {
         val entity = TaskEntity.find { Tasks.id eq id }.singleOrNull() ?: return@dbQuery false
         entity.apply {
@@ -69,7 +69,7 @@ class DAOFacadeImpl : DAOFacade {
         return@dbQuery true
     }
 
-    override suspend fun deleteTask(id: Int): Boolean = dbQuery {
+    override suspend fun deleteTask(id: String): Boolean = dbQuery {
         val tasks = TaskEntity.find { Tasks.id eq id }
         if (tasks.count().toInt() == 0) return@dbQuery false
         tasks.forEach { it.delete() }
@@ -84,11 +84,11 @@ class DAOFacadeImpl : DAOFacade {
         NoteEntity.find { Notes.id eq id }.map(::entityToNote).singleOrNull()
     }
 
-    override suspend fun userNotes(userId: Int): List<Note> = dbQuery {
+    override suspend fun userNotes(userId: String): List<Note> = dbQuery {
         NoteEntity.find { Notes.userId eq userId }.map(::entityToNote)
     }
 
-    override suspend fun addNewNote(title: String, body: String, tags: List<Tag>, userId: Int): Note = dbQuery {
+    override suspend fun addNewNote(title: String, body: String, tags: List<Tag>, userId: String): Note = dbQuery {
         entityToNote(NoteEntity.new {
             this.title = title
             this.body = body
@@ -123,11 +123,11 @@ class DAOFacadeImpl : DAOFacade {
         TagEntity.find { Tags.id eq id }.map(::entityToTag).singleOrNull()
     }
 
-    override suspend fun userTags(userId: Int): List<Tag> = dbQuery {
+    override suspend fun userTags(userId: String): List<Tag> = dbQuery {
         TagEntity.find { Tags.userId eq userId }.map(::entityToTag)
     }
 
-    override suspend fun addNewTag(title: String, colour: Colour, userId: Int): Tag = dbQuery {
+    override suspend fun addNewTag(title: String, colour: Colour, userId: String): Tag = dbQuery {
         entityToTag(TagEntity.new {
             this.title = title
             this.colour = colour

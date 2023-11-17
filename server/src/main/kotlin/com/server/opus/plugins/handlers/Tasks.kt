@@ -12,7 +12,7 @@ import org.models.opus.models.Task
 fun Routing.handleTasks() {
     get("/users/{user_id}/tasks") {
         try {
-            val userId = call.parameters.getOrFail("user_id").toInt()
+            val userId = call.parameters.getOrFail("user_id")
             call.respond(dao.userTasks(userId))
         } catch (e: Exception) {
             println(e.message)
@@ -22,7 +22,7 @@ fun Routing.handleTasks() {
     }
     get("/users/{user_id}/uncompleted-tasks") {
         try {
-            val userId = call.parameters.getOrFail("user_id").toInt()
+            val userId = call.parameters.getOrFail("user_id")
             call.respond(dao.userTasks(userId).filter { !it.completed })
         } catch (e: Exception) {
             println(e.message)
@@ -32,7 +32,7 @@ fun Routing.handleTasks() {
     }
     get("/users/{user_id}/completed-todos") {
         try {
-            val userId = call.parameters.getOrFail("user_id").toInt()
+            val userId = call.parameters.getOrFail("user_id")
             call.respond(dao.userTasks(userId).filter { it.completed })
         } catch (e: Exception) {
             println(e.message)
@@ -42,7 +42,7 @@ fun Routing.handleTasks() {
     }
     post("/users/{user_id}/tasks") {
         try {
-            val userId = call.parameters.getOrFail("user_id").toInt()
+            val userId = call.parameters.getOrFail("user_id")
             val task = call.receive<Task>()
 
             dao.addNewTask(
@@ -58,8 +58,8 @@ fun Routing.handleTasks() {
     }
     delete("/users/{user_id}/tasks/{task_id}") {
         try {
-            val userId = call.parameters.getOrFail("user_id").toInt()
-            val taskId = call.parameters.getOrFail("task_id").toInt()
+            val userId = call.parameters.getOrFail("user_id")
+            val taskId = call.parameters.getOrFail("task_id")
 
             dao.deleteTask(taskId)
 
@@ -73,8 +73,8 @@ fun Routing.handleTasks() {
     }
     put("/users/{user_id}/tasks/{task_id}") {
         try {
-            val userId = call.parameters.getOrFail("user_id").toInt()
-            val taskId = call.parameters.getOrFail("task_id").toInt()
+            val userId = call.parameters.getOrFail("user_id")
+            val taskId = call.parameters.getOrFail("task_id")
 
             val task = call.receive<Task>()
 

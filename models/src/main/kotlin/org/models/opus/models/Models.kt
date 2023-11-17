@@ -12,7 +12,7 @@ data class Task(
     val creationDate: LocalDateTime,
     val dueDate: LocalDateTime?,
     val tags: List<Tag> = listOf(),
-    val id: Int = -1
+    val id: String = ""
 )
 
 
@@ -30,6 +30,11 @@ data class Tag(
 @Serializable
 data class Colour(
     val red: Int, val green: Int, val blue: Int
+)
+
+@Serializable
+data class User(
+    val id: String = ""
 )
 
 //@Serializable

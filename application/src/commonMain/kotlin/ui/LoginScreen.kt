@@ -40,7 +40,7 @@ fun LoginScreen(
     Button(onClick = {
         coroutineScope.launch {
             val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
-            Cred.getCredentials(httpTransport)
+            println(Cred.getCredentials(httpTransport))
             navigator.navigate("/tasks")
             viewModel.setCurrentScreen("/tasks")
         }
