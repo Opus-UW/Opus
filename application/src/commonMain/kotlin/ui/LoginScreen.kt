@@ -38,10 +38,12 @@ fun LoginScreen(
 ) {
     val coroutineScope = rememberCoroutineScope()
     Button(onClick = {
-        val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
-        Cred.getCredentials(httpTransport)
-        navigator.navigate("/tasks")
-        viewModel.setCurrentScreen("/tasks")
+        coroutineScope.launch {
+            val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
+            Cred.getCredentials(httpTransport)
+            navigator.navigate("/tasks")
+            viewModel.setCurrentScreen("/tasks")
+        }
     }){
         Text("Login")
     }
