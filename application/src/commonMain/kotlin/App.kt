@@ -35,7 +35,7 @@ fun App() {
 
             val currentScreen by viewModel.currentScreen.collectAsStateWithLifecycle()
 
-            coroutineScope.launch { ApiClient.getInstance().startClientConn() }
+//            coroutineScope.launch { ApiClient.getInstance().startClientConn() }
 
             ModalNavigationDrawer(
                 drawerState = drawerState,

@@ -14,7 +14,7 @@ plugins {
 }
 
 group = "com.team202.opus"
-version = "1.0-SNAPSHOT"
+version = "1.0.2"
 
 repositories {
     mavenCentral()
@@ -54,6 +54,7 @@ kotlin {
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
             implementation(compose.materialIconsExtended)
             implementation(compose.material3)
+            implementation(compose.material)
             implementation(project(mapOf("path" to ":models")))
 
             implementation("io.ktor:ktor-client-core:$ktorVersion")
@@ -134,18 +135,16 @@ android {
         debugImplementation(libs.compose.ui.tooling)
     }
 }
-dependencies {
-    implementation("io.ktor:ktor-client-auth:2.3.5")
-}
 
 compose.desktop {
     application {
         mainClass = "MainKt"
 
         nativeDistributions {
+            includeAllModules = true
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "com.team202.opus"
-            packageVersion = "1.0.0"
+            packageName = "Opus"
+            packageVersion = "1.0.2"
         }
     }
 }

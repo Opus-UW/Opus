@@ -88,6 +88,7 @@ object Cred {
     @Throws(IOException::class)
     fun getCredentials(HTTP_TRANSPORT: NetHttpTransport): Credential { // Load client secrets.
         val credentials = Cred::class.java.getResourceAsStream(CREDENTIALS_FILE_PATH) ?: throw FileNotFoundException("Resource not found: $CREDENTIALS_FILE_PATH")
+
         val clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, InputStreamReader(credentials))
 
         // Build flow and trigger user authorization request.
@@ -96,8 +97,7 @@ object Cred {
             .setAccessType("offline")
             .build()
 
-        val receiver = LocalServerReceiver.Builder().setPort(8888).build()
-
+        val receiver = LocalServerReceiver.Builder().setPort(-1).build()
         return AuthorizationCodeInstalledApp(flow, receiver).authorize("user")
     }
 }
