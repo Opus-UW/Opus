@@ -28,19 +28,18 @@ import org.models.opus.models.Task
 fun DayPreview(previewDate: LocalDateTime, previewMonth: String,
                tasks: List<Task>,
                setShowDateDialog: (Boolean) -> Unit,
-               setSelectedDate: (LocalDateTime) -> Unit) {
+               setSelectedDate: (LocalDateTime) -> Unit,
+               compact: Boolean) {
     val todayDate = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
     val cardBgColor = if (todayDate.date == previewDate.date && todayDate.month == previewDate.month && todayDate.year == previewDate.year)
         Color(0xFFE0FFFF) else Color.White
     val cardTextColor = if (previewDate.month.name == previewMonth) Color.Black else Color.Gray
+    val aspectRatio = if (compact) 0.8f else 1.25f
 
     Box(
-//        elevation = CardDefaults.cardElevation(
-//            defaultElevation = 6.dp
-//        ),
         modifier = Modifier.background(cardBgColor)
             .border(1.dp, Color.LightGray)
-            .aspectRatio(1.25f)
+            .aspectRatio(aspectRatio)
             .heightIn(0.dp, 30.dp)
             .clickable ( onClick = {
                 setSelectedDate(previewDate)
@@ -55,7 +54,6 @@ fun DayPreview(previewDate: LocalDateTime, previewMonth: String,
                 singleLine = true,
                 colors = TextFieldDefaults.textFieldColors(
                     textColor = cardTextColor,
-                    //disabledTextColor = Color.Black,
                     backgroundColor = Color.Transparent,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
