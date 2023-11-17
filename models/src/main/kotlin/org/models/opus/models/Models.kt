@@ -29,7 +29,7 @@ data class Tag(
 
 @Serializable
 data class Colour(
-    val red: Int, val green: Int, val blue: Int
+    val red: Int, val green: Int, val blue: Int, val placeholder: Boolean = false
 )
 
 @Serializable
