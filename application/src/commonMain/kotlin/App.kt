@@ -1,10 +1,12 @@
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import api.ApiClient
 import ui.theme.OpusTheme
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.PreComposeApp
@@ -32,6 +34,8 @@ fun App() {
             val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
             val currentScreen by viewModel.currentScreen.collectAsStateWithLifecycle()
+
+            coroutineScope.launch { ApiClient.getInstance().startClientConn() }
 
             ModalNavigationDrawer(
                 drawerState = drawerState,

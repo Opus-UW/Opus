@@ -2,13 +2,15 @@ package api
 
 import io.ktor.client.*
 import io.ktor.client.call.*
-import io.ktor.client.plugins.auth.*
-import io.ktor.client.plugins.auth.providers.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
+import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
+import io.ktor.websocket.*
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.launch
 import org.models.opus.models.Note
 import org.models.opus.models.Tag
 import org.models.opus.models.Task
@@ -32,6 +34,47 @@ class ApiClient {
         }
         install(Logging) {
             level = LogLevel.ALL
+        }
+        install(WebSockets)
+    }
+
+    suspend fun startClientConn() {
+        //runBlocking {
+            httpClient.webSocket(method = HttpMethod.Get, host = "0.0.0.0", port = 8080, path = "/chat") {
+                val messageOutputRoutine = launch { outputMessages() }
+                val userInputRoutine = launch { inputMessages() }
+
+                userInputRoutine.join() // Wait for completion; either "exit" or error
+                messageOutputRoutine.cancelAndJoin()
+            }
+        //}
+        httpClient.close()
+        println("Connection closed. Goodbye!")
+    }
+
+    suspend fun DefaultClientWebSocketSession.outputMessages() {
+        try {
+            for (message in incoming) {
+                message as? Frame.Text ?: continue
+                println(message.readText())
+            }
+        } catch (e: Exception) {
+            println("Error while receiving: " + e.localizedMessage)
+        }
+    }
+
+    suspend fun DefaultClientWebSocketSession.inputMessages() {
+        var counter = 0;
+        while (true) {
+            Thread.sleep(3000L)
+            val message = (counter++).toString()
+            if (message.equals("exit", true)) return
+            try {
+                send(message)
+            } catch (e: Exception) {
+                println("Error while sending: " + e.localizedMessage)
+                return
+            }
         }
     }
 
