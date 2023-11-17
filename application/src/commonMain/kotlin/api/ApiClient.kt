@@ -73,14 +73,14 @@ class ApiClient {
         }.body()
     }
 
-    suspend fun deleteTask(userId: Int, taskId: Int): List<Task> {
+    suspend fun deleteTask(userId: Int, taskId: String): List<Task> {
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId/tasks/$taskId")
         }
         return httpClient.delete(url.build()).body()
     }
 
-    suspend fun editTask(userId: Int, taskId: Int, newTask: Task): List<Task> {
+    suspend fun editTask(userId: Int, taskId: String, newTask: Task): List<Task> {
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId/tasks/$taskId")
         }
