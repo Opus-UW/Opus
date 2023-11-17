@@ -26,7 +26,7 @@ class ApiClient {
         }
     }
 
-    private val baseUrl = "http://0.0.0.0:8080"
+    private val baseUrl = "http://35.239.87.183:8080"
 
     private val httpClient = HttpClient {
         install(ContentNegotiation) {
