@@ -2,8 +2,8 @@ package ui.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -33,6 +33,7 @@ import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults
 import moe.tlaster.precompose.flow.collectAsStateWithLifecycle
 import org.models.opus.models.Note
 import org.models.opus.models.Tag
+import ui.theme.md_theme_dark_background
 import viewmodels.MainViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -67,26 +68,25 @@ fun NotePreview(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
         ),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
         modifier = Modifier
             .size(width = 240.dp, height = 200.dp).alpha(if (editNote) 0f else 1f),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.LightGray, //Card background color
-        )
     ) {
         Column {
             // Title
             TextField(
                 value = title,
-                placeholder = { androidx.compose.material.Text("Title") },
+                placeholder = { Text("Title") },
                 onValueChange = { title = it },
                 singleLine = true,
-                colors = TextFieldDefaults.textFieldColors(
-                    textColor = Color.Black,
-                    disabledTextColor = Color.Black,
-                    backgroundColor = Color.Transparent,
+                colors = TextFieldDefaults.colors(
+                    unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    disabledTextColor = LocalContentColor.current,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
-                    disabledIndicatorColor = Color.Transparent
+                    disabledIndicatorColor = Color.Transparent,
                 ),
                 enabled = false
             )
@@ -95,7 +95,6 @@ fun NotePreview(
                 state = state,
                 modifier = Modifier.fillMaxWidth(),
                 colors = RichTextEditorDefaults.richTextEditorColors(
-                    textColor = Color.Black,
                     disabledTextColor = Color.Transparent,
                     containerColor = Color.Transparent,
                     focusedIndicatorColor = Color.Transparent,
@@ -248,31 +247,32 @@ fun EditNoteDialog(
                 .height(IntrinsicSize.Min)
                 .defaultMinSize(minHeight = 400.dp)
                 .padding(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
             shape = RoundedCornerShape(16.dp)
         ) {
             Row {
                 TextField(
                     value = newTitle,
-                    placeholder = { androidx.compose.material.Text("Title") },
+                    placeholder = { Text("Title") },
                     onValueChange = { newTitle = it },
                     singleLine = true,
-                    colors = TextFieldDefaults.textFieldColors(
-                        textColor = Color.Black,
-                        disabledTextColor = Color.Black,
-                        backgroundColor = Color.Transparent,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        disabledIndicatorColor = Color.Transparent
+                    colors = TextFieldDefaults.colors(
+                    unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent,
                     )
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 val (showTags, setShowTags) = remember(tags) { mutableStateOf(false) }
                 var rootPos by remember { mutableStateOf(Offset.Zero) }
-                androidx.compose.material.TextButton(onClick = { setShowTags(true) },
+                TextButton(onClick = { setShowTags(true) },
                     modifier = Modifier.onGloballyPositioned { coordinates ->
                         rootPos = coordinates.positionInRoot()
                     }) {
-                    androidx.compose.material.Icon(Icons.Default.Sell, contentDescription = "Tags")
+                    Icon(Icons.Default.Sell, contentDescription = "Tags")
                     ChooseTagMenu(viewModel, showTags, setShowTags, tagStatus)
                 }
                 IconButton(onClick = {
@@ -343,7 +343,6 @@ fun EditNoteDialog(
                         }
                     },
                 colors = RichTextEditorDefaults.richTextEditorColors(
-                    textColor = Color.Black,
                     disabledTextColor = Color.Transparent,
                     containerColor = Color.Transparent,
                     focusedIndicatorColor = Color.Transparent,

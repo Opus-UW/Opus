@@ -1,15 +1,13 @@
-package ui.components
+package ui
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import moe.tlaster.precompose.flow.collectAsStateWithLifecycle
 import moe.tlaster.precompose.navigation.Navigator
 import utils.minusMonth
@@ -30,11 +28,7 @@ fun OpusTopAppBar(
     var noteState by remember { mutableStateOf(false) }
     var calendarState by remember { mutableStateOf(false) }
 
-
-    println()
     TopAppBar(
-        backgroundColor = Color.White,
-        contentColor = Color.Black,
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(currentTag?.title ?: "All")
@@ -70,7 +64,7 @@ fun OpusTopAppBar(
                 ) {
                     Icon(
                         Icons.Default.ViewList,
-                        tint = if (taskState) Color.Blue else Color.Unspecified,
+                        tint = if (taskState) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
                         contentDescription = "Navigate to tasks"
                     )
                 }
@@ -86,7 +80,7 @@ fun OpusTopAppBar(
                 ) {
                     Icon(
                         Icons.Default.StickyNote2,
-                        tint = if (noteState) Color.Blue else Color.Unspecified,
+                        tint = if (noteState) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
                         contentDescription = "Navigate to notes"
                     )
                 }
@@ -102,7 +96,7 @@ fun OpusTopAppBar(
                 ) {
                     Icon(
                         Icons.Default.CalendarMonth,
-                        tint = if (calendarState) Color.Blue else Color.Unspecified,
+                        tint = if (calendarState) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
                         contentDescription = "Navigate to calendar"
                     )
                 }

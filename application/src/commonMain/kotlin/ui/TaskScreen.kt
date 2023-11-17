@@ -13,10 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
 import moe.tlaster.precompose.flow.collectAsStateWithLifecycle
-import moe.tlaster.precompose.navigation.Navigator
-import ui.components.OpusTopAppBar
 import ui.components.SimpleVerticalScrollbar
 import ui.components.task
 import viewmodels.MainViewModel
@@ -36,7 +33,7 @@ fun TaskScreen(
     val completedTasks = tagTasks.filter { it.completed }
 
     Column(
-        modifier = Modifier.padding(5.dp)
+        modifier = Modifier.padding(20.dp)
     ) {
         task(viewModel, null, null, null)
         Spacer(modifier = Modifier.size(5.dp))

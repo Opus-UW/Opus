@@ -3,7 +3,7 @@ package ui
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.*
@@ -20,7 +20,8 @@ import viewmodels.MainViewModel
 
 @Composable
 fun CalendarScreen(
-    viewModel: MainViewModel                   ){
+    viewModel: MainViewModel
+) {
 
     val curDate by viewModel.curDate.collectAsStateWithLifecycle()
     val tasks by viewModel.tasks.collectAsStateWithLifecycle()
@@ -57,7 +58,6 @@ fun CalendarScreen(
                     }
                 }
             )
-
             // Insert days here
             val list = (1..42).map { it.toString() }
             tempDate -= (tempDate.dayOfMonth - 1)

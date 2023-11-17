@@ -3,12 +3,12 @@ package ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.Sell
+import androidx.compose.material3.*
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -45,7 +45,7 @@ fun optionsTray(
     val (showTags, setShowTags) = remember { mutableStateOf(false) }
 
     var rootPos by remember { mutableStateOf(Offset.Zero) }
-    Box(modifier = Modifier.fillMaxWidth().background(Color.Gray)) {
+    Box(modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.onSecondary)) {
         if (isTaskFocused) {
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -79,7 +79,7 @@ fun optionsTray(
                         modifier = Modifier.onGloballyPositioned { coordinates ->
                             rootPos = coordinates.positionInRoot()
                         }) {
-                        Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color.Red)
+                        Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.tertiary)
                     }
             }
         }
@@ -88,7 +88,12 @@ fun optionsTray(
 }
 
 @Composable
-fun chooseDate(showDueDatePicker: Boolean, setShowDueDatePickerPicker: (Boolean) -> Unit, pos: Offset, updateDueDate:(LocalDateTime?) -> Unit) {
+fun chooseDate(
+    showDueDatePicker: Boolean,
+    setShowDueDatePickerPicker: (Boolean) -> Unit,
+    pos: Offset,
+    updateDueDate: (LocalDateTime?) -> Unit
+) {
     var selectedDate = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
     val (showCalendar, setShowCalendar) = remember { mutableStateOf(false) }
     datePickerDialog(showCalendar, setShowCalendar, updateDueDate)
@@ -98,37 +103,50 @@ fun chooseDate(showDueDatePicker: Boolean, setShowDueDatePickerPicker: (Boolean)
         DropdownMenuItem(onClick = {
             updateDueDate(selectedDate)
             println(selectedDate.date)
-            setShowDueDatePickerPicker(false)} ) {
-            Text("Today")
-        }
+            setShowDueDatePickerPicker(false)
+        },
+            text = {
+                Text("Today")
+            }
+        )
+
         DropdownMenuItem(onClick = {
             selectedDate += 1
             updateDueDate(selectedDate)
             println(selectedDate.date)
             setShowDueDatePickerPicker(false)
-        }) {
+        }, text = {
             Text("Tomorrow")
         }
+        )
         DropdownMenuItem(onClick = {
             selectedDate += 7
             updateDueDate(selectedDate)
             println(selectedDate.date)
             setShowDueDatePickerPicker(false)
-        }) {
-            Text("Next Week")
-        }
+        },
+            text = {
+                Text("Next Week")
+            }
+        )
         DropdownMenuItem(onClick = {
             setShowDueDatePickerPicker(false)
             setShowCalendar(true)
-        }) {
-            Text("Choose Date")
-        }
+        },
+            text = {
+                Text("Choose Date")
+            }
+        )
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun datePickerDialog(showCalendar: Boolean, setShowCalendar: (Boolean) -> Unit, updateDueDate:(LocalDateTime?) -> Unit) {
+fun datePickerDialog(
+    showCalendar: Boolean,
+    setShowCalendar: (Boolean) -> Unit,
+    updateDueDate: (LocalDateTime?) -> Unit
+) {
     if (showCalendar) {
         val datePickerState = rememberDatePickerState()
         val confirmEnabled = derivedStateOf { datePickerState.selectedDateMillis != null }
@@ -168,7 +186,6 @@ fun datePickerDialog(showCalendar: Boolean, setShowCalendar: (Boolean) -> Unit, 
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun chooseOccurrence(showOccurrence: Boolean, setShowOccurrence: (Boolean) -> Unit, pos: Offset) {
     var multi by remember { mutableStateOf("1") }
