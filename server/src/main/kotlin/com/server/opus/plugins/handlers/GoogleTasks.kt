@@ -14,8 +14,8 @@ import org.models.opus.models.Tag
 fun Routing.handleTaskApi() {
     get("/tasks") {
         try {
-            val tasks = TaskAPI.tasks()
-            println(tasks)
+//            val tasks = TaskAPI.tasks()
+//            println(tasks)
             call.response.status(HttpStatusCode.OK)
         } catch (e: Exception) {
             e.printStackTrace()

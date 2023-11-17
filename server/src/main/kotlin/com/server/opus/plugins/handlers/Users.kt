@@ -8,9 +8,16 @@ import io.ktor.server.util.*
 import org.models.opus.dao.dao
 
 fun Routing.handleUsers() {
-    get("/users/{user_id}") {
+    post("/users/{user_id}") {
         try {
+            val userId = call.parameters.getOrFail("user_id")
+            val user = dao.user(userId)
 
+            if(user == null){
+                call.respond(dao.addNewUser(userId))
+            } else {
+                call.respond(user)
+            }
         } catch (e: Exception) {
             println(e.message)
             e.printStackTrace()

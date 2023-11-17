@@ -38,6 +38,8 @@ class TaskAPI(private val accessTokenString: String) {
 
     private val taskService: Tasks
 
+    private val taskListId: String
+
     init {
         val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
 
@@ -46,17 +48,27 @@ class TaskAPI(private val accessTokenString: String) {
         taskService = Tasks.Builder(httpTransport, JSON_FACTORY, HttpCredentialsAdapter(credential))
             .setApplicationName(APPLICATION_NAME)
             .build()
+
+        taskListId = taskService.tasklists().list().execute().items[0].id
+
     }
 
     fun tasks(maxResults: Int = 100, timeMinimum: DateTime = DateTime(System.currentTimeMillis()), orderBy: String = "startTime"): com.google.api.services.tasks.model.Tasks {
-        println(taskService.tasklists().list().execute())
 
         return taskService.tasks().list("MDU5MjcxNDc3MDc4NDg0Mjc3MjM6MDow")
             .setMaxResults(maxResults)
             .execute()
     }
 
-    fun patchEvent(task: Task) {
-        taskService.tasks().patch("MDU5MjcxNDc3MDc4NDg0Mjc3MjM6MDow", task.id, task).execute()
+    fun patchTask(task: Task) : Task {
+        return taskService.tasks().patch(taskListId, task.id, task).execute()
+    }
+
+    fun createTask(task: Task) : Task {
+        return taskService.tasks().insert(taskListId, task).execute()
+    }
+
+    fun deleteTask(taskId: String) {
+        taskService.tasks().delete(taskListId, taskId).execute()
     }
 }

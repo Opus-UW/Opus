@@ -62,15 +62,16 @@ fun LoginScreen(
                 coroutineScope.launch {
                     val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
                     val cred = Cred.getCredentials(httpTransport)
+                    viewModel.setCredential(cred)
                     ApiClient.getInstance().setAccessToken(cred.accessToken)
                     val oauth2 = Oauth2.Builder(httpTransport, JSON_FACTORY, cred).build()
 
-                    ApiClient.getInstance().getOrCreateUser(oauth2.userinfo().get().execute().id)
+                    ApiClient.getInstance().setUserId(oauth2.userinfo().get().execute().id)
+
+                    viewModel.setUser(ApiClient.getInstance().getOrCreateUser())
 
                     // Grab Data from server
-                    LaunchedEffect(Unit) {
-                        viewModel.fetchAllData()
-                    }
+                    viewModel.fetchAllData()
 
                     navigator.navigate("/tasks")
                     viewModel.setCurrentScreen("/tasks")

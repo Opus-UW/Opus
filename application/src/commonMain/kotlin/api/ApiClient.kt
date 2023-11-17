@@ -24,7 +24,7 @@ class ApiClient {
         }
     }
 
-    private val baseUrl = "http://35.239.87.183:8080"
+    private val baseUrl = "http://0.0.0.0:8080"
 
     private val httpClient = HttpClient {
         install(ContentNegotiation) {
@@ -40,8 +40,13 @@ class ApiClient {
         accessToken = value
     }
 
+    private var userId: String = ""
+    fun setUserId(value: String) {
+        userId = value
+    }
 
-    suspend fun getTasks(userId: Int): List<Task> {
+
+    suspend fun getTasks(): List<Task> {
         try {
             val url = URLBuilder().apply {
                 takeFrom("$baseUrl/users/$userId/tasks")
@@ -59,7 +64,7 @@ class ApiClient {
         return listOf()
     }
 
-    suspend fun getCompletedTasks(userId: Int): List<Task> {
+    suspend fun getCompletedTasks(): List<Task> {
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId/completed-tasks")
         }
@@ -71,7 +76,7 @@ class ApiClient {
         }.body()
     }
 
-    suspend fun getUncompletedTasks(userId: Int): List<Task> {
+    suspend fun getUncompletedTasks(): List<Task> {
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId/uncompleted-tasks")
         }
@@ -83,7 +88,7 @@ class ApiClient {
         }.body()
     }
 
-    suspend fun postTask(userId: Int, task: Task): List<Task> {
+    suspend fun postTask(task: Task): List<Task> {
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId/tasks")
         }
@@ -97,7 +102,7 @@ class ApiClient {
         }.body()
     }
 
-    suspend fun deleteTask(userId: Int, taskId: String): List<Task> {
+    suspend fun deleteTask(taskId: Int): List<Task> {
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId/tasks/$taskId")
         }
@@ -108,7 +113,7 @@ class ApiClient {
         }.body()
     }
 
-    suspend fun editTask(userId: Int, taskId: String, newTask: Task): List<Task> {
+    suspend fun editTask(taskId: Int, newTask: Task): List<Task> {
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId/tasks/$taskId")
         }
@@ -121,7 +126,7 @@ class ApiClient {
         }.body()
     }
 
-    suspend fun getNotes(userId: Int): List<Note> {
+    suspend fun getNotes(): List<Note> {
         try {
             val url = URLBuilder().apply {
                 takeFrom("$baseUrl/users/$userId/notes")
@@ -139,7 +144,7 @@ class ApiClient {
         return listOf()
     }
 
-    suspend fun postNote(userId: Int, note: Note): List<Note> {
+    suspend fun postNote(note: Note): List<Note> {
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId/notes")
         }
@@ -153,7 +158,7 @@ class ApiClient {
         }.body()
     }
 
-    suspend fun deleteNote(userId: Int, noteId: Int): List<Note> {
+    suspend fun deleteNote(noteId: Int): List<Note> {
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId/notes/$noteId")
         }
@@ -164,7 +169,7 @@ class ApiClient {
         }.body()
     }
 
-    suspend fun editNote(userId: Int, noteId: Int, newNote: Note): List<Note> {
+    suspend fun editNote(noteId: Int, newNote: Note): List<Note> {
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId/notes/$noteId")
         }
@@ -177,7 +182,7 @@ class ApiClient {
         }.body()
     }
 
-    suspend fun getTags(userId: Int): List<Tag> {
+    suspend fun getTags(): List<Tag> {
         try {
             val url = URLBuilder().apply {
                 takeFrom("$baseUrl/users/$userId/tags")
@@ -195,7 +200,7 @@ class ApiClient {
         return listOf()
     }
 
-    suspend fun postTag(userId: Int, tag: Tag): List<Tag> {
+    suspend fun postTag(tag: Tag): List<Tag> {
         val url = URLBuilder().apply {
             headers{
                 append("gtoken", accessToken)
@@ -212,7 +217,7 @@ class ApiClient {
         }.body()
     }
 
-    suspend fun deleteTag(userId: Int, tagId: Int): List<Tag> {
+    suspend fun deleteTag(tagId: Int): List<Tag> {
         val url = URLBuilder().apply {
             headers{
                 append("gtoken", accessToken)
@@ -222,7 +227,7 @@ class ApiClient {
         return httpClient.delete(url.build()).body()
     }
 
-    suspend fun editTag(userId: Int, tagId: Int, newTag: Tag): List<Tag> {
+    suspend fun editTag(tagId: Int, newTag: Tag): List<Tag> {
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId/tags/$tagId")
         }
@@ -236,7 +241,7 @@ class ApiClient {
     }
 
 
-    suspend fun getOrCreateUser(userId: String): List<User> {
+    suspend fun getOrCreateUser(): User {
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId")
         }
@@ -245,7 +250,6 @@ class ApiClient {
                 append("gtoken", accessToken)
             }
             contentType(ContentType.Application.Json)
-
         }.body()
     }
 
