@@ -3,6 +3,7 @@ package ui
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import com.google.api.client.auth.oauth2.Credential
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver
@@ -14,6 +15,7 @@ import com.google.api.client.json.JsonFactory
 import com.google.api.client.json.gson.GsonFactory
 import com.google.api.client.util.store.FileDataStoreFactory
 import com.google.api.services.tasks.TasksScopes
+import kotlinx.coroutines.launch
 import moe.tlaster.precompose.navigation.Navigator
 import viewmodels.MainViewModel
 import java.io.File
@@ -34,10 +36,12 @@ fun LoginScreen(
     viewModel: MainViewModel,
     navigator: Navigator
 ) {
+    val coroutineScope = rememberCoroutineScope()
     Button(onClick = {
         val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
         Cred.getCredentials(httpTransport)
         navigator.navigate("/tasks")
+        viewModel.setCurrentScreen("/tasks")
     }){
         Text("Login")
     }

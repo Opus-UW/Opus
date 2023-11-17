@@ -33,6 +33,9 @@ class MainViewModel(
     private var _curDate = MutableStateFlow(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()))
     val curDate = _curDate.asStateFlow()
 
+    private var _currentScreen = MutableStateFlow(savedStateHolder.consumeRestored("currentScreen") as String? ?: "/login")
+    val currentScreen = _currentScreen.asStateFlow()
+
     fun setCurDate(value: LocalDateTime){
         _curDate.value = value
     }
@@ -47,6 +50,10 @@ class MainViewModel(
 
     fun setNotes(value: List<Note>) {
         _notes.value = value
+    }
+
+    fun setCurrentScreen(value: String) {
+        _currentScreen.value = value
     }
 
     fun updateNote(
@@ -160,6 +167,9 @@ class MainViewModel(
         }
         savedStateHolder.registerProvider("tags") {
             tags.value
+        }
+        savedStateHolder.registerProvider("currentScreen"){
+            currentScreen.value
         }
     }
 }

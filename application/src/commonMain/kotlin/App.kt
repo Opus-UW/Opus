@@ -1,12 +1,13 @@
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.PreComposeApp
+import moe.tlaster.precompose.flow.collectAsStateWithLifecycle
 import moe.tlaster.precompose.navigation.NavHost
 import moe.tlaster.precompose.navigation.rememberNavigator
 import moe.tlaster.precompose.viewmodel.viewModel
@@ -32,6 +33,8 @@ fun App() {
             // Data
             val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
+            val currentScreen by viewModel.currentScreen.collectAsStateWithLifecycle()
+
             ModalNavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
@@ -41,9 +44,11 @@ fun App() {
             ) {
                 Scaffold(
                     topBar = {
-                        OpusTopAppBar(viewModel, navigator) {
-                            coroutineScope.launch {
-                                drawerState.open()
+                        AnimatedVisibility(visible = currentScreen != "/login") {
+                            OpusTopAppBar(viewModel, navigator) {
+                                coroutineScope.launch {
+                                    drawerState.open()
+                                }
                             }
                         }
                     }
