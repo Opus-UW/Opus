@@ -51,7 +51,7 @@ fun CalendarScreen(
                                 containerColor = Color.White, //Card background color
                             )
                         ) {
-                            Text(modifier = Modifier.fillMaxWidth(), text = daysOfWeek[it], textAlign = TextAlign.Center)
+                            Text(modifier = Modifier.fillMaxWidth(), text = daysOfWeek.get(it), textAlign = TextAlign.Center)
                         }
                     }
                 }
@@ -66,12 +66,12 @@ fun CalendarScreen(
                 columns = GridCells.Fixed(7),
                 modifier = Modifier.fillMaxWidth().padding(2.dp).padding(5.dp),
                 content = {
-                    items(list.size) {idx ->
+                    items(list.size, key = { tempDate + it }) {idx ->
                         val tasksOnDay = tasks.filter{
-                            it.dueDate?.dayOfYear == (tempDate + idx).dayOfYear
+                            it.dueDate?.dayOfYear == ((tempDate + idx).dayOfYear)
                                     && it.dueDate?.year == (tempDate + idx).year
                         }
-                        DayPreview((tempDate+ idx), curDate.month.name, tasksOnDay, setShowDateDialog, setSelectedDate, compact)
+                        DayPreview((tempDate + idx), curDate.month.name, tasksOnDay, setShowDateDialog, setSelectedDate, compact)
                     }
                 }
             )
