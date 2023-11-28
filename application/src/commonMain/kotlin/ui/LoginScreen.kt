@@ -56,19 +56,12 @@ fun LoginScreen(
     viewModel: MainViewModel,
     navigator: Navigator
 ) {
-//    val density = LocalDensity.current
     val logoVector = if (isDarkTheme()) darkModeLogoVector() else lightModeLogoVector()
-//    val opusLogo = remember {
-//        useResource(logoPath) { loadSvgPainter(it, density) }
-//    }
     Column{
         Spacer(modifier = Modifier.weight(1f))
         Row{
             Spacer(modifier = Modifier.weight(1f))
                 Icon (logoVector, "Opus logo", tint = Color.Unspecified, modifier = Modifier.padding(vertical = 10.dp, horizontal = 30.dp))
-//            Image(painter = opusLogo,
-//                "Opus Logo",
-//                modifier = Modifier.padding(vertical = 10.dp, horizontal = 30.dp))
             Spacer(modifier = Modifier.weight(1f))
         }
         Spacer(modifier = Modifier.weight(1f))
