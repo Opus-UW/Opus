@@ -88,3 +88,8 @@ fun OpusTheme(
     content = content
   )
 }
+
+@Composable
+fun isDarkTheme(): Boolean {
+    return isSystemInDarkTheme()
+}
