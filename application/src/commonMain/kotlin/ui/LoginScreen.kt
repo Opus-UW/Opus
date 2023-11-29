@@ -7,7 +7,9 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Login
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -66,17 +68,25 @@ fun LoginScreen(
     if (showLoginDialog) {
         Dialog(onDismissRequest = { setShowLoginDialog(false) }) {
             Card(
-                modifier = Modifier.height(250.dp).width(500.dp).padding(16.dp),
+                modifier = Modifier.fillMaxHeight(0.5f).fillMaxWidth().padding(16.dp),
                 shape = RoundedCornerShape(16.dp),
             ) {
                 Column(
                     modifier = Modifier.fillMaxHeight().fillMaxWidth().padding(5.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
                 ) {
-                    androidx.compose.material3.Text(
-                        text = "Redirecting you to your browser..."
+                    Spacer(modifier = Modifier.weight(1f))
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(64.dp),
+                        color = MaterialTheme.colorScheme.secondary,
+                        trackColor = MaterialTheme.colorScheme.surfaceVariant,
                     )
+                    Spacer(modifier = Modifier.height(25.dp))
+                    Text(
+                        text = "Redirecting you to your browser...",
+                        fontSize = 20.sp
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
                 }
             }
         }
