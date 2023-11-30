@@ -226,14 +226,15 @@ fun EditNoteDialog(
 
     Dialog(
         onDismissRequest = {
-            if (title != newTitle || state.toHtml() != newState.toHtml()) {
-                // Update tags
-                val newTaskTags = mutableListOf<Tag>()
-                tagStatus.forEach { entry ->
-                    if (entry.value) {
-                        newTaskTags.add(entry.key)
-                    }
+            // Update tags
+            val newTaskTags = mutableListOf<Tag>()
+            tagStatus.forEach { entry ->
+                if (entry.value) {
+                    newTaskTags.add(entry.key)
                 }
+            }
+
+            if (title != newTitle || state.toHtml() != newState.toHtml() || newTaskTags != note.tags) {
                 // Check if new note is to be created
                 if (note.id != -1) {
                     setTitle(newTitle)
