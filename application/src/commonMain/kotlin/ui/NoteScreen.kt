@@ -1,6 +1,5 @@
 package ui
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -9,7 +8,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
@@ -28,13 +26,14 @@ fun NoteScreen(
 
     Column(modifier = Modifier.padding(20.dp).fillMaxWidth().fillMaxHeight()) {
         AddNote(viewModel)
-        Spacer(modifier = Modifier.height(5.dp))
+        Spacer(modifier = Modifier.height(15.dp))
         LazyVerticalGrid(
             state = listState,
 //                modifier = Modifier.SimpleVerticalScrollbar(listState),
             verticalArrangement = Arrangement.spacedBy(10.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             columns = GridCells.Adaptive(minSize = 240.dp),
+            modifier = Modifier.weight(1f),
             content = {
                 items(notes.size) { note ->
                     NotePreview(viewModel, notes[note])
@@ -60,7 +59,7 @@ fun AddNote(
         ElevatedButton(
             onClick = {editNote = true},
             shape = RoundedCornerShape(10.dp),
-            border = BorderStroke(1.dp, Color.Black),
+            elevation = ButtonDefaults.buttonElevation(5.dp),
             modifier = Modifier.weight(1f)
         ){
             Row {

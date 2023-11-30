@@ -48,7 +48,7 @@ fun task(
     viewModel: MainViewModel,
     task: Task?,
     dueDate: LocalDateTime? = null,
-    defaultDueDate: kotlinx.datetime.LocalDateTime?,
+    defaultDueDate: LocalDateTime?,
 ) {
     // Get data from viewModel
     val tags by viewModel.tags.collectAsStateWithLifecycle()
@@ -67,7 +67,6 @@ fun task(
 
     val initialDueDate: LocalDateTime? = defaultDueDate ?: task?.dueDate
     var taskDueDate by remember(task) { mutableStateOf(initialDueDate) }
-
 
     fun updateDueDate(dueDate: LocalDateTime? = null) {
         if (dueDate != null) taskDueDate = dueDate
@@ -102,18 +101,18 @@ fun task(
         Box(
             modifier = Modifier
                 .height(IntrinsicSize.Min)
-                .background(MaterialTheme.colorScheme.secondaryContainer)
+                .background(if (isTaskFocused) MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp) else MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp))
                 .fillMaxWidth()
-                .border(
-                    1.dp,
-                    if (isTaskFocused) MaterialTheme.colorScheme.outline else Color.Transparent,
-                    shape = if (edit || new) RoundedCornerShape(
-                        8.dp,
-                        8.dp,
-                        0.dp,
-                        0.dp
-                    ) else RoundedCornerShape(8.dp)
-                )
+//                .border(
+//                    1.dp,
+//                    if (isTaskFocused) MaterialTheme.colorScheme.outline else Color.Transparent,
+//                    shape = if (edit || new) RoundedCornerShape(
+//                        8.dp,
+//                        8.dp,
+//                        0.dp,
+//                        0.dp
+//                    ) else RoundedCornerShape(8.dp)
+//                )
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -158,8 +157,8 @@ fun task(
                                 value = text,
                                 interactionSource = interactionSource,
                                 colors = TextFieldDefaults.colors(
-                                    unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                    focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                    unfocusedContainerColor = Color.Transparent,
+                                    focusedContainerColor = Color.Transparent,
                                     focusedIndicatorColor = Color.Transparent,
                                     unfocusedIndicatorColor = Color.Transparent,
                                     disabledIndicatorColor = Color.Transparent,

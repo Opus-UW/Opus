@@ -1,11 +1,14 @@
 package ui.components
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateMap
@@ -33,7 +36,6 @@ import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults
 import moe.tlaster.precompose.flow.collectAsStateWithLifecycle
 import org.models.opus.models.Note
 import org.models.opus.models.Tag
-import ui.theme.md_theme_dark_background
 import viewmodels.MainViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,13 +66,16 @@ fun NotePreview(
 
     // Note Base
     ElevatedCard(
-        onClick = { editNote = true },
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
         ),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)),
         modifier = Modifier
-            .size(width = 240.dp, height = 200.dp).alpha(if (editNote) 0f else 1f),
+            .size(width = 240.dp, height = 200.dp).alpha(if (editNote) 0f else 1f)
+            .clickable(
+            interactionSource = MutableInteractionSource(),
+            indication = rememberRipple(),
+            onClick = {editNote = true})
     ) {
         Column {
             // Title
@@ -80,9 +85,9 @@ fun NotePreview(
                 onValueChange = { title = it },
                 singleLine = true,
                 colors = TextFieldDefaults.colors(
-                    unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
                     disabledTextColor = LocalContentColor.current,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
@@ -247,7 +252,7 @@ fun EditNoteDialog(
                 .height(IntrinsicSize.Min)
                 .defaultMinSize(minHeight = 400.dp)
                 .padding(16.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)),
             shape = RoundedCornerShape(16.dp)
         ) {
             Row {
@@ -257,9 +262,9 @@ fun EditNoteDialog(
                     onValueChange = { newTitle = it },
                     singleLine = true,
                     colors = TextFieldDefaults.colors(
-                    unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
                     disabledIndicatorColor = Color.Transparent,

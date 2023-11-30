@@ -6,7 +6,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import api.ApiClient
 import ui.theme.OpusTheme
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.PreComposeApp
@@ -22,7 +21,7 @@ import viewmodels.MainViewModel
 @Composable
 fun App() {
     PreComposeApp {
-        OpusTheme  {
+        OpusTheme (useDarkTheme = true) {
             val viewModel = viewModel(modelClass = MainViewModel::class, keys = listOf("main")) {
                 MainViewModel(it)
             }
