@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.datetime.*
 import moe.tlaster.precompose.flow.collectAsStateWithLifecycle
 import org.models.opus.models.Task
+import utils.plus
 import viewmodels.MainViewModel
 
 // Source: https://proandroiddev.com/remove-ripple-effect-from-clickable-and-toggleable-widget-in-jetpack-compose-16b154265283
@@ -73,8 +74,8 @@ fun task(
     }
 
     // Get current tags for the task
-    val tagStatus = remember(tags) { mutableStateMapOf(*tags.map { it to false }.toTypedArray()) }
-    LaunchedEffect(Unit) {
+    var tagStatus = remember(tags) { mutableStateMapOf(*tags.map { it to false }.toTypedArray()) }
+    LaunchedEffect(tags) {
         task?.tags?.forEach { tag ->
             tagStatus[tag] = true
         }
@@ -101,18 +102,12 @@ fun task(
         Box(
             modifier = Modifier
                 .height(IntrinsicSize.Min)
-                .background(if (isTaskFocused) MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp) else MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp))
+                .background(
+                    if (isTaskFocused) MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp) else MaterialTheme.colorScheme.surfaceColorAtElevation(
+                        1.dp
+                    )
+                )
                 .fillMaxWidth()
-//                .border(
-//                    1.dp,
-//                    if (isTaskFocused) MaterialTheme.colorScheme.outline else Color.Transparent,
-//                    shape = if (edit || new) RoundedCornerShape(
-//                        8.dp,
-//                        8.dp,
-//                        0.dp,
-//                        0.dp
-//                    ) else RoundedCornerShape(8.dp)
-//                )
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -122,7 +117,7 @@ fun task(
                 TaskCheckbox(viewModel, task, new, isTaskFocused, textFieldFocusRequester)
 
                 // Text box
-                Row (modifier = Modifier.weight(1f)){
+                Row(modifier = Modifier.weight(1f)) {
                     Column {
                         val interactionSource = remember { MutableInteractionSource() }
                         val visualTransformation = VisualTransformation.None
@@ -133,26 +128,39 @@ fun task(
                             visualTransformation = visualTransformation,
                             readOnly = !(new || edit),
                             cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                            textStyle = LocalTextStyle.current.merge(TextStyle(color = LocalContentColor.current, textDecoration = if (task != null && task.completed) TextDecoration.LineThrough else TextDecoration.None)),
+                            textStyle = LocalTextStyle.current.merge(
+                                TextStyle(
+                                    color = LocalContentColor.current,
+                                    textDecoration = if (task != null && task.completed) TextDecoration.LineThrough else TextDecoration.None
+                                )
+                            ),
                             modifier = Modifier
                                 .onKeyEvent { keyEvent ->
                                     if (keyEvent.key != Key.Enter) return@onKeyEvent false
                                     if (keyEvent.type == KeyEventType.KeyUp) {
-                                        println (text)
+                                        println(text)
                                         viewModel.updateTask(
                                             text = text,
                                             task = task,
                                             dueDate = taskDueDate,
                                             tagStatus = tagStatus
                                         )
-                                        text = ""
+                                        if (new) {
+                                            taskDueDate = null
+                                            text = ""
+                                            tagStatus.forEach {
+                                                if (it.value) {
+                                                    tagStatus[it.key] = false
+                                                }
+                                            }
+                                        }
                                         focusManager.clearFocus()
                                     }
                                     true
                                 }
                                 .focusRequester(textFieldFocusRequester).fillMaxWidth(),
                             singleLine = true
-                        ){ innerTextField ->
+                        ) { innerTextField ->
                             TextFieldDefaults.DecorationBox(
                                 value = text,
                                 interactionSource = interactionSource,
@@ -171,10 +179,27 @@ fun task(
                                 contentPadding = PaddingValues(0.dp)
                             )
                         }
-                        if (dueDate != null) {
-                            Row (modifier = Modifier.fillMaxWidth().noRippleClickable(onClick = {textFieldFocusRequester.requestFocus()})){
-                                Text("Due on ${dueDate.date}", fontSize = 10.sp)
+                        Row(verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                                .noRippleClickable(onClick = { textFieldFocusRequester.requestFocus() })
+                        ) {
+                            if (taskDueDate != null) {
+                                taskDisplayDate(taskDueDate!!)
+                            } else if (dueDate != null) {
+                                taskDisplayDate(dueDate)
                             }
+                            if (tagStatus.containsValue(true) && (taskDueDate != null || dueDate != null)) {
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Column {
+                                    Spacer(modifier = Modifier.height(10.dp))
+                                    Divider(
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        modifier = Modifier.width(2.dp).height(10.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(10.dp))
+                            }
+                            displayTags(new, edit, tagStatus, task?.tags)
                         }
                     }
                 }
@@ -189,14 +214,35 @@ fun task(
                         },
                     ) { Icon(Icons.Default.Done, contentDescription = "Done") }
                 }
-                // tag colors
-                // change to rounded box? or not full width?
-                //Box(Modifier.fillMaxHeight().width(4.dp).background(Color.Blue))
             }
         }
         // Edit Options Tray
         if (new || edit) {
             optionsTray(viewModel, task, isTaskFocused, new, tagStatus) { d -> updateDueDate(d) }
         }
+    }
+}
+
+
+@Composable
+fun taskDisplayDate(
+    date: LocalDateTime
+) {
+    val todayDate = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+    Column {
+        Spacer(modifier = Modifier.height(6.dp))
+        Icon(
+            Icons.Default.CalendarToday,
+            contentDescription = null,
+            modifier = Modifier.size(15.dp)
+        )
+    }
+    Spacer(modifier = Modifier.width(2.dp))
+    if (date.date == todayDate.date) {
+        Text("Due Today", fontSize = 10.sp)
+    } else if (date.date == (todayDate + 1).date) {
+        Text("Due Tomorrow", fontSize = 10.sp)
+    } else {
+        Text("Due on ${date.date}", fontSize = 10.sp)
     }
 }

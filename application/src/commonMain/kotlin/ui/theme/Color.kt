@@ -63,6 +63,30 @@ val md_theme_dark_surfaceTint = Color(0xFFA1C9FF)
 val md_theme_dark_outlineVariant = Color(0xFF43474E)
 val md_theme_dark_scrim = Color(0xFF000000)
 
+val md_theme_light_tags = arrayOf(
+    Color(0xFFFAAFA8),
+    Color(0xFFF39F76),
+    Color(0xFFFFF8B8),
+    Color(0xFFE2F6D3),
+    Color(0xFFB4DDD3),
+    Color(0xFFD4E4ED),
+    Color(0xFFAECCDC),
+    Color(0xFFD3BFDB),
+    Color(0xFFF6E2DD)
+)
+
+
+val md_theme_dark_tags = arrayOf(
+    Color(0xFF77172E),
+    Color(0xFF692B17),
+    Color(0xFF7C4A03),
+    Color(0xFF264D3B),
+    Color(0xFF0C625D),
+    Color(0xFF256377),
+    Color(0xFF284255),
+    Color(0xFF472E5B),
+    Color(0xFF6C394F)
+)
 
 val seed = Color(0xFF1261A4)
 

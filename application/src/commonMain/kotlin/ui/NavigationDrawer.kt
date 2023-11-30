@@ -11,7 +11,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import moe.tlaster.precompose.flow.collectAsStateWithLifecycle
 import org.models.opus.models.Tag
-import ui.components.createNewTag
 import viewmodels.MainViewModel
 
 @Composable
@@ -33,8 +32,6 @@ fun NavigationContent(
         tags.forEach {
             NavigationEntry(viewModel, it)
         }
-
-        createNewTag(viewModel)
     }
 }
 

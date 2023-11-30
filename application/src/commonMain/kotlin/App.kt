@@ -1,5 +1,6 @@
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -15,6 +16,7 @@ import moe.tlaster.precompose.navigation.rememberNavigator
 import moe.tlaster.precompose.viewmodel.viewModel
 import ui.*
 import ui.OpusTopAppBar
+import ui.components.TagBar
 import viewmodels.MainViewModel
 
 
@@ -33,6 +35,7 @@ fun App() {
             val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
             val currentScreen by viewModel.currentScreen.collectAsStateWithLifecycle()
+            val tags by viewModel.tags.collectAsStateWithLifecycle()
 
 //            coroutineScope.launch { ApiClient.getInstance().startClientConn() }
 
@@ -56,21 +59,26 @@ fun App() {
                     containerColor = MaterialTheme.colorScheme.onBackground
                 ) {
                     Surface(modifier = Modifier.padding(top = it.calculateTopPadding())) {
-                        NavHost(
-                            navigator = navigator,
-                            initialRoute = "/login"
-                        ) {
-                            scene(route = "/login") {
-                                LoginScreen(viewModel, navigator)
+                        Column {
+                            if (currentScreen != "/login"){
+                                TagBar(viewModel, tags)
                             }
-                            scene(route = "/tasks") {
-                                TaskScreen(viewModel)
-                            }
-                            scene(route = "/notes") {
-                                NoteScreen(viewModel)
-                            }
-                            scene(route = "/calendar") {
-                                CalendarScreen(viewModel)
+                            NavHost(
+                                navigator = navigator,
+                                initialRoute = "/login"
+                            ) {
+                                scene(route = "/login") {
+                                    LoginScreen(viewModel, navigator)
+                                }
+                                scene(route = "/tasks") {
+                                    TaskScreen(viewModel)
+                                }
+                                scene(route = "/notes") {
+                                    NoteScreen(viewModel)
+                                }
+                                scene(route = "/calendar") {
+                                    CalendarScreen(viewModel)
+                                }
                             }
                         }
                     }

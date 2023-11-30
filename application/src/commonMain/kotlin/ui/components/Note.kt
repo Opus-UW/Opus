@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -72,9 +73,10 @@ fun NotePreview(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)),
         modifier = Modifier
             .size(width = 240.dp, height = 200.dp).alpha(if (editNote) 0f else 1f)
+            .clip(CardDefaults.elevatedShape)
             .clickable(
             interactionSource = MutableInteractionSource(),
-            indication = rememberRipple(),
+            indication = rememberRipple(bounded = true),
             onClick = {editNote = true})
     ) {
         Column {
@@ -98,7 +100,7 @@ fun NotePreview(
             // Body
             RichTextEditor(
                 state = state,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.weight(1f),
                 colors = RichTextEditorDefaults.richTextEditorColors(
                     disabledTextColor = Color.Transparent,
                     containerColor = Color.Transparent,
@@ -108,6 +110,11 @@ fun NotePreview(
                 ),
                 readOnly = true
             )
+            Row {
+                Spacer(modifier = Modifier.width(15.dp))
+                displayTags(false, false, tagStatus, note.tags)
+            }
+            Spacer(modifier = Modifier.height(15.dp))
         }
     }
     if (editNote) {
@@ -318,7 +325,7 @@ fun EditNoteDialog(
             RichTextEditor(
                 state = newState,
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .weight(1f)
                     .onKeyEvent {
                         if (it.type == KeyEventType.KeyUp) {
                             keyboardShortcuts.forEach { shortcut ->
@@ -355,6 +362,11 @@ fun EditNoteDialog(
                     disabledIndicatorColor = Color.Transparent
                 )
             )
+            Row {
+                Spacer(modifier = Modifier.width(15.dp))
+                displayTags(false, false, tagStatus, note.tags)
+            }
+            Spacer(modifier = Modifier.height(15.dp))
         }
     }
 }

@@ -22,6 +22,8 @@ fun NoteScreen(
     viewModel: MainViewModel
 ) {
     val notes by viewModel.notes.collectAsStateWithLifecycle()
+    val currentTag by viewModel.currentTag.collectAsStateWithLifecycle()
+    val tagNotes = notes.filter { if (currentTag != null) it.tags.contains(currentTag) else true }
     val listState = rememberLazyGridState()
 
     Column(modifier = Modifier.padding(20.dp).fillMaxWidth().fillMaxHeight()) {
@@ -35,7 +37,7 @@ fun NoteScreen(
             columns = GridCells.Adaptive(minSize = 240.dp),
             modifier = Modifier.weight(1f),
             content = {
-                items(notes.size) { note ->
+                items(tagNotes.size) { note ->
                     NotePreview(viewModel, notes[note])
                 }
             }
