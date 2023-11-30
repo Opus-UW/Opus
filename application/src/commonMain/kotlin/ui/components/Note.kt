@@ -102,13 +102,13 @@ fun NotePreview(
                 state = state,
                 modifier = Modifier.weight(1f),
                 colors = RichTextEditorDefaults.richTextEditorColors(
-                    disabledTextColor = Color.Transparent,
                     containerColor = Color.Transparent,
+                    disabledTextColor = LocalContentColor.current,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
                     disabledIndicatorColor = Color.Transparent
                 ),
-                readOnly = true
+                enabled = false
             )
             Row {
                 Spacer(modifier = Modifier.width(15.dp))
