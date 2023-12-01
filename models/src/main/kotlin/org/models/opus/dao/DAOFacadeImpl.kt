@@ -17,12 +17,11 @@ class DAOFacadeImpl : DAOFacade {
             null
         },
         important = entity.important,
-        pinned = entity.pinned,
         tags = entity.tags.map(::entityToTag)
     )
 
     private fun entityToNote(entity: NoteEntity) = Note(
-        id = entity.id.value, title = entity.title, body = entity.body, tags = entity.tags.map(::entityToTag)
+        id = entity.id.value, title = entity.title, body = entity.body, tags = entity.tags.map(::entityToTag), pinned = entity.pinned
     )
 
     private fun entityToTag(entity: TagEntity) = Tag(
@@ -51,7 +50,7 @@ class DAOFacadeImpl : DAOFacade {
     }
 
     override suspend fun addNewTask(
-        completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>, important: Boolean, pinned: Boolean, gTaskId: String?, userId: String
+        completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>, important: Boolean, gTaskId: String?, userId: String
     ): Task = dbQuery {
         entityToTask(TaskEntity.new {
             this.completed = completed
@@ -61,7 +60,6 @@ class DAOFacadeImpl : DAOFacade {
             this.user = UserEntity.findById(userId) ?: throw Exception()
             this.tags = TagEntity.forIds(tags.map { it.id })
             this.important = important
-            this.pinned = pinned
             this.gTaskId = gTaskId
         })
     }
@@ -76,14 +74,13 @@ class DAOFacadeImpl : DAOFacade {
             this.creationDate = dueDate.toLDT().toString()
             this.user = UserEntity.findById(userId) ?: throw Exception()
             this.important = false
-            this.pinned = false
             this.gTaskId = gTaskId
             this.tags = SizedCollection()
         })
     }
 
     override suspend fun editTask(
-        id: Int, completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>, important: Boolean, pinned: Boolean, gTaskId: String?
+        id: Int, completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>, important: Boolean, gTaskId: String?
     ): Boolean = dbQuery {
         val entity = TaskEntity.find { Tasks.id eq id }.singleOrNull() ?: return@dbQuery false
         entity.apply {
@@ -93,7 +90,6 @@ class DAOFacadeImpl : DAOFacade {
             this.dueDate = dueDate
             this.tags = TagEntity.forIds(tags.map { it.id })
             this.important = important
-            this.pinned = pinned
             this.gTaskId = gTaskId
         }
 
@@ -139,21 +135,23 @@ class DAOFacadeImpl : DAOFacade {
         NoteEntity.find { Notes.userId eq userId }.map(::entityToNote)
     }
 
-    override suspend fun addNewNote(title: String, body: String, tags: List<Tag>, userId: String): Note = dbQuery {
+    override suspend fun addNewNote(title: String, body: String, tags: List<Tag>, pinned: Boolean, userId: String): Note = dbQuery {
         entityToNote(NoteEntity.new {
             this.title = title
             this.body = body
             this.user = UserEntity.findById(userId) ?: throw Exception()
+            this.pinned = pinned
             this.tags = TagEntity.forIds(tags.map { it.id })
         })
     }
 
-    override suspend fun editNote(id: Int, title: String, body: String, tags: List<Tag>): Boolean = dbQuery {
+    override suspend fun editNote(id: Int, title: String, body: String, tags: List<Tag>, pinned: Boolean): Boolean = dbQuery {
         val entity = NoteEntity.find { Notes.id eq id }.singleOrNull() ?: return@dbQuery false
         entity.apply {
             this.title = title
             this.body = body
             this.tags = TagEntity.forIds(tags.map { it.id })
+            this.pinned = pinned
         }
 
         return@dbQuery true

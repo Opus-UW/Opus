@@ -12,7 +12,6 @@ object Tasks : IntIdTable(name = "tasks", columnName = "task_id") {
     val dueDate = text("due_date").nullable()
 
     val important = bool("important")
-    val pinned = bool("pinned")
 
     val gTaskId = text("g_task_id").nullable()
 
@@ -27,7 +26,7 @@ class TaskEntity(id: EntityID<Int>) : IntEntity(id) {
     var creationDate by Tasks.creationDate
     var dueDate by Tasks.dueDate
     var important by Tasks.important
-    var pinned by Tasks.pinned
+
     var tags by TagEntity via TaskTags
 
     var gTaskId by Tasks.gTaskId

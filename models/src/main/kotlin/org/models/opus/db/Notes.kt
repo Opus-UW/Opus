@@ -8,6 +8,8 @@ import org.jetbrains.exposed.dao.id.IntIdTable
 object Notes : IntIdTable(name = "notes", columnName = "note_id") {
     val title = text("title")
     val body = text("body")
+    val pinned = bool("pinned")
+
     val userId = reference("user_id", Users)
 }
 
@@ -16,6 +18,7 @@ class NoteEntity(id: EntityID<Int>) : IntEntity(id) {
     var title by Notes.title
     var body by Notes.body
     var tags by TagEntity via NoteTags
+    var pinned by Notes.pinned
 
     var user by UserEntity referencedOn Notes.userId
 

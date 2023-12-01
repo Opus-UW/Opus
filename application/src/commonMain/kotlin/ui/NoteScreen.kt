@@ -49,7 +49,7 @@ fun NoteScreen(
 fun AddNote(
     viewModel: MainViewModel
 ){
-    var note = Note("", "", listOf(), -1)
+    var note = Note("", "", listOf(), false, -1) //TODO: matt
     val tags by viewModel.tags.collectAsStateWithLifecycle()
     var editNote by remember(note) { mutableStateOf(false) }
     val (title, setTitle) = remember(note) { mutableStateOf(note.title) }
@@ -85,6 +85,6 @@ fun AddNote(
             tagStatus,
             true
         )
-        note = Note("", "", listOf(), -1)
+        note = Note("", "", listOf(), false,-1)
     }
 }

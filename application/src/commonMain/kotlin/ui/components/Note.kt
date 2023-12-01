@@ -264,7 +264,7 @@ fun EditNoteDialog(
                         tags = newTaskTags.toList()
                     )
                 } else {
-                    val newNote = Note(newTitle, newState.toHtml(), newTaskTags)
+                    val newNote = Note(newTitle, newState.toHtml(), newTaskTags, false) //TODO: matt
                     viewModel.createNote(newNote)
                 }
             }

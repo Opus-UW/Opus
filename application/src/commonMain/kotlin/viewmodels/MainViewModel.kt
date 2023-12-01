@@ -120,6 +120,7 @@ class MainViewModel(
             title ?: note.title,
             body ?: note.body,
             tags ?: note.tags,
+            false, //TODO: matt
             note.id
         )
         viewModelScope.launch {
@@ -182,7 +183,6 @@ class MainViewModel(
                 dueDate?: task.dueDate,
                 if (tagStatus != null) taskTags else task.tags,
                 false, // TODO: Matthew
-                false
             )
             viewModelScope.launch {
                 setTasks(ApiClient.getInstance().editTask(task.id, taskToSend))
@@ -196,7 +196,6 @@ class MainViewModel(
                 dueDate,
                 taskTags.toList(),
                 false, // TODO: Matthew
-                false
             )
             viewModelScope.launch {
                 setTasks(ApiClient.getInstance().postTask(taskToSend))
