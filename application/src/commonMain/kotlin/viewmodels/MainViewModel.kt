@@ -173,7 +173,9 @@ class MainViewModel(
                 text ?: task.action,
                 time.toLocalDateTime(TimeZone.currentSystemDefault()),
                 dueDate?: task.dueDate,
-                if (tagStatus != null) taskTags else task.tags
+                if (tagStatus != null) taskTags else task.tags,
+                false, // TODO: Matthew
+                false
             )
             viewModelScope.launch {
                 setTasks(ApiClient.getInstance().editTask(task.id, taskToSend))
@@ -185,7 +187,9 @@ class MainViewModel(
                 text ?: "",
                 time.toLocalDateTime(TimeZone.currentSystemDefault()),
                 dueDate,
-                taskTags.toList()
+                taskTags.toList(),
+                false, // TODO: Matthew
+                false
             )
             viewModelScope.launch {
                 setTasks(ApiClient.getInstance().postTask(taskToSend))

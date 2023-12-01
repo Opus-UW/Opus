@@ -16,6 +16,8 @@ class DAOFacadeImpl : DAOFacade {
             if (it != "null") return@let it.toLDT()
             null
         },
+        important = entity.important,
+        pinned = entity.pinned,
         tags = entity.tags.map(::entityToTag)
     )
 
@@ -49,7 +51,7 @@ class DAOFacadeImpl : DAOFacade {
     }
 
     override suspend fun addNewTask(
-        completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>, gTaskId: String?, userId: String
+        completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>, important: Boolean, pinned: Boolean, gTaskId: String?, userId: String
     ): Task = dbQuery {
         entityToTask(TaskEntity.new {
             this.completed = completed
@@ -58,6 +60,8 @@ class DAOFacadeImpl : DAOFacade {
             this.dueDate = dueDate
             this.user = UserEntity.findById(userId) ?: throw Exception()
             this.tags = TagEntity.forIds(tags.map { it.id })
+            this.important = important
+            this.pinned = pinned
             this.gTaskId = gTaskId
         })
     }
@@ -71,13 +75,15 @@ class DAOFacadeImpl : DAOFacade {
             this.dueDate = dueDate.toLDT().toString()
             this.creationDate = dueDate.toLDT().toString()
             this.user = UserEntity.findById(userId) ?: throw Exception()
+            this.important = false
+            this.pinned = false
             this.gTaskId = gTaskId
             this.tags = SizedCollection()
         })
     }
 
     override suspend fun editTask(
-        id: Int, completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>, gTaskId: String?
+        id: Int, completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>, important: Boolean, pinned: Boolean, gTaskId: String?
     ): Boolean = dbQuery {
         val entity = TaskEntity.find { Tasks.id eq id }.singleOrNull() ?: return@dbQuery false
         entity.apply {
@@ -86,6 +92,8 @@ class DAOFacadeImpl : DAOFacade {
             this.creationDate = creationDate
             this.dueDate = dueDate
             this.tags = TagEntity.forIds(tags.map { it.id })
+            this.important = important
+            this.pinned = pinned
             this.gTaskId = gTaskId
         }
 
@@ -93,7 +101,7 @@ class DAOFacadeImpl : DAOFacade {
     }
 
     override suspend fun editGTask(
-        gTaskId: String, completed: Boolean, action: String,  dueDate: String?
+        gTaskId: String, completed: Boolean, action: String, dueDate: String?
     ): Boolean = dbQuery {
         val entity = TaskEntity.find { Tasks.gTaskId eq gTaskId }.singleOrNull() ?: return@dbQuery false
         entity.apply {

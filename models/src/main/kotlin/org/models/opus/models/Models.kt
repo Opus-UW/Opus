@@ -11,6 +11,8 @@ data class Task(
     val creationDate: LocalDateTime,
     val dueDate: LocalDateTime?,
     val tags: List<Tag> = listOf(),
+    val important: Boolean,
+    val pinned: Boolean,
     val id: Int = -1
 )
 

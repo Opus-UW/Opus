@@ -9,7 +9,7 @@ interface DAOFacade {
     suspend fun taskGId(id: Int): String?
     suspend fun userTasks(userId: String): List<Task>
     suspend fun addNewTask(
-        completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>, gTaskId: String?, userId: String
+        completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>, important: Boolean, pinned: Boolean, gTaskId: String?, userId: String
     ): Task
 
     suspend fun addNewGTask(
@@ -17,7 +17,7 @@ interface DAOFacade {
     ): Task
 
     suspend fun editTask(
-        id: Int, completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>, gTaskId: String?
+        id: Int, completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>, important: Boolean, pinned: Boolean, gTaskId: String?
     ): Boolean
 
     suspend fun editGTask(
