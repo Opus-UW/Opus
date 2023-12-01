@@ -19,6 +19,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
@@ -62,6 +63,8 @@ fun task(
     val textFieldFocusRequester = remember(task) { FocusRequester() }
     var isTaskFocused by remember(task) { mutableStateOf(false) }
     var edit by remember(isTaskFocused) { mutableStateOf(false) }
+    var editCount by remember(task) { mutableStateOf(0) }
+
 
     // Task variables
     var text by remember(task) { mutableStateOf(task?.action ?: "") }
@@ -96,6 +99,7 @@ fun task(
         }
     }
 
+    // Update currentTag and tagStatus based on current tag
     LaunchedEffect(currentTag){
         if (currentTag != null){
             tagStatus[currentTag!!] = true
@@ -105,6 +109,13 @@ fun task(
         }
         oldCurrentTag = currentTag
     }
+
+    when {
+        !edit && (editCount > 0)-> {
+            viewModel.updateTask(task = task, text = text, tagStatus = tagStatus, dueDate = taskDueDate)
+        }
+    }
+
 
     // Column for task + options bar
     Column(
@@ -227,7 +238,7 @@ fun task(
                 }
                 if (!new && isTaskFocused && !edit) {
                     IconButton(
-                        onClick = { textFieldFocusRequester.requestFocus(); edit = true; },
+                        onClick = { textFieldFocusRequester.requestFocus(); edit = true; editCount++},
                     ) { Icon(Icons.Default.Edit, contentDescription = "Edit") }
                 } else if (!new && isTaskFocused) {
                     IconButton(
@@ -267,4 +278,46 @@ fun taskDisplayDate(
     } else {
         Text("Due on ${date.date}", fontSize = 10.sp)
     }
+}
+
+@Composable
+fun AlertDialogExample(
+    onDismissRequest: () -> Unit,
+    onConfirmation: () -> Unit,
+    dialogTitle: String,
+    dialogText: String,
+    icon: ImageVector,
+) {
+    AlertDialog(
+        icon = {
+            Icon(icon, contentDescription = "Example Icon")
+        },
+        title = {
+            Text(text = dialogTitle)
+        },
+        text = {
+            Text(text = dialogText)
+        },
+        onDismissRequest = {
+            onDismissRequest()
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onConfirmation()
+                }
+            ) {
+                Text("Confirm")
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    onDismissRequest()
+                }
+            ) {
+                Text("Dismiss")
+            }
+        }
+    )
 }
