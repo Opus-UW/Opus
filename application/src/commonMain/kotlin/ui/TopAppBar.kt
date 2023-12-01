@@ -31,25 +31,6 @@ fun OpusTopAppBar(
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(if (taskState) "Tasks" else (if (noteState) "Notes" else  (if (calendarState) "Calendar" else (if (tagState) "Tags" else "Unknown")) ) )
-                IconButton(
-                    onClick = {
-                        if (!tagState) {
-                            tagState = true
-                            taskState = false
-                            noteState = false
-                            calendarState = false
-                            viewModel.setCurrentScreen("/tags")
-                            navigator.navigate("/tags")
-                        }
-                    }
-                ) {
-                    Icon(
-                        Icons.Default.Sell,
-                        tint = if (tagState) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
-                        contentDescription = "Navigate to tags"
-                    )
-                }
-
                 if (calendarState) {
                     Row(
                         Modifier.weight(1f),
@@ -121,6 +102,24 @@ fun OpusTopAppBar(
                         Icons.Default.CalendarMonth,
                         tint = if (calendarState) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
                         contentDescription = "Navigate to calendar"
+                    )
+                }
+                IconButton(
+                    onClick = {
+                        if (!tagState) {
+                            tagState = true
+                            taskState = false
+                            noteState = false
+                            calendarState = false
+                            viewModel.setCurrentScreen("/tags")
+                            navigator.navigate("/tags")
+                        }
+                    }
+                ) {
+                    Icon(
+                        Icons.Default.Sell,
+                        tint = if (tagState) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
+                        contentDescription = "Navigate to tags"
                     )
                 }
             }

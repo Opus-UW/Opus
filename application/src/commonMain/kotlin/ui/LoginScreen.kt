@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Login
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -34,6 +35,7 @@ import com.google.api.services.tasks.TasksScopes
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import moe.tlaster.precompose.flow.collectAsStateWithLifecycle
 import moe.tlaster.precompose.navigation.Navigator
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import ui.components.darkModeLogoVector
@@ -87,8 +89,8 @@ fun LoginScreen(
             }
         }
     }
-
-    val logoVector = if (isDarkTheme()) darkModeLogoVector() else lightModeLogoVector()
+    val darkTheme by viewModel.darkTheme.collectAsStateWithLifecycle()
+    val logoVector = if (darkTheme == true) darkModeLogoVector() else lightModeLogoVector()
     Column{
         Spacer(modifier = Modifier.weight(1f))
         Row{
@@ -145,6 +147,10 @@ fun Login(
         val oauth2 = Oauth2.Builder(httpTransport, JSON_FACTORY, cred).build()
 
         ApiClient.getInstance().setUserId(oauth2.userinfo().get().execute().id)
+
+        viewModel.setUserName(oauth2.userinfo().get().execute().givenName + " " + oauth2.userinfo().get().execute().familyName)
+        viewModel.setPictureURL(oauth2.userinfo().get().execute().picture)
+        viewModel.setEmail(oauth2.userinfo().get().execute().email)
 
         viewModel.setUser(ApiClient.getInstance().getOrCreateUser())
 

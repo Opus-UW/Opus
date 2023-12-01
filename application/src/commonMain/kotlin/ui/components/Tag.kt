@@ -95,7 +95,7 @@ fun AddTag(viewModel: MainViewModel) {
                 Spacer(modifier = Modifier.width(5.dp))
                 Column {
                     Spacer(modifier = Modifier.height(2.dp))
-                    chooseColor(color, setColor, 20.dp)
+                    chooseColor(viewModel, color, setColor, 20.dp)
                 }
                 Spacer(modifier = Modifier.width(10.dp))
                 val interactionSource = remember { MutableInteractionSource() }

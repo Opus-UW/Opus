@@ -101,13 +101,15 @@ fun task(
 
     // Update currentTag and tagStatus based on current tag
     LaunchedEffect(currentTag){
-        if (currentTag != null){
-            tagStatus[currentTag!!] = true
+        if (new){
+            if (currentTag != null) {
+                tagStatus[currentTag!!] = true
+            }
+            if (oldCurrentTag != null) {
+                tagStatus[oldCurrentTag!!] = false
+            }
+            oldCurrentTag = currentTag
         }
-        if (oldCurrentTag != null){
-            tagStatus[oldCurrentTag!!] = false
-        }
-        oldCurrentTag = currentTag
     }
 
     when {

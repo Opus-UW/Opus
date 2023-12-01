@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import moe.tlaster.precompose.flow.collectAsStateWithLifecycle
 import org.models.opus.models.Tag
+import ui.deleteTagMenu
 import ui.theme.isDarkTheme
 import ui.theme.md_theme_dark_tags
 import ui.theme.md_theme_light_tags
@@ -53,6 +54,8 @@ fun ChooseTagMenu(
                         )
                     }
                     TagButtonContent(tag)
+                    Spacer(modifier = Modifier.weight(1f))
+                    deleteTagMenu(viewModel, tag)
                 }
             }
             createNewTag(viewModel)
@@ -71,7 +74,7 @@ fun createNewTag(viewModel: MainViewModel){
             Icon(Icons.Default.Add, contentDescription = "Add Tag")
         }
         Spacer(modifier = Modifier.width(5.dp))
-        chooseColor(color, setColor, 40.dp)
+        chooseColor(viewModel, color, setColor, 40.dp)
         Spacer(modifier = Modifier.width(10.dp))
         TextField(
             value = newTag,
@@ -102,14 +105,16 @@ fun createNewTag(viewModel: MainViewModel){
 
 @Composable
 fun chooseColor(
+    viewModel: MainViewModel,
     currentColor: Color,
     setColor: (Color) -> Unit,
     size: Dp
 ){
+    val darkTheme by viewModel.darkTheme.collectAsStateWithLifecycle()
     val (showColors, setShowColors) = remember { mutableStateOf(false) }
-    val colors = if (isDarkTheme()) md_theme_dark_tags else md_theme_light_tags
+    val colors = if (darkTheme == true) md_theme_dark_tags else md_theme_light_tags
     if (currentColor == Color(0, 0,0 ,0)){
-        if (isDarkTheme()){
+        if (darkTheme == true){
             setColor(md_theme_dark_tags[0])
         }
         else{
