@@ -498,3 +498,111 @@ fun darkModeLogoVector(): ImageVector {
     }
 }
 
+@Composable
+fun LogoVector(): ImageVector {
+    return remember {
+        ImageVector.Builder(
+            name = "vector",
+            defaultWidth = 151.dp,
+            defaultHeight = 117.dp,
+            viewportWidth = 151f,
+            viewportHeight = 117f
+        ).apply {
+            path(
+                fill = null,
+                fillAlpha = 1.0f,
+                stroke = SolidColor(Color(0xFF2998FF)),
+                strokeAlpha = 1.0f,
+                strokeLineWidth = 15f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 1.0f,
+                pathFillType = PathFillType.NonZero
+            ) {
+                moveTo(44.9999f, 15.6484f)
+                lineTo(129f, 15.6484f)
+            }
+            path(
+                fill = SolidColor(Color(0xFF2998FF)),
+                fillAlpha = 1.0f,
+                stroke = null,
+                strokeAlpha = 1.0f,
+                strokeLineWidth = 1.0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 1.0f,
+                pathFillType = PathFillType.NonZero
+            ) {
+                moveTo(30f, 16.5f)
+                arcTo(12.5f, 12.5f, 0f, isMoreThanHalf = false, isPositiveArc = true, 17.5f, 29f)
+                arcTo(12.5f, 12.5f, 0f, isMoreThanHalf = false, isPositiveArc = true, 5f, 16.5f)
+                arcTo(12.5f, 12.5f, 0f, isMoreThanHalf = false, isPositiveArc = true, 30f, 16.5f)
+                close()
+            }
+            path(
+                fill = null,
+                fillAlpha = 1.0f,
+                stroke = SolidColor(Color(0xFFFFC93E)),
+                strokeAlpha = 1.0f,
+                strokeLineWidth = 15f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 1.0f,
+                pathFillType = PathFillType.NonZero
+            ) {
+                moveTo(58.9999f, 59.4175f)
+                lineTo(143f, 59.4175f)
+            }
+            path(
+                fill = SolidColor(Color(0xFFFFC93E)),
+                fillAlpha = 1.0f,
+                stroke = null,
+                strokeAlpha = 1.0f,
+                strokeLineWidth = 1.0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 1.0f,
+                pathFillType = PathFillType.NonZero
+            ) {
+                moveTo(44f, 60.5f)
+                curveTo(44f, 67.4036f, 38.4036f, 73f, 31.5f, 73f)
+                curveTo(24.5964f, 73f, 19f, 67.4036f, 19f, 60.5f)
+                curveTo(19f, 53.5964f, 24.5964f, 48f, 31.5f, 48f)
+                curveTo(38.4036f, 48f, 44f, 53.5964f, 44f, 60.5f)
+                close()
+            }
+            path(
+                fill = null,
+                fillAlpha = 1.0f,
+                stroke = SolidColor(Color(0xFFFF295D)),
+                strokeAlpha = 1.0f,
+                strokeLineWidth = 15f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 1.0f,
+                pathFillType = PathFillType.NonZero
+            ) {
+                moveTo(45f, 103.648f)
+                lineTo(129f, 103.648f)
+            }
+            path(
+                fill = SolidColor(Color(0xFFFF295D)),
+                fillAlpha = 1.0f,
+                stroke = null,
+                strokeAlpha = 1.0f,
+                strokeLineWidth = 1.0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 1.0f,
+                pathFillType = PathFillType.NonZero
+            ) {
+                moveTo(30f, 104.5f)
+                arcTo(12.5f, 12.5f, 0f, isMoreThanHalf = false, isPositiveArc = true, 17.5f, 117f)
+                arcTo(12.5f, 12.5f, 0f, isMoreThanHalf = false, isPositiveArc = true, 5f, 104.5f)
+                arcTo(12.5f, 12.5f, 0f, isMoreThanHalf = false, isPositiveArc = true, 30f, 104.5f)
+                close()
+            }
+        }.build()
+    }
+}
+
