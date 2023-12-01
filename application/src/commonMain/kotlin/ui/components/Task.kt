@@ -68,6 +68,8 @@ fun task(
     val initialDueDate: LocalDateTime? = defaultDueDate ?: task?.dueDate
     var taskDueDate by remember(task) { mutableStateOf(initialDueDate) }
 
+    println("DERECK3: $taskDueDate $initialDueDate $defaultDueDate ${task?.dueDate}")
+
 
     fun updateDueDate(dueDate: LocalDateTime? = null) {
         if (dueDate != null) taskDueDate = dueDate

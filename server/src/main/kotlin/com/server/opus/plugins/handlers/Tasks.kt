@@ -8,7 +8,6 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.util.*
-import kotlinx.datetime.*
 import org.models.opus.dao.dao
 import org.models.opus.models.Task
 
@@ -66,7 +65,10 @@ fun Routing.handleTasks() {
                 val gTask = com.google.api.services.tasks.model.Task()
                 gTask.apply {
                     setTitle(task.action)
-                    task.dueDate?.let { setDue(DateTime(it.toString()).toStringRfc3339()) } ?: setDue(null)
+                    task.dueDate?.let {
+                        println("DERECK1: ${it.toString()}")
+                        setDue(DateTime(it.toString()).toStringRfc3339())
+                    } ?: setDue(null)
                     if (task.completed) {
                         setHidden(true)
                         setStatus("completed")
@@ -141,7 +143,10 @@ fun Routing.handleTasks() {
                 gTask.apply {
                     setId(gTaskId)
                     setTitle(task.action)
-                    task.dueDate?.let { setDue(DateTime(it.toString()).toStringRfc3339()) } ?: setDue(null)
+                    task.dueDate?.let {
+                        println("DERECK2: ${it.toString()}")
+                        setDue(DateTime(it.toString()).toStringRfc3339())
+                    } ?: setDue(null)
 
                     if (task.completed) {
                         setHidden(true)

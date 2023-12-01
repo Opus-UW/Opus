@@ -29,6 +29,7 @@ fun Application.configureSockets() {
                     if(receivedText.accessToken.isEmpty() || receivedText.userId.isEmpty()) continue
                     val updatedTasks = TaskAPI(receivedText.accessToken).modifiedTasks()
                     updatedTasks.items.forEach { task ->
+                        println("ROHIT: ${task.due}")
                         if (dbQuery { TaskEntity.find { Tasks.gTaskId eq task.id }.count().toInt() > 0 }) {
                             dao.editGTask(task.id, task.status == "completed", task.title, task.due)
                         } else {

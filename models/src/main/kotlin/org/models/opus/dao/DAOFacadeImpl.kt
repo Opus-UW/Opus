@@ -71,8 +71,8 @@ class DAOFacadeImpl : DAOFacade {
         entityToTask(TaskEntity.new {
             this.completed = completed
             this.action = action
-            this.dueDate = dueDate
-            this.creationDate = dueDate
+            this.dueDate = dueDate.toLDT().toString()
+            this.creationDate = dueDate.toLDT().toString()
             this.user = UserEntity.findById(userId) ?: throw Exception()
             this.gTaskId = gTaskId
             this.tags = SizedCollection()
@@ -102,7 +102,8 @@ class DAOFacadeImpl : DAOFacade {
         entity.apply {
             this.completed = completed
             this.action = action
-            this.dueDate = dueDate
+            println("DERECK5: ${dueDate?.toLDT()?.toString()}")
+            this.dueDate = dueDate?.toLDT()?.toString()
         }
 
         return@dbQuery true

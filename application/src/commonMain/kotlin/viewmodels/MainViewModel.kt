@@ -135,8 +135,11 @@ class MainViewModel(
         // Grab timestamp
         val time = Clock.System.now()
 
+        println("DERECK1: ${dueDate}")
+
         // If updating task
         if (!new && task != null) {
+            println("DERECK2: ${task.dueDate}")
             val taskToSend = Task(
                 completed ?: task.completed,
                 text ?: task.action,

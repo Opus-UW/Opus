@@ -7,8 +7,17 @@ import kotlinx.datetime.toLocalDateTime
 
 fun String.toLDT(): LocalDateTime{
     return try{
-        Instant.parse(this).toLocalDateTime(TimeZone.UTC)
+        var a = Instant.parse(this).toLocalDateTime(TimeZone.UTC).toString()
+        if(a.count{it == ':'} == 1){
+            a = "${a}:01"
+        }
+        LocalDateTime.parse(a)
     } catch (e: Exception){
-        LocalDateTime.parse(this)
+        var a = LocalDateTime.parse(this).toString()
+        if(a.count{it == ':'} == 1){
+           a = "${a}:01"
+        }
+        println(LocalDateTime.parse(a))
+        LocalDateTime.parse(a)
     }
 }
