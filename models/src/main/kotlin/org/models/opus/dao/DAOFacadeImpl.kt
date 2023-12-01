@@ -24,7 +24,7 @@ class DAOFacadeImpl : DAOFacade {
     )
 
     private fun entityToTag(entity: TagEntity) = Tag(
-        id = entity.id.value, title = entity.title, colour = entity.colour.toEnum<Colour>() ?: Colour.RED
+        id = entity.id.value, title = entity.title, colour = entity.colour.toEnum<Colour>() ?: Colour.CORAL
     )
 
     private fun entityToUser(entity: UserEntity) = User(

@@ -28,15 +28,15 @@ data class Tag(
 
 @Serializable
 enum class Colour{
-    RED,
-    BROWN,
-    ORANGE_YELLOW,
-    GREEN,
-    TEAL,
-    CYAN,
-    BLUE,
-    PURPLE,
-    PLUM_PEACH;
+    CORAL,
+    PEACH,
+    SAND,
+    MINT,
+    SAGE,
+    FOG,
+    STORM,
+    DUSK,
+    BLOSSOM;
 }
 
 
