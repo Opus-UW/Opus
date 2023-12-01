@@ -199,6 +199,7 @@ fun task(
                                                     tagStatus[it.key] = false
                                                 }
                                             }
+                                            important = false
                                         }
                                         focusManager.clearFocus()
                                     }

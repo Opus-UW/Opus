@@ -120,7 +120,9 @@ fun Login(
 
         ApiClient.getInstance().setUserId(oauth2.userinfo().get().execute().id)
 
-        viewModel.setUserName(oauth2.userinfo().get().execute().givenName + " " + oauth2.userinfo().get().execute().familyName)
+        val givenName = oauth2.userinfo().get().execute().givenName
+        val familyName = oauth2.userinfo().get().execute().familyName ?: ""
+        viewModel.setUserName("$givenName $familyName")
         viewModel.setPictureURL(oauth2.userinfo().get().execute().picture)
         viewModel.setEmail(oauth2.userinfo().get().execute().email)
 

@@ -53,7 +53,7 @@ fun TagBar(
                 rows = StaggeredGridCells.Adaptive(35.dp),
                 horizontalItemSpacing = 5.dp,
                 verticalArrangement = Arrangement.spacedBy(5.dp),
-                modifier = Modifier.fillMaxWidth().fillMaxHeight(0.2f),
+                modifier = Modifier.fillMaxWidth().fillMaxHeight(0.2f).padding(20.dp),
                 content = {
                     items(tags.size) { tag ->
                         TagButton(viewModel, tags[tag])
