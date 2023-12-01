@@ -6,10 +6,11 @@ interface DAOFacade {
     suspend fun allTasks(): List<Task>
     suspend fun task(id: Int): Task?
 
+    suspend fun unsentTasks(): List<Task>
     suspend fun taskGId(id: Int): String?
     suspend fun userTasks(userId: String): List<Task>
     suspend fun addNewTask(
-        completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>, important: Boolean, gTaskId: String?, userId: String
+        completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>, notificationSent: Boolean, important: Boolean, gTaskId: String?, userId: String
     ): Task
 
     suspend fun addNewGTask(
@@ -17,7 +18,7 @@ interface DAOFacade {
     ): Task
 
     suspend fun editTask(
-        id: Int, completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>, important: Boolean, gTaskId: String?
+        id: Int, completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>, notificationSent: Boolean, important: Boolean,  gTaskId: String?
     ): Boolean
 
     suspend fun editGTask(

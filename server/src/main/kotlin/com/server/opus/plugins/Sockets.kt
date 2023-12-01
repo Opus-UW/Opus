@@ -1,18 +1,23 @@
 package com.server.opus.plugins
 
+import com.server.opus.GmailAPI
 import com.server.opus.TaskAPI
 import io.ktor.serialization.*
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
+import kotlinx.datetime.toJavaLocalDateTime
 import org.models.opus.dao.DatabaseFactory.dbQuery
 import org.models.opus.dao.dao
 import org.models.opus.db.TaskEntity
 import org.models.opus.db.Tasks
 import org.models.opus.models.UserWSData
 import java.nio.charset.Charset
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 import java.util.*
+
 
 fun Application.configureSockets() {
     routing {
@@ -42,6 +47,28 @@ fun Application.configureSockets() {
                     }
                     if (updatedTasks.items.isNotEmpty()) {
                         thisConnection.session.send("829 modified")
+                    }
+                    val allTasks = dao.unsentTasks()
+                    for (task in allTasks) {
+                        if (task.dueDate == null) {
+                            continue
+                        }
+                        val curDT = LocalDateTime.now()
+                        val targetDT = task.dueDate!!.toJavaLocalDateTime()
+                        val dur = curDT.until(targetDT, ChronoUnit.DAYS)
+                        if (dur <= 1 && dur >= 0 && task.completed == false) {
+                            dao.editTask(
+                                task.id,
+                                task.completed,
+                                task.action,
+                                task.creationDate.toString(),
+                                task.dueDate?.toString(),
+                                task.tags,
+                                true,
+                                dao.taskGId(task.id)
+                            )
+                            GmailAPI(receivedText.accessToken).sendEmail("Task \"${task.action}\" due","Your task \"${task.action}\" is due in < 1 day.\n Good Luck!")
+                        }
                     }
                 }
             } catch (e: Exception) {

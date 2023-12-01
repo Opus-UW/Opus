@@ -59,5 +59,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
     implementation("io.ktor:ktor-server-websockets-jvm")
 
+    implementation("com.sun.mail:javax.mail:1.6.2")
+    implementation("com.google.apis:google-api-services-oauth2:v2-rev20200213-2.0.0")
+
     implementation(project(mapOf("path" to ":models")))
 }

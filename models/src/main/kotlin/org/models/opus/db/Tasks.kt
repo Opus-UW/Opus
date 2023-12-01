@@ -10,6 +10,7 @@ object Tasks : IntIdTable(name = "tasks", columnName = "task_id") {
     val action = text("action")
     val creationDate = text("creation_date")
     val dueDate = text("due_date").nullable()
+    val notificationSent = bool("notification_sent").default(false)
 
     val important = bool("important")
 
@@ -28,6 +29,7 @@ class TaskEntity(id: EntityID<Int>) : IntEntity(id) {
     var important by Tasks.important
 
     var tags by TagEntity via TaskTags
+    var notificationSent by Tasks.notificationSent
 
     var gTaskId by Tasks.gTaskId
 

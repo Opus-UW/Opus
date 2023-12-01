@@ -11,6 +11,7 @@ data class Task(
     val creationDate: LocalDateTime,
     val dueDate: LocalDateTime?,
     val tags: List<Tag> = listOf(),
+    val notificationSent: Boolean = false,
     val important: Boolean,
     val id: Int = -1
 )
