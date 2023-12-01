@@ -21,14 +21,12 @@ fun Color.toColour(): Colour {
     md_theme_light_tags.forEachIndexed{i, color ->
         if (color == this){
             val colour = i.toEnum<Colour>()
-            println (colour)
             return colour ?: Colour.CORAL
         }
     }
     md_theme_dark_tags.forEachIndexed{i, color ->
         if (color == this){
             val colour = i.toEnum<Colour>()
-            println (colour)
             return colour ?: Colour.CORAL
         }
     }

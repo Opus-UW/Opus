@@ -123,7 +123,6 @@ fun AddTag(viewModel: MainViewModel) {
                             if (keyEvent.key != Key.Enter) return@onKeyEvent false
                             if (keyEvent.type == KeyEventType.KeyUp) {
                                 val tag = Tag(text, color.toColour())
-                                print (tag)
                                 viewModel.createTag(tag)
                                 text = ""
                                 setColor(Color.Transparent)
