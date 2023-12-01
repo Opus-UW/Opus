@@ -2,6 +2,7 @@ package ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,20 +14,19 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.input.key.*
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import moe.tlaster.precompose.flow.collectAsStateWithLifecycle
 import moe.tlaster.precompose.navigation.Navigator
-import org.models.opus.models.Tag
 import utils.minusMonth
 import utils.plusMonth
-import utils.toColour
 import viewmodels.MainViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,6 +68,8 @@ fun OpusTopAppBar(
                     var text by remember { mutableStateOf("") }
                     val interactionSource = remember { MutableInteractionSource() }
                     val visualTransformation = VisualTransformation.None
+                    val focusRequester = remember { FocusRequester() }
+                    val focusManager = LocalFocusManager.current
                     Box(modifier = Modifier
                         .fillMaxWidth(0.5f)
                         .clip(RoundedCornerShape(7.dp))
@@ -75,38 +77,44 @@ fun OpusTopAppBar(
                         .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(7.dp))
                         .padding(7.dp)
                     ){
-                        BasicTextField(
-                            value = text,
-                            onValueChange = { text = it; viewModel.setSearchString(text) },
-                            interactionSource = interactionSource,
-                            visualTransformation = visualTransformation,
-                            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                            textStyle = TextStyle(fontSize = 15.sp, color = MaterialTheme.colorScheme.onSurface),
-                            singleLine = true
-                        ) { innerTextField ->
-                            TextFieldDefaults.DecorationBox(
+                        Row {
+                            BasicTextField(
                                 value = text,
+                                onValueChange = { text = it; viewModel.setSearchString(text) },
                                 interactionSource = interactionSource,
-                                colors = TextFieldDefaults.colors(
-                                    unfocusedContainerColor = Color.Transparent,
-                                    focusedContainerColor = Color.Transparent,
-                                    focusedIndicatorColor = Color.Transparent,
-                                    unfocusedIndicatorColor = Color.Transparent,
-                                    disabledIndicatorColor = Color.Transparent,
-                                ),
-                                enabled = true,
-                                innerTextField = innerTextField,
-                                singleLine = true,
                                 visualTransformation = visualTransformation,
-                                placeholder = {
-                                    Text(
-                                        "Search...",
-                                        fontSize = 15.sp,
-                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
-                                    )
-                                },
-                                contentPadding = PaddingValues(0.dp)
-                            )
+                                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                                textStyle = TextStyle(fontSize = 15.sp, color = MaterialTheme.colorScheme.onSurface),
+                                singleLine = true,
+                                modifier = Modifier.weight(1f).focusRequester(focusRequester)
+                            ) { innerTextField ->
+                                TextFieldDefaults.DecorationBox(
+                                    value = text,
+                                    interactionSource = interactionSource,
+                                    colors = TextFieldDefaults.colors(
+                                        unfocusedContainerColor = Color.Transparent,
+                                        focusedContainerColor = Color.Transparent,
+                                        focusedIndicatorColor = Color.Transparent,
+                                        unfocusedIndicatorColor = Color.Transparent,
+                                        disabledIndicatorColor = Color.Transparent,
+                                    ),
+                                    enabled = true,
+                                    innerTextField = innerTextField,
+                                    singleLine = true,
+                                    visualTransformation = visualTransformation,
+                                    placeholder = {
+                                        Text(
+                                            "Search...",
+                                            fontSize = 15.sp,
+                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                                        )
+                                    },
+                                    contentPadding = PaddingValues(0.dp)
+                                )
+                            }
+                            if (text != ""){
+                                Icon(Icons.Default.Close, contentDescription = "Clear search", modifier = Modifier.clickable{text = ""; viewModel.setSearchString(text); focusManager.clearFocus()})
+                            }
                         }
                     }
                     Spacer(modifier = Modifier.weight(1f))

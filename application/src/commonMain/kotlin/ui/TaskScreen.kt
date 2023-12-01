@@ -1,6 +1,5 @@
 package ui
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -32,12 +31,11 @@ fun TaskScreen(
     val validSearchString = searchString != null && searchString != ""
 
     val tagTasks = tasks.filter { if (currentTag != null) it.tags.contains(currentTag) else true }
-    println (validSearchString)
     var uncompletedTasks = tagTasks.filter { !it.completed }
     var completedTasks = tagTasks.filter { it.completed }
     if (validSearchString){
-        uncompletedTasks = uncompletedTasks.filter { searchString?.let { it1 -> it.action.contains(it1, ignoreCase = true) } ?: true }
-        completedTasks = completedTasks.filter { searchString?.let { it1 -> it.action.contains(it1, ignoreCase = true) } ?: true }
+        uncompletedTasks = uncompletedTasks.filter { searchString?.let { it1 -> it.action.contains(it1, ignoreCase = true) } ?: false }
+        completedTasks = completedTasks.filter { searchString?.let { it1 -> it.action.contains(it1, ignoreCase = true) } ?: false }
     }
 
     Column(
@@ -52,7 +50,15 @@ fun TaskScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             items(
-                items = uncompletedTasks,
+                items = uncompletedTasks.filter { it.important },
+                key = { task ->
+                    task.id
+                }
+            ) { task ->
+                task(viewModel, task, task.dueDate, defaultDueDate)
+            }
+            items(
+                items = uncompletedTasks.filter { !it.important },
                 key = { task ->
                     task.id
                 }

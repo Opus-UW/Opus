@@ -14,7 +14,6 @@ import org.models.opus.models.Tag
 import org.models.opus.models.Task
 import kotlinx.datetime.Clock
 import org.models.opus.models.User
-import ui.components.getTheme
 import ui.components.storeTheme
 
 
@@ -114,13 +113,14 @@ class MainViewModel(
         note: Note,
         title: String? = null,
         body: String? = null,
-        tags: List<Tag>? = null
+        tags: List<Tag>? = null,
+        pinned: Boolean? = null
     ){
         val updatedNote = Note(
             title ?: note.title,
             body ?: note.body,
             tags ?: note.tags,
-            false, //TODO: matt
+            pinned ?: false,
             note.id
         )
         viewModelScope.launch {
@@ -162,7 +162,8 @@ class MainViewModel(
         tagStatus: Map<Tag, Boolean>? = null,
         dueDate: LocalDateTime? = null,
         new: Boolean = false,
-        task: Task? = null
+        task: Task? = null,
+        important: Boolean? = null
     ) {
         // Convert tag status map to list of tags
         val taskTags = mutableListOf<Tag>()
@@ -182,7 +183,7 @@ class MainViewModel(
                 time.toLocalDateTime(TimeZone.currentSystemDefault()),
                 dueDate?: task.dueDate,
                 if (tagStatus != null) taskTags else task.tags,
-                false, // TODO: Matthew
+                important ?: false,
             )
             viewModelScope.launch {
                 setTasks(ApiClient.getInstance().editTask(task.id, taskToSend))
@@ -195,7 +196,7 @@ class MainViewModel(
                 time.toLocalDateTime(TimeZone.currentSystemDefault()),
                 dueDate,
                 taskTags.toList(),
-                false, // TODO: Matthew
+                important ?: false,
             )
             viewModelScope.launch {
                 setTasks(ApiClient.getInstance().postTask(taskToSend))
