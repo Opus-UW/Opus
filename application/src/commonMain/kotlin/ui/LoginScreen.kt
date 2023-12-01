@@ -45,7 +45,7 @@ import java.io.IOException
 import java.io.InputStreamReader
 
 private const val APPLICATION_NAME = "Opus"
-private const val TOKENS_DIRECTORY_PATH = "tokens"
+private val TOKENS_DIRECTORY_PATH = "${System.getProperty("user.home")}/.opus/tokens"
 private const val CREDENTIALS_FILE_PATH = "/credentials.json"
 
 private val JSON_FACTORY: JsonFactory = GsonFactory.getDefaultInstance()
