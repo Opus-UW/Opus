@@ -32,9 +32,6 @@ fun TaskScreen(
     val uncompletedTasks = tagTasks.filter { !it.completed }
     val completedTasks = tagTasks.filter { it.completed }
 
-
-    println("DERECK4: $tasks")
-
     Column(
         modifier = Modifier.padding(20.dp)
     ) {

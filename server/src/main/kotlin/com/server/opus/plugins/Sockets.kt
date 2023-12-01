@@ -30,7 +30,6 @@ fun Application.configureSockets() {
                     val updatedTasks = TaskAPI(receivedText.accessToken).modifiedTasks()
                     //println(updatedTasks)
                     updatedTasks.items.forEach { task ->
-                        println("ROHIT: ${task.due}")
                         if (dbQuery { TaskEntity.find { Tasks.gTaskId eq task.id }.count().toInt() > 0 }) {
                             if (task.deleted == true) {
                                 dao.deleteGTask(task.id)

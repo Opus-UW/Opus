@@ -66,7 +66,6 @@ fun Routing.handleTasks() {
                 gTask.apply {
                     setTitle(task.action)
                     task.dueDate?.let {
-                        println("DERECK1: ${it.toString()}")
                         setDue(DateTime(it.toString()).toStringRfc3339())
                     } ?: setDue(null)
                     if (task.completed) {
@@ -144,7 +143,6 @@ fun Routing.handleTasks() {
                     setId(gTaskId)
                     setTitle(task.action)
                     task.dueDate?.let {
-                        println("DERECK2: ${it.toString()}")
                         setDue(DateTime(it.toString()).toStringRfc3339())
                     } ?: setDue(null)
 

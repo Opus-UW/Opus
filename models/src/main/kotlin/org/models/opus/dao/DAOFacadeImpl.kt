@@ -99,7 +99,6 @@ class DAOFacadeImpl : DAOFacade {
         entity.apply {
             this.completed = completed
             this.action = action
-            println("DERECK5: ${dueDate?.toLDT()?.toString()}")
             this.dueDate = dueDate?.toLDT()?.toString()
         }
 
