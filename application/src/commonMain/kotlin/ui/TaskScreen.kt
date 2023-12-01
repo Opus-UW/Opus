@@ -28,10 +28,16 @@ fun TaskScreen(
     val defaultDueDate = null
     val (showCompleted, setShowCompleted) = remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
+    val searchString by viewModel.searchString.collectAsStateWithLifecycle()
+    val validSearchString = searchString != null && searchString != ""
 
     val tagTasks = tasks.filter { if (currentTag != null) it.tags.contains(currentTag) else true }
+    println (validSearchString)
     val uncompletedTasks = tagTasks.filter { !it.completed }
     val completedTasks = tagTasks.filter { it.completed }
+    if (validSearchString){
+
+    }
 
     Column(
         modifier = Modifier.padding(20.dp)
