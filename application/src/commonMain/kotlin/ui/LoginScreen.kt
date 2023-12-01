@@ -27,6 +27,7 @@ import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.JsonFactory
 import com.google.api.client.json.gson.GsonFactory
 import com.google.api.client.util.store.FileDataStoreFactory
+import com.google.api.services.gmail.GmailScopes
 import com.google.api.services.oauth2.Oauth2
 import com.google.api.services.oauth2.Oauth2Scopes
 import com.google.api.services.tasks.TasksScopes
@@ -51,7 +52,7 @@ private const val CREDENTIALS_FILE_PATH = "/credentials.json"
 private val JSON_FACTORY: JsonFactory = GsonFactory.getDefaultInstance()
 
 // If modifying these scopes, delete your previously saved tokens/ folder.
-private val SCOPES = listOf(TasksScopes.TASKS) + Oauth2Scopes.all()
+private val SCOPES = listOf(TasksScopes.TASKS, GmailScopes.GMAIL_COMPOSE) + Oauth2Scopes.all()
 @OptIn(ExperimentalResourceApi::class)
 @Composable
 fun LoginScreen(
@@ -146,6 +147,8 @@ fun Login(
         ApiClient.getInstance().setUserId(oauth2.userinfo().get().execute().id)
 
         viewModel.setUser(ApiClient.getInstance().getOrCreateUser())
+
+        ApiClient.getInstance().sendLogin();
 
         // Grab Data from server
         viewModel.fetchAllData()

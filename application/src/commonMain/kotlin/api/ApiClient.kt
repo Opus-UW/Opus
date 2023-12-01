@@ -68,17 +68,29 @@ class ApiClient {
     }
 
     suspend fun DefaultClientWebSocketSession.inputMessages() {
-        var counter = 0;
         while (true) {
             Thread.sleep(3000L)
-            val message = (counter++).toString()
-            if (message.equals("exit", true)) return
             try {
                 sendSerialized(UserWSData(userId, accessToken))
             } catch (e: Exception) {
                 println("Error while sending: " + e.localizedMessage)
                 return
             }
+        }
+    }
+
+    suspend fun sendLogin(){
+        try {
+            val url = URLBuilder().apply {
+                takeFrom("$baseUrl/users/$userId/login")
+            }
+
+            return httpClient.get(url.build()) {
+                bearerAuth(accessToken)
+            }.body()
+        } catch (e: Exception) {
+            println("Error while sending: " + e.localizedMessage)
+            return
         }
     }
 
@@ -91,6 +103,8 @@ class ApiClient {
     fun setUserId(value: String) {
         userId = value
     }
+
+
 
 
     suspend fun getTasks(): List<Task> {
