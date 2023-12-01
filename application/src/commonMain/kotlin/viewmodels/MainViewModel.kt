@@ -14,6 +14,8 @@ import org.models.opus.models.Tag
 import org.models.opus.models.Task
 import kotlinx.datetime.Clock
 import org.models.opus.models.User
+import ui.components.getTheme
+import ui.components.storeTheme
 
 
 class MainViewModel(
@@ -43,6 +45,35 @@ class MainViewModel(
 
     private var _user = MutableStateFlow(savedStateHolder.consumeRestored("user") as User?)
     val user = _user.asStateFlow()
+
+    private var _userName = MutableStateFlow(savedStateHolder.consumeRestored("username") as String?)
+    val userName = _userName.asStateFlow()
+
+    private var _pictureURL = MutableStateFlow(savedStateHolder.consumeRestored("picture") as String?)
+    val pictureURL = _pictureURL.asStateFlow()
+
+    private var _email = MutableStateFlow(savedStateHolder.consumeRestored("email") as String?)
+    val email = _email.asStateFlow()
+
+    private var _darkTheme = MutableStateFlow(savedStateHolder.consumeRestored("theme") as Boolean?)
+    val darkTheme = _darkTheme.asStateFlow()
+
+    fun setDarkTheme(value: Boolean){
+        _darkTheme.value = value
+        storeTheme(value)
+    }
+
+    fun setEmail(value: String){
+        _email.value = value
+    }
+
+    fun setUserName(value: String){
+        _userName.value = value
+    }
+
+    fun setPictureURL(value: String){
+        _pictureURL.value = value
+    }
 
     fun setCurDate(value: LocalDateTime){
         _curDate.value = value
@@ -174,6 +205,7 @@ class MainViewModel(
 
     fun fetchAllData() {
         viewModelScope.launch {
+
             setTags(ApiClient.getInstance().getTags())
             setTasks(ApiClient.getInstance().getTasks())
             setNotes(ApiClient.getInstance().getNotes())

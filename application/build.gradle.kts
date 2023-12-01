@@ -79,6 +79,7 @@ kotlin {
             implementation ("com.google.auth:google-auth-library-oauth2-http:1.19.0")
             implementation ("com.google.auth:google-auth-library-oauth2-http:1.19.0")
             implementation("com.google.apis:google-api-services-oauth2:v2-rev20200213-2.0.0")
+            implementation("media.kamel:kamel-image:0.9.0")
         }
     }
 }
