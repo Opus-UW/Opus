@@ -174,9 +174,9 @@ class MainViewModel(
 
     fun fetchAllData() {
         viewModelScope.launch {
+            setTags(ApiClient.getInstance().getTags())
             setTasks(ApiClient.getInstance().getTasks())
             setNotes(ApiClient.getInstance().getNotes())
-            setTags(ApiClient.getInstance().getTags())
         }
     }
 

@@ -2,18 +2,13 @@ package ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Login
-import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,7 +33,6 @@ import com.google.api.services.tasks.TasksScopes
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.time.delay
 import moe.tlaster.precompose.navigation.Navigator
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import ui.components.darkModeLogoVector
@@ -83,8 +77,9 @@ fun LoginScreen(
                     )
                     Spacer(modifier = Modifier.height(25.dp))
                     Text(
-                        text = "Redirecting you to your browser...",
-                        fontSize = 20.sp
+                        text = "Loading...",
+                        fontSize = 20.sp,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Spacer(modifier = Modifier.weight(1f))
                 }
@@ -106,10 +101,11 @@ fun LoginScreen(
             Button(onClick = {
                 setShowLoginDialog(true)
                 Login(viewModel, navigator)
-            }){
-                Icon(Icons.Default.Login, contentDescription = "Login Button",
-                    tint = Color.White, modifier = Modifier.padding(5.dp))
-                Text("LOGIN", fontWeight = FontWeight.Bold, fontSize = 18.sp, modifier = Modifier.padding(5.dp))
+            },
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer, contentColor = MaterialTheme.colorScheme.onPrimaryContainer)
+            ){
+                Icon(Icons.Default.Login, contentDescription = "Login Button", modifier = Modifier.padding(5.dp))
+                Text("Login", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.padding(5.dp))
             }
             Spacer(modifier = Modifier.weight(1f))
         }

@@ -1,16 +1,20 @@
 package ui.components
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -33,7 +37,6 @@ import com.mohamedrejeb.richeditor.ui.material3.RichTextEditorDefaults
 import moe.tlaster.precompose.flow.collectAsStateWithLifecycle
 import org.models.opus.models.Note
 import org.models.opus.models.Tag
-import ui.theme.md_theme_dark_background
 import viewmodels.MainViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,29 +51,49 @@ fun NotePreview(
     var editNote by remember(note) { mutableStateOf(false) }
     var (title, setTitle) = remember(note) { mutableStateOf(note.title) }
     val state = rememberRichTextState()
-    val tagStatus = remember(tags) { mutableStateMapOf(*tags.map { it to false }.toTypedArray()) }
+    val tagStatus = remember(note) { mutableStateMapOf(
+        *tags.map {
+            it to (note.tags.contains(it) || (it == currentTag))
+        }.toTypedArray()) }
 
-    LaunchedEffect(Unit) {
-        note.tags.forEach { tag ->
-            tagStatus[tag] = true
+    // Update tagStatus to see if tags are removed or added
+    LaunchedEffect(tags){
+        tags.forEach{tag ->
+            if (!tagStatus.containsKey(tag)){
+                tagStatus[tag] = false
+            }
         }
-        if (currentTag != null) {
+
+        tagStatus.forEach{
+            if (!tags.contains(it.key)){
+                tagStatus.remove(it.key)
+            }
+        }
+    }
+
+    LaunchedEffect(currentTag){
+        if (currentTag != null){
             tagStatus[currentTag!!] = true
         }
     }
+
     LaunchedEffect(Unit) {
         state.setHtml(note.body)
     }
 
     // Note Base
     ElevatedCard(
-        onClick = { editNote = true },
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
         ),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)),
         modifier = Modifier
-            .size(width = 240.dp, height = 200.dp).alpha(if (editNote) 0f else 1f),
+            .size(width = 240.dp, height = 200.dp).alpha(if (editNote) 0f else 1f)
+            .clip(CardDefaults.elevatedShape)
+            .clickable(
+            interactionSource = MutableInteractionSource(),
+            indication = rememberRipple(bounded = true),
+            onClick = {editNote = true})
     ) {
         Column {
             // Title
@@ -80,9 +103,9 @@ fun NotePreview(
                 onValueChange = { title = it },
                 singleLine = true,
                 colors = TextFieldDefaults.colors(
-                    unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
                     disabledTextColor = LocalContentColor.current,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
@@ -93,16 +116,21 @@ fun NotePreview(
             // Body
             RichTextEditor(
                 state = state,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.weight(1f),
                 colors = RichTextEditorDefaults.richTextEditorColors(
-                    disabledTextColor = Color.Transparent,
                     containerColor = Color.Transparent,
+                    disabledTextColor = LocalContentColor.current,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
                     disabledIndicatorColor = Color.Transparent
                 ),
-                readOnly = true
+                enabled = false
             )
+            Row {
+                Spacer(modifier = Modifier.width(15.dp))
+                displayTags(tagStatus)
+            }
+            Spacer(modifier = Modifier.height(15.dp))
         }
     }
     if (editNote) {
@@ -214,14 +242,15 @@ fun EditNoteDialog(
 
     Dialog(
         onDismissRequest = {
-            if (title != newTitle || state.toHtml() != newState.toHtml()) {
-                // Update tags
-                val newTaskTags = mutableListOf<Tag>()
-                tagStatus.forEach { entry ->
-                    if (entry.value) {
-                        newTaskTags.add(entry.key)
-                    }
+            // Update tags
+            val newTaskTags = mutableListOf<Tag>()
+            tagStatus.forEach { entry ->
+                if (entry.value) {
+                    newTaskTags.add(entry.key)
                 }
+            }
+
+            if (title != newTitle || state.toHtml() != newState.toHtml() || newTaskTags != note.tags) {
                 // Check if new note is to be created
                 if (note.id != -1) {
                     setTitle(newTitle)
@@ -247,7 +276,7 @@ fun EditNoteDialog(
                 .height(IntrinsicSize.Min)
                 .defaultMinSize(minHeight = 400.dp)
                 .padding(16.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)),
             shape = RoundedCornerShape(16.dp)
         ) {
             Row {
@@ -257,9 +286,9 @@ fun EditNoteDialog(
                     onValueChange = { newTitle = it },
                     singleLine = true,
                     colors = TextFieldDefaults.colors(
-                    unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
                     disabledIndicatorColor = Color.Transparent,
@@ -313,7 +342,7 @@ fun EditNoteDialog(
             RichTextEditor(
                 state = newState,
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .weight(1f)
                     .onKeyEvent {
                         if (it.type == KeyEventType.KeyUp) {
                             keyboardShortcuts.forEach { shortcut ->
@@ -350,6 +379,11 @@ fun EditNoteDialog(
                     disabledIndicatorColor = Color.Transparent
                 )
             )
+            Row {
+                Spacer(modifier = Modifier.width(15.dp))
+                displayTags(tagStatus)
+            }
+            Spacer(modifier = Modifier.height(15.dp))
         }
     }
 }

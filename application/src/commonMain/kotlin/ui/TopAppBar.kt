@@ -7,7 +7,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import moe.tlaster.precompose.flow.collectAsStateWithLifecycle
 import moe.tlaster.precompose.navigation.Navigator
 import utils.minusMonth
@@ -21,7 +20,6 @@ fun OpusTopAppBar(
     navigator: Navigator,
     toggleDrawer: () -> Unit
 ) {
-    val currentTag by viewModel.currentTag.collectAsStateWithLifecycle()
     val curDate by viewModel.curDate.collectAsStateWithLifecycle()
 
     var taskState by remember { mutableStateOf(true) }
@@ -31,7 +29,7 @@ fun OpusTopAppBar(
     TopAppBar(
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(currentTag?.title ?: "All")
+                Text(if (taskState) "Tasks" else (if (noteState) "Notes" else "Calendar") )
 
                 if (calendarState) {
                     Row(
