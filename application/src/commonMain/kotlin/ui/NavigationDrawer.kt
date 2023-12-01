@@ -21,50 +21,8 @@ fun NavigationContent(
 
     ModalDrawerSheet {
         Text("General", modifier = Modifier.padding(16.dp))
-        NavigationEntry(viewModel, null)
-
-//        TextButton(onClick = {  }, modifier = Modifier.fillMaxWidth()) {
-//            Text("Calendar", textAlign = TextAlign.Left, modifier = Modifier.fillMaxWidth())
-//        }
-
         Divider(color = Color.Black, thickness = 1.dp)
         Text("Tags", modifier = Modifier.padding(16.dp))
-        tags.forEach {
-            NavigationEntry(viewModel, it)
-        }
     }
 }
 
-@Composable
-fun NavigationEntry(
-    viewModel: MainViewModel,
-    tag: Tag?
-) {
-    var tagOptionState by remember { mutableStateOf(false) }
-    val title = tag?.title ?: "All"
-
-
-    Row {
-        TextButton(onClick = { viewModel.setCurrentTag(tag) }, modifier = Modifier.weight(1f)) {
-            Text(title ?: "Null", textAlign = TextAlign.Left, modifier = Modifier.fillMaxWidth())
-        }
-
-        if (tag != null) {
-            //Spacer(modifier = Modifier.weight(1f))
-            IconButton(onClick = { tagOptionState = true }) {
-                Icon(Icons.Default.MoreVert, contentDescription = "Tag Menu Button")
-                DropdownMenu(
-                    expanded = tagOptionState, onDismissRequest = { tagOptionState = false }) {
-                    DropdownMenuItem(onClick = {
-                        viewModel.deleteTag(tag)
-                    },
-                        text = {
-                            Text("Delete Tag")
-                        }
-                    )
-
-                }
-            }
-        }
-    }
-}

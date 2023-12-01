@@ -44,7 +44,7 @@ fun App() {
                 drawerContent = {
                     NavigationContent(viewModel)
                 },
-                gesturesEnabled = true
+                gesturesEnabled = currentScreen != "/login"
             ) {
                 Scaffold(
                     topBar = {
@@ -78,6 +78,9 @@ fun App() {
                                 }
                                 scene(route = "/calendar") {
                                     CalendarScreen(viewModel)
+                                }
+                                scene(route = "/tags"){
+                                    TagScreen(viewModel)
                                 }
                             }
                         }
