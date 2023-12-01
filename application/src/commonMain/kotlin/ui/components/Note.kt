@@ -48,6 +48,7 @@ fun NotePreview(
 ) {
     val tags by viewModel.tags.collectAsStateWithLifecycle()
     val currentTag by viewModel.currentTag.collectAsStateWithLifecycle()
+    val darkTheme by viewModel.darkTheme.collectAsStateWithLifecycle()
 
     var editNote by remember(note) { mutableStateOf(false) }
     var (title, setTitle) = remember(note) { mutableStateOf(note.title) }
@@ -129,7 +130,7 @@ fun NotePreview(
             )
             Row {
                 Spacer(modifier = Modifier.width(15.dp))
-                displayTags(tagStatus)
+                displayTags(darkTheme ?: false, tagStatus)
             }
             Spacer(modifier = Modifier.height(15.dp))
         }
@@ -183,6 +184,7 @@ fun EditNoteDialog(
 ) {
     var newTitle by remember { mutableStateOf(title) }
     val tags by viewModel.tags.collectAsStateWithLifecycle()
+    val darkTheme by viewModel.darkTheme.collectAsStateWithLifecycle()
 
     val keyboardShortcuts = listOf<keyboardShortcut>(
         keyboardShortcut(
@@ -385,7 +387,7 @@ fun EditNoteDialog(
             )
             Row {
                 Spacer(modifier = Modifier.width(15.dp))
-                displayTags(tagStatus)
+                displayTags(darkTheme ?: false, tagStatus)
             }
             Spacer(modifier = Modifier.height(15.dp))
         }
