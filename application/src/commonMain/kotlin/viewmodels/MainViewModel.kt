@@ -58,6 +58,13 @@ class MainViewModel(
     private var _darkTheme = MutableStateFlow(savedStateHolder.consumeRestored("theme") as Boolean?)
     val darkTheme = _darkTheme.asStateFlow()
 
+    private var _searchString = MutableStateFlow(savedStateHolder.consumeRestored("search") as String?)
+    val searchString = _searchString.asStateFlow()
+
+    fun setSearchString(value: String){
+        _searchString.value = value
+    }
+
     fun setDarkTheme(value: Boolean){
         _darkTheme.value = value
         storeTheme(value)
