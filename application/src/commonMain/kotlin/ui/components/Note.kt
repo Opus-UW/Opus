@@ -177,7 +177,8 @@ fun EditNoteDialog(
     newState: RichTextState,
     state: RichTextState,
     note: Note,
-    tagStatus: SnapshotStateMap<Tag, Boolean>
+    tagStatus: SnapshotStateMap<Tag, Boolean>,
+    new: Boolean = false
 ) {
     var newTitle by remember { mutableStateOf(title) }
     val tags by viewModel.tags.collectAsStateWithLifecycle()
@@ -304,13 +305,15 @@ fun EditNoteDialog(
                     Icon(Icons.Default.Sell, contentDescription = "Tags")
                     ChooseTagMenu(viewModel, showTags, setShowTags, tagStatus)
                 }
-                IconButton(onClick = {
-                    viewModel.deleteNote(note)
-                }) {
-                    Icon(
-                        Icons.Default.Delete,
-                        contentDescription = "Delete Note"
-                    )
+                if (!new){
+                    IconButton(onClick = {
+                        viewModel.deleteNote(note)
+                    }) {
+                        Icon(
+                            Icons.Default.Delete,
+                            contentDescription = "Delete Note"
+                        )
+                    }
                 }
             }
             Row(

@@ -21,7 +21,6 @@ actual fun getTheme(sysTheme: Boolean) :  Boolean {
         settingsFile.forEachLine{
             if (it.substring(0, 5) == "theme"){
                 val isDarkSetting = it.substring(it.length-1)
-                print (isDarkSetting)
                 if (isDarkSetting == "1"){
                     isDark = true
                 }
@@ -32,10 +31,7 @@ actual fun getTheme(sysTheme: Boolean) :  Boolean {
         }
     }
     else {
-        println ("Settings does not exist")
-        println (SETTINGS_DIRECTORY_PATH)
         settingsFile.writeText("theme: " + if (sysTheme) "1" else "0")
-        println("Wrote file? ${settingsFile.isFile}")
         isDark = sysTheme
     }
     return isDark
