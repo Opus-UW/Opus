@@ -66,9 +66,10 @@ fun Application.configureSockets() {
                                 task.dueDate?.toString(),
                                 task.tags,
                                 true,
+                                task.important,
                                 dao.taskGId(task.id)
                             )
-                            GmailAPI(receivedText.accessToken).sendEmail("Task \"${task.action}\" due","Your task \"${task.action}\" is due in < 1 day.\n Good Luck!")
+                            GmailAPI(user!!.credentials).sendEmail("Task \"${task.action}\" due","Your task \"${task.action}\" is due in < 1 day.\n Good Luck!")
                         }
                     }
                 }

@@ -11,7 +11,6 @@ fun Application.configureRouting() {
         handleNotes()
         handleTags()
         handleUsers()
-        handleCalendarApi()
         handleTaskApi()
     }
 }
