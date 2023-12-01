@@ -23,6 +23,9 @@ fun DateDialog(
     setDateDialog: (Boolean) -> Unit,
 ) {
     val tasks by viewModel.tasks.collectAsStateWithLifecycle()
+    val currentTag by viewModel.currentTag.collectAsStateWithLifecycle()
+    var taskFilter = tasks.filter { if (currentTag != null) it.tags.contains(currentTag) else true }
+
 
     if (showDateDialog) {
         Dialog(onDismissRequest = { setDateDialog(false) }) {
@@ -43,7 +46,7 @@ fun DateDialog(
                     )
                     taskList(
                         viewModel,
-                        tasks.filter {
+                        taskFilter.filter {
                         it.dueDate?.dayOfYear == date.dayOfYear && it.dueDate?.year == date.year
                     }, true, date)
                 }
