@@ -23,9 +23,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import moe.tlaster.precompose.flow.collectAsStateWithLifecycle
 import org.models.opus.models.Tag
-import utils.toColor
+import ui.theme.md_theme_dark_tags
+import ui.theme.md_theme_light_tags
 import utils.toColour
 import viewmodels.MainViewModel
+
+@Composable
+fun getTagColor(darkTheme: Boolean, tag: Tag) : Color{
+    return if(darkTheme) md_theme_dark_tags[tag.colour.ordinal] else md_theme_light_tags[tag.colour.ordinal]
+}
 
 @Composable
 fun TagButton(
@@ -33,6 +39,8 @@ fun TagButton(
     tag: Tag
 ) {
     val currentTag by viewModel.currentTag.collectAsStateWithLifecycle()
+    val darkTheme by viewModel.darkTheme.collectAsStateWithLifecycle()
+
     ElevatedButton(
         onClick = {
             if (currentTag == tag) {
@@ -49,12 +57,15 @@ fun TagButton(
         ),
         modifier = Modifier.height(40.dp)
     ) {
-        TagButtonContent(tag)
+        TagButtonContent(darkTheme ?: true, tag)
     }
 }
 
 @Composable
-fun TagButtonContent(tag: Tag) {
+fun TagButtonContent(
+    darkTheme: Boolean,
+    tag: Tag
+) {
     Row {
         Column {
             Spacer(modifier = Modifier.height(2.dp))
@@ -62,7 +73,7 @@ fun TagButtonContent(tag: Tag) {
                 modifier = Modifier
                     .size(20.dp)
                     .clip(CircleShape)
-                    .background(tag.colour.toColor())
+                    .background(getTagColor(darkTheme, tag))
             )
         }
         Spacer(modifier = Modifier.width(10.dp))
@@ -95,7 +106,7 @@ fun AddTag(viewModel: MainViewModel) {
                 Spacer(modifier = Modifier.width(5.dp))
                 Column {
                     Spacer(modifier = Modifier.height(2.dp))
-                    chooseColor(color, setColor, 20.dp)
+                    chooseColor(viewModel, color, setColor, 20.dp)
                 }
                 Spacer(modifier = Modifier.width(10.dp))
                 val interactionSource = remember { MutableInteractionSource() }
@@ -111,9 +122,8 @@ fun AddTag(viewModel: MainViewModel) {
                         .onKeyEvent { keyEvent ->
                             if (keyEvent.key != Key.Enter) return@onKeyEvent false
                             if (keyEvent.type == KeyEventType.KeyUp) {
-                                print(color)
-                                print(color.toColour())
                                 val tag = Tag(text, color.toColour())
+                                print (tag)
                                 viewModel.createTag(tag)
                                 text = ""
                                 setColor(Color.Transparent)
@@ -156,11 +166,12 @@ fun AddTag(viewModel: MainViewModel) {
 
 @Composable
 fun displayTags(
+    darkTheme: Boolean,
     tagStatus: Map<Tag, Boolean>
 ) {
     val tagStatusList = tagStatus.toList().filter { it.second }
     tagStatusList.forEach {
-        displayTag(it.first)
+        displayTag(darkTheme, it.first)
         if (it != tagStatusList.last()) {
             Spacer(modifier = Modifier.width(5.dp))
         }
@@ -169,6 +180,7 @@ fun displayTags(
 
 @Composable
 fun displayTag(
+    darkTheme: Boolean,
     tag: Tag
 ) {
     Row (verticalAlignment = Alignment.CenterVertically){
@@ -178,7 +190,7 @@ fun displayTag(
                 modifier = Modifier
                     .size(10.dp)
                     .clip(CircleShape)
-                    .background(tag.colour.toColor())
+                    .background(getTagColor(darkTheme, tag))
             )
         }
         Spacer(modifier = Modifier.width(5.dp))

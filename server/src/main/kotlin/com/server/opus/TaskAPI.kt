@@ -40,6 +40,14 @@ class TaskAPI(private val accessTokenString: String) {
 
     }
 
+    fun allTasks(): com.google.api.services.tasks.model.Tasks{
+        return taskService.tasks().list(taskListId)
+            .setShowDeleted(true)
+            .setShowHidden(true)
+            .setShowCompleted(true)
+            .execute()
+    }
+
     fun modifiedTasks(): com.google.api.services.tasks.model.Tasks {
         val time = Clock.System.now()
 

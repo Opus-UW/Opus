@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import moe.tlaster.precompose.flow.collectAsStateWithLifecycle
 import org.models.opus.models.Tag
+import ui.deleteTagMenu
 import ui.theme.isDarkTheme
 import ui.theme.md_theme_dark_tags
 import ui.theme.md_theme_light_tags
@@ -36,6 +37,7 @@ fun ChooseTagMenu(
     tagStatus: SnapshotStateMap<Tag, Boolean>
 ) {
     val tags by viewModel.tags.collectAsStateWithLifecycle()
+    val darkTheme by viewModel.darkTheme.collectAsStateWithLifecycle()
 
     DropdownMenu(
         expanded = showTags,
@@ -52,7 +54,9 @@ fun ChooseTagMenu(
                             contentDescription = "Not Selected"
                         )
                     }
-                    TagButtonContent(tag)
+                    TagButtonContent(darkTheme ?: false, tag)
+                    Spacer(modifier = Modifier.weight(1f))
+                    deleteTagMenu(viewModel, tag)
                 }
             }
             createNewTag(viewModel)
@@ -71,7 +75,7 @@ fun createNewTag(viewModel: MainViewModel){
             Icon(Icons.Default.Add, contentDescription = "Add Tag")
         }
         Spacer(modifier = Modifier.width(5.dp))
-        chooseColor(color, setColor, 40.dp)
+        chooseColor(viewModel, color, setColor, 40.dp)
         Spacer(modifier = Modifier.width(10.dp))
         TextField(
             value = newTag,
@@ -89,6 +93,7 @@ fun createNewTag(viewModel: MainViewModel){
                 if (keyEvent.key != Key.Enter) return@onKeyEvent false
                 if (keyEvent.type == KeyEventType.KeyUp) {
                     val tag = Tag(newTag, color.toColour())
+                    print (tag)
                     viewModel.createTag(tag)
                     newTag = ""
                     setColor(Color.Transparent)
@@ -102,21 +107,33 @@ fun createNewTag(viewModel: MainViewModel){
 
 @Composable
 fun chooseColor(
+    viewModel: MainViewModel,
     currentColor: Color,
     setColor: (Color) -> Unit,
     size: Dp
 ){
+    val darkTheme by viewModel.darkTheme.collectAsStateWithLifecycle()
     val (showColors, setShowColors) = remember { mutableStateOf(false) }
-    val colors = if (isDarkTheme()) md_theme_dark_tags else md_theme_light_tags
     if (currentColor == Color(0, 0,0 ,0)){
-        if (isDarkTheme()){
+        if (darkTheme == true){
             setColor(md_theme_dark_tags[0])
         }
         else{
             setColor(md_theme_light_tags[0])
         }
     }
+
+    LaunchedEffect(darkTheme){
+        if (darkTheme == true){
+            setColor(md_theme_dark_tags[currentColor.toColour().ordinal])
+        }
+        else{
+            setColor(md_theme_light_tags[currentColor.toColour().ordinal])
+        }
+    }
+
     displayColor(currentColor, Color.Black, size) { setShowColors(true) }
+
     DropdownMenu(
         expanded = showColors,
         onDismissRequest = {
@@ -124,7 +141,7 @@ fun chooseColor(
         }
     ){
         Row(modifier = Modifier.padding(10.dp), horizontalArrangement = Arrangement.spacedBy(5.dp)){
-            colors.forEach{color ->
+            (if (darkTheme == true) md_theme_dark_tags else md_theme_light_tags).forEach{color ->
                 displayColor(color, currentColor, size){setColor(color)}
             }
         }

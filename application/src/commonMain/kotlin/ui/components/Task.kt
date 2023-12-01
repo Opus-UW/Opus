@@ -64,6 +64,7 @@ fun task(
     var isTaskFocused by remember(task) { mutableStateOf(false) }
     var edit by remember(isTaskFocused) { mutableStateOf(false) }
     var editCount by remember(task) { mutableStateOf(0) }
+    val darkTheme by viewModel.darkTheme.collectAsStateWithLifecycle()
 
 
     // Task variables
@@ -101,13 +102,15 @@ fun task(
 
     // Update currentTag and tagStatus based on current tag
     LaunchedEffect(currentTag){
-        if (currentTag != null){
-            tagStatus[currentTag!!] = true
+        if (new){
+            if (currentTag != null) {
+                tagStatus[currentTag!!] = true
+            }
+            if (oldCurrentTag != null) {
+                tagStatus[oldCurrentTag!!] = false
+            }
+            oldCurrentTag = currentTag
         }
-        if (oldCurrentTag != null){
-            tagStatus[oldCurrentTag!!] = false
-        }
-        oldCurrentTag = currentTag
     }
 
     when {
@@ -232,7 +235,7 @@ fun task(
                                 }
                                 Spacer(modifier = Modifier.width(10.dp))
                             }
-                            displayTags(tagStatus)
+                            displayTags(darkTheme ?: false, tagStatus)
                         }
                     }
                 }

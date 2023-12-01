@@ -24,7 +24,7 @@ class DAOFacadeImpl : DAOFacade {
     )
 
     private fun entityToTag(entity: TagEntity) = Tag(
-        id = entity.id.value, title = entity.title, colour = entity.colour
+        id = entity.id.value, title = entity.title, colour = entity.colour.toEnum<Colour>() ?: Colour.CORAL
     )
 
     private fun entityToUser(entity: UserEntity) = User(
@@ -176,7 +176,7 @@ class DAOFacadeImpl : DAOFacade {
     override suspend fun addNewTag(title: String, colour: Colour, userId: String): Tag = dbQuery {
         entityToTag(TagEntity.new {
             this.title = title
-            this.colour = colour
+            this.colour = colour.ordinal
             this.user = UserEntity.findById(userId) ?: throw Exception()
         })
     }
@@ -185,7 +185,7 @@ class DAOFacadeImpl : DAOFacade {
         val entity = TagEntity.find { Tags.id eq id }.singleOrNull() ?: return@dbQuery false
         entity.apply {
             this.title = title
-            this.colour = colour
+            this.colour = colour.ordinal
         }
         return@dbQuery true
     }
