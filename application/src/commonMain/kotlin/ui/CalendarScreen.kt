@@ -26,6 +26,9 @@ fun CalendarScreen(
 
     val curDate by viewModel.curDate.collectAsStateWithLifecycle()
     val tasks by viewModel.tasks.collectAsStateWithLifecycle()
+    val currentTag by viewModel.currentTag.collectAsStateWithLifecycle()
+
+    var taskFilter = tasks.filter { if (currentTag != null) it.tags.contains(currentTag) else true }
 
     val (showDateDialog, setShowDateDialog) = remember { mutableStateOf(false) }
     val (selectedDate, setSelectedDate) = remember { mutableStateOf(curDate) }
@@ -64,7 +67,7 @@ fun CalendarScreen(
                 modifier = Modifier.fillMaxWidth().padding(2.dp).padding(5.dp),
                 content = {
                     items(list.size, key = { tempDate + it }) {idx ->
-                        val tasksOnDay = tasks.filter{
+                        val tasksOnDay = taskFilter.filter{
                             it.dueDate?.dayOfYear == ((tempDate + idx).dayOfYear)
                                     && it.dueDate?.year == (tempDate + idx).year
                         }
