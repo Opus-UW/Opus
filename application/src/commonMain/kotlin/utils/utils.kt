@@ -32,6 +32,5 @@ fun Color.toColour(): Colour {
             return colour ?: Colour.CORAL
         }
     }
-    println("Not found")
     return Colour.CORAL
 }
