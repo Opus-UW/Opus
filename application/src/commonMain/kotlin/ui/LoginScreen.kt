@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Login
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -27,12 +28,14 @@ import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.JsonFactory
 import com.google.api.client.json.gson.GsonFactory
 import com.google.api.client.util.store.FileDataStoreFactory
+import com.google.api.services.gmail.GmailScopes
 import com.google.api.services.oauth2.Oauth2
 import com.google.api.services.oauth2.Oauth2Scopes
 import com.google.api.services.tasks.TasksScopes
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import moe.tlaster.precompose.flow.collectAsStateWithLifecycle
 import moe.tlaster.precompose.navigation.Navigator
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import ui.components.darkModeLogoVector
@@ -51,16 +54,15 @@ private const val CREDENTIALS_FILE_PATH = "/credentials.json"
 private val JSON_FACTORY: JsonFactory = GsonFactory.getDefaultInstance()
 
 // If modifying these scopes, delete your previously saved tokens/ folder.
-private val SCOPES = listOf(TasksScopes.TASKS) + Oauth2Scopes.all()
+private val SCOPES = listOf(TasksScopes.TASKS, GmailScopes.GMAIL_COMPOSE) + Oauth2Scopes.all()
 @OptIn(ExperimentalResourceApi::class)
 @Composable
 fun LoginScreen(
     viewModel: MainViewModel,
     navigator: Navigator
 ) {
-
-
-    val logoVector = if (isDarkTheme()) darkModeLogoVector() else lightModeLogoVector()
+    val darkTheme by viewModel.darkTheme.collectAsStateWithLifecycle()
+    val logoVector = if (darkTheme) darkModeLogoVector() else lightModeLogoVector()
     Column{
         Spacer(modifier = Modifier.weight(1f))
         Row{
@@ -118,8 +120,14 @@ fun Login(
 
         ApiClient.getInstance().setUserId(oauth2.userinfo().get().execute().id)
 
+        viewModel.setUserName(oauth2.userinfo().get().execute().givenName + " " + oauth2.userinfo().get().execute().familyName)
+        viewModel.setPictureURL(oauth2.userinfo().get().execute().picture)
+        viewModel.setEmail(oauth2.userinfo().get().execute().email)
+
         viewModel.setUser(ApiClient.getInstance().getOrCreateUser())
         viewModel.setLoading(false)
+
+        ApiClient.getInstance().sendLogin();
 
         // Grab Data from server
         viewModel.fetchAllData()

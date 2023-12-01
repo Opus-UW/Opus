@@ -5,6 +5,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 
 private val LightColors = lightColorScheme(
     primary = md_theme_light_primary,
@@ -73,8 +74,8 @@ private val DarkColors = darkColorScheme(
 
 @Composable
 fun OpusTheme(
-  useDarkTheme: Boolean = isSystemInDarkTheme(),
-  content: @Composable() () -> Unit
+    useDarkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable() () -> Unit
 ) {
   val colors = if (!useDarkTheme) {
     LightColors

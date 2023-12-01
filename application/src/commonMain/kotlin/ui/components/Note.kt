@@ -15,6 +15,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -47,6 +48,7 @@ fun NotePreview(
 ) {
     val tags by viewModel.tags.collectAsStateWithLifecycle()
     val currentTag by viewModel.currentTag.collectAsStateWithLifecycle()
+    val darkTheme by viewModel.darkTheme.collectAsStateWithLifecycle()
 
     var editNote by remember(note) { mutableStateOf(false) }
     var (title, setTitle) = remember(note) { mutableStateOf(note.title) }
@@ -128,7 +130,7 @@ fun NotePreview(
             )
             Row {
                 Spacer(modifier = Modifier.width(15.dp))
-                displayTags(tagStatus)
+                displayTags(darkTheme ?: false, tagStatus)
             }
             Spacer(modifier = Modifier.height(15.dp))
         }
@@ -177,10 +179,12 @@ fun EditNoteDialog(
     newState: RichTextState,
     state: RichTextState,
     note: Note,
-    tagStatus: SnapshotStateMap<Tag, Boolean>
+    tagStatus: SnapshotStateMap<Tag, Boolean>,
+    new: Boolean = false
 ) {
     var newTitle by remember { mutableStateOf(title) }
     val tags by viewModel.tags.collectAsStateWithLifecycle()
+    val darkTheme by viewModel.darkTheme.collectAsStateWithLifecycle()
 
     val keyboardShortcuts = listOf<keyboardShortcut>(
         keyboardShortcut(
@@ -304,13 +308,15 @@ fun EditNoteDialog(
                     Icon(Icons.Default.Sell, contentDescription = "Tags")
                     ChooseTagMenu(viewModel, showTags, setShowTags, tagStatus)
                 }
-                IconButton(onClick = {
-                    viewModel.deleteNote(note)
-                }) {
-                    Icon(
-                        Icons.Default.Delete,
-                        contentDescription = "Delete Note"
-                    )
+                if (!new){
+                    IconButton(onClick = {
+                        viewModel.deleteNote(note)
+                    }) {
+                        Icon(
+                            Icons.Default.Delete,
+                            contentDescription = "Delete Note"
+                        )
+                    }
                 }
             }
             Row(
@@ -331,8 +337,8 @@ fun EditNoteDialog(
                             } else if (shortcut.numberList) {
                                 newState.toggleOrderedList()
                             }
-                        }
-
+                        },
+                        modifier = Modifier.focusProperties { canFocus = false }
                     ) {
                         Icon(shortcut.icon, contentDescription = shortcut.name)
                     }
@@ -342,7 +348,7 @@ fun EditNoteDialog(
             RichTextEditor(
                 state = newState,
                 modifier = Modifier
-                    .weight(1f)
+                    .weight(1f).fillMaxWidth()
                     .onKeyEvent {
                         if (it.type == KeyEventType.KeyUp) {
                             keyboardShortcuts.forEach { shortcut ->
@@ -381,7 +387,7 @@ fun EditNoteDialog(
             )
             Row {
                 Spacer(modifier = Modifier.width(15.dp))
-                displayTags(tagStatus)
+                displayTags(darkTheme ?: false, tagStatus)
             }
             Spacer(modifier = Modifier.height(15.dp))
         }

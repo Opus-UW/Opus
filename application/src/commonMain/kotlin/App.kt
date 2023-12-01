@@ -4,6 +4,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import api.ApiClient
 import ui.theme.OpusTheme
@@ -17,16 +21,27 @@ import ui.*
 import ui.OpusTopAppBar
 import ui.components.LoadingDialog
 import ui.components.TagBar
+import ui.components.getTheme
+import ui.components.noRippleClickable
+import ui.theme.isDarkTheme
 import viewmodels.MainViewModel
 
 
 @Composable
 fun App() {
     PreComposeApp {
-        OpusTheme (useDarkTheme = true) {
-            val viewModel = viewModel(modelClass = MainViewModel::class, keys = listOf("main")) {
-                MainViewModel(it)
-            }
+
+        val viewModel = viewModel(modelClass = MainViewModel::class, keys = listOf("main")) {
+            MainViewModel(it)
+        }
+        val darkTheme by viewModel.darkTheme.collectAsStateWithLifecycle()
+        val isDarkTheme = isDarkTheme()
+
+        LaunchedEffect(Unit){
+            viewModel.setDarkTheme(getTheme(isDarkTheme))
+        }
+
+        OpusTheme (useDarkTheme = darkTheme ?: true) {
             val navigator = rememberNavigator()
             val coroutineScope = rememberCoroutineScope()
             val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -41,7 +56,7 @@ fun App() {
             ModalNavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
-                    NavigationContent(viewModel)
+                    NavigationContent(viewModel, navigator, drawerState)
                 },
                 gesturesEnabled = currentScreen != "/login"
             ) {
@@ -55,7 +70,8 @@ fun App() {
                             }
                         }
                     },
-                    containerColor = MaterialTheme.colorScheme.onBackground
+                    containerColor = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.noRippleClickable {  }
                 ) {
                     Surface(modifier = Modifier.padding(top = it.calculateTopPadding())) {
                         Column {

@@ -82,7 +82,8 @@ fun AddNote(
             newState,
             state,
             note,
-            tagStatus
+            tagStatus,
+            true
         )
         note = Note("", "", listOf(), -1)
     }
