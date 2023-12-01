@@ -24,7 +24,7 @@ fun Routing.handleNotes() {
         try {
             val userId = call.parameters.getOrFail("user_id")
             val note = call.receive<Note>()
-            dao.addNewNote(note.title, note.body, note.tags, userId)
+            dao.addNewNote(note.title, note.body, note.tags, note.pinned, userId)
             call.respond(dao.userNotes(userId))
         } catch (e: Exception) {
             println(e.message)
@@ -54,7 +54,7 @@ fun Routing.handleNotes() {
 
             val note = call.receive<Note>()
 
-            dao.editNote(noteId, note.title, note.body, note.tags)
+            dao.editNote(noteId, note.title, note.body, note.tags, note.pinned)
 
             call.respond(dao.userNotes(userId))
         } catch (e: Exception) {

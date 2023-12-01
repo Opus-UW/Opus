@@ -8,6 +8,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -99,22 +100,28 @@ fun NotePreview(
     ) {
         Column {
             // Title
-            TextField(
-                value = title,
-                placeholder = { Text("Title") },
-                onValueChange = { title = it },
-                singleLine = true,
-                colors = TextFieldDefaults.colors(
-                    unfocusedContainerColor = Color.Transparent,
-                    focusedContainerColor = Color.Transparent,
-                    disabledContainerColor = Color.Transparent,
-                    disabledTextColor = LocalContentColor.current,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    disabledIndicatorColor = Color.Transparent,
-                ),
-                enabled = false
-            )
+            Row {
+                TextField(
+                    value = title,
+                    placeholder = { Text("Title") },
+                    onValueChange = { title = it },
+                    singleLine = true,
+                    colors = TextFieldDefaults.colors(
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedContainerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
+                        disabledTextColor = LocalContentColor.current,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        disabledIndicatorColor = Color.Transparent,
+                    ),
+                    enabled = false,
+                    modifier = Modifier.weight(1f)
+                )
+                IconButton(onClick = {viewModel.updateNote(note, pinned = !note.pinned)}){
+                    Icon(if (note.pinned) Icons.Filled.PushPin else Icons.Outlined.PushPin, contentDescription = "Pin note")
+                }
+            }
             // Body
             RichTextEditor(
                 state = state,
@@ -184,6 +191,7 @@ fun EditNoteDialog(
 ) {
     var newTitle by remember { mutableStateOf(title) }
     val tags by viewModel.tags.collectAsStateWithLifecycle()
+    var pinned by remember(note) { mutableStateOf(note.pinned) }
     val darkTheme by viewModel.darkTheme.collectAsStateWithLifecycle()
 
     val keyboardShortcuts = listOf<keyboardShortcut>(
@@ -254,7 +262,7 @@ fun EditNoteDialog(
                 }
             }
 
-            if (title != newTitle || state.toHtml() != newState.toHtml() || newTaskTags != note.tags) {
+            if (title != newTitle || state.toHtml() != newState.toHtml() || newTaskTags != note.tags || pinned != note.pinned) {
                 // Check if new note is to be created
                 if (note.id != -1) {
                     setTitle(newTitle)
@@ -263,10 +271,11 @@ fun EditNoteDialog(
                         note,
                         title = newTitle,
                         body = newState.toHtml(),
-                        tags = newTaskTags.toList()
+                        tags = newTaskTags.toList(),
+                        pinned = pinned
                     )
                 } else {
-                    val newNote = Note(newTitle, newState.toHtml(), newTaskTags)
+                    val newNote = Note(newTitle, newState.toHtml(), newTaskTags, pinned)
                     viewModel.createNote(newNote)
                 }
             }
@@ -299,15 +308,6 @@ fun EditNoteDialog(
                     )
                 )
                 Spacer(modifier = Modifier.weight(1f))
-                val (showTags, setShowTags) = remember(tags) { mutableStateOf(false) }
-                var rootPos by remember { mutableStateOf(Offset.Zero) }
-                TextButton(onClick = { setShowTags(true) },
-                    modifier = Modifier.onGloballyPositioned { coordinates ->
-                        rootPos = coordinates.positionInRoot()
-                    }) {
-                    Icon(Icons.Default.Sell, contentDescription = "Tags")
-                    ChooseTagMenu(viewModel, showTags, setShowTags, tagStatus)
-                }
                 if (!new){
                     IconButton(onClick = {
                         viewModel.deleteNote(note)
@@ -317,6 +317,18 @@ fun EditNoteDialog(
                             contentDescription = "Delete Note"
                         )
                     }
+                }
+                val (showTags, setShowTags) = remember(tags) { mutableStateOf(false) }
+                var rootPos by remember { mutableStateOf(Offset.Zero) }
+                TextButton(onClick = { setShowTags(true) },
+                    modifier = Modifier.onGloballyPositioned { coordinates ->
+                        rootPos = coordinates.positionInRoot()
+                    }) {
+                    Icon(Icons.Default.Sell, contentDescription = "Tags", tint = MaterialTheme.colorScheme.onSurface)
+                    ChooseTagMenu(viewModel, showTags, setShowTags, tagStatus)
+                }
+                IconButton (onClick = {pinned = !pinned}){
+                    Icon(if (pinned) Icons.Filled.PushPin else Icons.Outlined.PushPin, contentDescription = "Pin note")
                 }
             }
             Row(

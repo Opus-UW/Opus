@@ -29,7 +29,10 @@ fun taskList(
             verticalArrangement = Arrangement.spacedBy(5.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            items(tasks.size) {
+            items(tasks.filter { it.important }.size) {
+                task(viewModel, tasks[it], tasks[it].dueDate, defaultDueDate)
+            }
+            items(tasks.filter { !it.important }.size) {
                 task(viewModel, tasks[it], tasks[it].dueDate, defaultDueDate)
             }
         }
