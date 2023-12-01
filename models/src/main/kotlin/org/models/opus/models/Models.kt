@@ -27,9 +27,25 @@ data class Tag(
 
 
 @Serializable
-data class Colour(
-    val red: Int, val green: Int, val blue: Int, val placeholder: Boolean = false
-)
+enum class Colour{
+    RED,
+    BROWN,
+    ORANGE_YELLOW,
+    GREEN,
+    TEAL,
+    CYAN,
+    BLUE,
+    PURPLE,
+    PLUM_PEACH;
+}
+
+
+//Int to Enum
+inline fun <reified T : Enum<T>> Int.toEnum(): T? {
+    return enumValues<T>().firstOrNull { it.ordinal == this }
+}
+
+
 
 @Serializable
 data class User(

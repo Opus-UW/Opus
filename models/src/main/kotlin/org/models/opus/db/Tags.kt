@@ -10,7 +10,7 @@ import org.models.opus.models.Colour
 
 object Tags : IntIdTable(name = "tags", columnName = "tag_id") {
     val title = text("title")
-    val colour = json<Colour>("colour", Json)
+    val colour = integer("colour")
     val userId = reference("user_id", Users)
 }
 
