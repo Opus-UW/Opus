@@ -24,6 +24,7 @@ interface DAOFacade {
         gTaskId: String, completed: Boolean, action: String, dueDate: String?
     ): Boolean
     suspend fun deleteTask(id: Int): Boolean
+    suspend fun deleteGTask(gTaskId: String): Boolean
 
     suspend fun allNotes(): List<Note>
     suspend fun note(id: Int): Note?
