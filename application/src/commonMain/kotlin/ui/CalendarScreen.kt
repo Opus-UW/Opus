@@ -29,7 +29,6 @@ fun CalendarScreen(
 
     val (showDateDialog, setShowDateDialog) = remember { mutableStateOf(false) }
     val (selectedDate, setSelectedDate) = remember { mutableStateOf(curDate) }
-    var tempDate = curDate
 
     BoxWithConstraints (
         modifier = Modifier.fillMaxSize()
@@ -53,7 +52,8 @@ fun CalendarScreen(
                     }
                 }
             )
-            // Insert days here
+
+            var tempDate = curDate
             val list = (1..42).map { it.toString() }
             tempDate -= (tempDate.dayOfMonth - 1)
             tempDate -= ((tempDate.dayOfWeek.ordinal + 1) % 7 )

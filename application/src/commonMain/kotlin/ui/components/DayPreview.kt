@@ -26,12 +26,12 @@ import org.models.opus.models.Task
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DayPreview(previewDatee: LocalDateTime, previewMonth: String,
+fun DayPreview(previewDate: LocalDateTime, previewMonth: String,
                tasks: List<Task>,
                setShowDateDialog: (Boolean) -> Unit,
                setSelectedDate: (LocalDateTime) -> Unit,
                compact: Boolean) {
-    val previewDate by remember(previewMonth) { mutableStateOf(previewDatee) }
+    val previewDate by remember(previewMonth) { mutableStateOf(previewDate) }
     val todayDate = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
     val cardBgColor = if (todayDate.date == previewDate.date && todayDate.month == previewDate.month && todayDate.year == previewDate.year)
         MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)

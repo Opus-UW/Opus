@@ -13,6 +13,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -56,12 +59,12 @@ fun OpusTopAppBar(
                         IconButton(
                             onClick = { viewModel.setCurDate(curDate.minusMonth(1)) },
                             enabled = true
-                        ) { Icon(Icons.Default.ArrowBack, contentDescription = "Calender Right") }
-                        Text(curDate.month.name)
+                        ) { Icon(Icons.Default.ArrowBack, contentDescription = "Calender Left") }
+                        Text(curDate.month.name + " " + curDate.year)
                         IconButton(
                             onClick = { viewModel.setCurDate(curDate.plusMonth(1)) },
                             enabled = true
-                        ) { Icon(Icons.Default.ArrowForward, contentDescription = "Calender Left") }
+                        ) { Icon(Icons.Default.ArrowForward, contentDescription = "Calender Right") }
                     }
                 } else if (noteState || taskState){
                     Spacer(modifier = Modifier.weight(1f))
@@ -165,6 +168,7 @@ fun OpusTopAppBar(
                             taskState = false
                             noteState = false
                             calendarState = true
+                            viewModel.setCurDate(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()))
                             viewModel.setCurrentScreen("/calendar")
                             navigator.navigate("/calendar")
                         }
