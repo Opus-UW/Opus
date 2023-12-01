@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.datetime.*
 import moe.tlaster.precompose.flow.collectAsStateWithLifecycle
+import org.models.opus.models.Tag
 import org.models.opus.models.Task
 import utils.plus
 import viewmodels.MainViewModel
@@ -65,6 +66,7 @@ fun task(
     // Task variables
     var text by remember(task) { mutableStateOf(task?.action ?: "") }
     val currentTag by viewModel.currentTag.collectAsStateWithLifecycle()
+    var oldCurrentTag by remember (task) { mutableStateOf<Tag?>(null) }
 
     val initialDueDate: LocalDateTime? = defaultDueDate ?: task?.dueDate
     var taskDueDate by remember(task) { mutableStateOf(initialDueDate) }
@@ -74,16 +76,35 @@ fun task(
     }
 
     // Get current tags for the task
-    var tagStatus = remember(tags) { mutableStateMapOf(*tags.map { it to false }.toTypedArray()) }
-    LaunchedEffect(tags) {
-        task?.tags?.forEach { tag ->
-            tagStatus[tag] = true
+    val tagStatus = remember(task) { mutableStateMapOf(
+        *tags.map {
+            it to (task?.tags?.contains(it) ?: (it == currentTag) || (it == currentTag))
+        }.toTypedArray()) }
+
+    // Update tagStatus to see if tags are removed or added
+    LaunchedEffect(tags){
+        tags.forEach{tag ->
+            if (!tagStatus.containsKey(tag)){
+                tagStatus[tag] = false
+            }
         }
-        if (currentTag != null) {
-            tagStatus[currentTag!!] = true
+
+        tagStatus.forEach{
+            if (!tags.contains(it.key)){
+                tagStatus.remove(it.key)
+            }
         }
     }
 
+    LaunchedEffect(currentTag){
+        if (currentTag != null){
+            tagStatus[currentTag!!] = true
+        }
+        if (oldCurrentTag != null){
+            tagStatus[oldCurrentTag!!] = false
+        }
+        oldCurrentTag = currentTag
+    }
 
     // Column for task + options bar
     Column(
@@ -138,7 +159,7 @@ fun task(
                                 .onKeyEvent { keyEvent ->
                                     if (keyEvent.key != Key.Enter) return@onKeyEvent false
                                     if (keyEvent.type == KeyEventType.KeyUp) {
-                                        println(text)
+
                                         viewModel.updateTask(
                                             text = text,
                                             task = task,
@@ -188,6 +209,7 @@ fun task(
                             } else if (dueDate != null) {
                                 taskDisplayDate(dueDate)
                             }
+
                             if (tagStatus.containsValue(true) && (taskDueDate != null || dueDate != null)) {
                                 Spacer(modifier = Modifier.width(10.dp))
                                 Column {
@@ -199,7 +221,7 @@ fun task(
                                 }
                                 Spacer(modifier = Modifier.width(10.dp))
                             }
-                            displayTags(new, edit, tagStatus, task?.tags)
+                            displayTags(tagStatus)
                         }
                     }
                 }

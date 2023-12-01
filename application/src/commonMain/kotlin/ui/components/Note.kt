@@ -51,16 +51,32 @@ fun NotePreview(
     var editNote by remember(note) { mutableStateOf(false) }
     var (title, setTitle) = remember(note) { mutableStateOf(note.title) }
     val state = rememberRichTextState()
-    val tagStatus = remember(tags) { mutableStateMapOf(*tags.map { it to false }.toTypedArray()) }
+    val tagStatus = remember(note) { mutableStateMapOf(
+        *tags.map {
+            it to (note.tags.contains(it) || (it == currentTag))
+        }.toTypedArray()) }
 
-    LaunchedEffect(Unit) {
-        note.tags.forEach { tag ->
-            tagStatus[tag] = true
+    // Update tagStatus to see if tags are removed or added
+    LaunchedEffect(tags){
+        tags.forEach{tag ->
+            if (!tagStatus.containsKey(tag)){
+                tagStatus[tag] = false
+            }
         }
-        if (currentTag != null) {
+
+        tagStatus.forEach{
+            if (!tags.contains(it.key)){
+                tagStatus.remove(it.key)
+            }
+        }
+    }
+
+    LaunchedEffect(currentTag){
+        if (currentTag != null){
             tagStatus[currentTag!!] = true
         }
     }
+
     LaunchedEffect(Unit) {
         state.setHtml(note.body)
     }
@@ -112,7 +128,7 @@ fun NotePreview(
             )
             Row {
                 Spacer(modifier = Modifier.width(15.dp))
-                displayTags(false, false, tagStatus, note.tags)
+                displayTags(tagStatus)
             }
             Spacer(modifier = Modifier.height(15.dp))
         }
@@ -365,7 +381,7 @@ fun EditNoteDialog(
             )
             Row {
                 Spacer(modifier = Modifier.width(15.dp))
-                displayTags(false, false, tagStatus, note.tags)
+                displayTags(tagStatus)
             }
             Spacer(modifier = Modifier.height(15.dp))
         }

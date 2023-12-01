@@ -156,22 +156,12 @@ fun AddTag(viewModel: MainViewModel) {
 
 @Composable
 fun displayTags(
-    new: Boolean,
-    edit: Boolean,
-    tagStatus: Map<Tag, Boolean>,
-    tags: List<Tag>?
+    tagStatus: Map<Tag, Boolean>
 ) {
-    if (new || edit) {
-        val tagStatusList = tagStatus.toList().filter { it.second }
-        tagStatusList.forEach {
-            displayTag(it.first)
-            if (it != tagStatusList.last()) {
-                Spacer(modifier = Modifier.width(5.dp))
-            }
-        }
-    } else tags?.forEach {
-        displayTag(it)
-        if (it != tags.last()) {
+    val tagStatusList = tagStatus.toList().filter { it.second }
+    tagStatusList.forEach {
+        displayTag(it.first)
+        if (it != tagStatusList.last()) {
             Spacer(modifier = Modifier.width(5.dp))
         }
     }
