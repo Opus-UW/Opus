@@ -12,10 +12,17 @@ interface DAOFacade {
         completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>, gTaskId: String?, userId: String
     ): Task
 
+    suspend fun addNewGTask(
+        completed: Boolean, action: String, dueDate: String, gTaskId: String?, userId: String
+    ): Task
+
     suspend fun editTask(
         id: Int, completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>, gTaskId: String?
     ): Boolean
 
+    suspend fun editGTask(
+        gTaskId: String, completed: Boolean, action: String, dueDate: String?
+    ): Boolean
     suspend fun deleteTask(id: Int): Boolean
 
     suspend fun allNotes(): List<Note>

@@ -1,6 +1,9 @@
 package org.models.opus.dao
 
-import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import org.jetbrains.exposed.sql.SizedCollection
 import org.models.opus.dao.DatabaseFactory.dbQuery
 import org.models.opus.db.*
 import org.models.opus.models.*
@@ -10,9 +13,9 @@ class DAOFacadeImpl : DAOFacade {
         id = entity.id.value,
         completed = entity.completed,
         action = entity.action,
-        creationDate = LocalDateTime.parse(entity.creationDate),
+        creationDate = Instant.parse(entity.creationDate).toLocalDateTime(TimeZone.UTC),
         dueDate = entity.dueDate?.let {
-            if (it != "null") return@let LocalDateTime.parse(it)
+            if (it != "null") return@let Instant.parse(it).toLocalDateTime(TimeZone.UTC)
             null
         },
         tags = entity.tags.map(::entityToTag)
@@ -61,6 +64,20 @@ class DAOFacadeImpl : DAOFacade {
         })
     }
 
+    override suspend fun addNewGTask(
+        completed: Boolean, action: String, dueDate: String, gTaskId: String?, userId: String
+    ): Task = dbQuery {
+        entityToTask(TaskEntity.new {
+            this.completed = completed
+            this.action = action
+            this.dueDate = dueDate
+            this.creationDate = dueDate
+            this.user = UserEntity.findById(userId) ?: throw Exception()
+            this.gTaskId = gTaskId
+            this.tags = SizedCollection()
+        })
+    }
+
     override suspend fun editTask(
         id: Int, completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>, gTaskId: String?
     ): Boolean = dbQuery {
@@ -72,6 +89,19 @@ class DAOFacadeImpl : DAOFacade {
             this.dueDate = dueDate
             this.tags = TagEntity.forIds(tags.map { it.id })
             this.gTaskId = gTaskId
+        }
+
+        return@dbQuery true
+    }
+
+    override suspend fun editGTask(
+        gTaskId: String, completed: Boolean, action: String,  dueDate: String?
+    ): Boolean = dbQuery {
+        val entity = TaskEntity.find { Tasks.gTaskId eq gTaskId }.singleOrNull() ?: return@dbQuery false
+        entity.apply {
+            this.completed = completed
+            this.action = action
+            this.dueDate = dueDate
         }
 
         return@dbQuery true

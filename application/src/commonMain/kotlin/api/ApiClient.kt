@@ -7,14 +7,13 @@ import io.ktor.client.plugins.logging.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
 import io.ktor.http.*
+import io.ktor.serialization.kotlinx.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
-import org.models.opus.models.Note
-import org.models.opus.models.Tag
-import org.models.opus.models.Task
-import org.models.opus.models.User
+import kotlinx.serialization.json.Json
+import org.models.opus.models.*
 
 class ApiClient {
 
@@ -26,7 +25,7 @@ class ApiClient {
         }
     }
 
-    private val baseUrl = "http://35.239.87.183:8080"
+    private val baseUrl = "http://0.0.0.0:8080"//"http://35.239.87.183:8080"
 
     private val httpClient = HttpClient {
         install(ContentNegotiation) {
@@ -35,13 +34,15 @@ class ApiClient {
         install(Logging) {
             level = LogLevel.ALL
         }
-        install(WebSockets)
+        install(WebSockets) {
+            contentConverter = KotlinxWebsocketSerializationConverter(Json)
+        }
     }
 
-    suspend fun startClientConn() {
+    suspend fun startClientConn(cb: () -> Unit) {
         //runBlocking {
             httpClient.webSocket(method = HttpMethod.Get, host = "0.0.0.0", port = 8080, path = "/chat") {
-                val messageOutputRoutine = launch { outputMessages() }
+                val messageOutputRoutine = launch { outputMessages(cb) }
                 val userInputRoutine = launch { inputMessages() }
 
                 userInputRoutine.join() // Wait for completion; either "exit" or error
@@ -52,10 +53,13 @@ class ApiClient {
         println("Connection closed. Goodbye!")
     }
 
-    suspend fun DefaultClientWebSocketSession.outputMessages() {
+    suspend fun DefaultClientWebSocketSession.outputMessages(cb: () -> Unit) {
         try {
             for (message in incoming) {
                 message as? Frame.Text ?: continue
+                if (message.readText() == "829 modified") {
+                    cb()
+                }
                 println(message.readText())
             }
         } catch (e: Exception) {
@@ -70,7 +74,7 @@ class ApiClient {
             val message = (counter++).toString()
             if (message.equals("exit", true)) return
             try {
-                send(message)
+                sendSerialized(UserWSData(userId, accessToken))
             } catch (e: Exception) {
                 println("Error while sending: " + e.localizedMessage)
                 return

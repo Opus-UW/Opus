@@ -1,7 +1,6 @@
 package org.models.opus.models
 
-import com.google.api.client.auth.oauth2.Credential
-import kotlinx.datetime.*
+import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.Serializable
 
 
@@ -35,4 +34,10 @@ data class Colour(
 @Serializable
 data class User(
     val id: String = ""
+)
+
+
+@Serializable
+data class UserWSData(
+    val userId: String, val accessToken: String
 )

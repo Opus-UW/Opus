@@ -7,7 +7,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import api.ApiClient
-import ui.theme.OpusTheme
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.PreComposeApp
 import moe.tlaster.precompose.flow.collectAsStateWithLifecycle
@@ -15,7 +14,7 @@ import moe.tlaster.precompose.navigation.NavHost
 import moe.tlaster.precompose.navigation.rememberNavigator
 import moe.tlaster.precompose.viewmodel.viewModel
 import ui.*
-import ui.OpusTopAppBar
+import ui.theme.OpusTheme
 import viewmodels.MainViewModel
 
 
@@ -35,7 +34,7 @@ fun App() {
 
             val currentScreen by viewModel.currentScreen.collectAsStateWithLifecycle()
 
-//            coroutineScope.launch { ApiClient.getInstance().startClientConn() }
+            coroutineScope.launch { ApiClient.getInstance().startClientConn{ viewModel.fetchAllData() } }
 
             ModalNavigationDrawer(
                 drawerState = drawerState,
