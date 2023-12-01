@@ -58,17 +58,7 @@ fun Application.configureSockets() {
                         val targetDT = task.dueDate!!.toJavaLocalDateTime()
                         val dur = curDT.until(targetDT, ChronoUnit.DAYS)
                         if (dur <= 1 && dur >= 0 && task.completed == false) {
-                            dao.editTask(
-                                task.id,
-                                task.completed,
-                                task.action,
-                                task.creationDate.toString(),
-                                task.dueDate?.toString(),
-                                task.tags,
-                                true,
-                                task.important,
-                                dao.taskGId(task.id)
-                            )
+                            dao.notifyTask(task.id)
                             GmailAPI(user!!.credentials).sendEmail("Task \"${task.action}\" due","Your task \"${task.action}\" is due in < 1 day.\n Good Luck!")
                         }
                     }

@@ -87,7 +87,7 @@ class DAOFacadeImpl : DAOFacade {
     }
 
     override suspend fun editTask(
-        id: Int, completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>, notificationSent: Boolean, important: Boolean, gTaskId: String?
+        id: Int, completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>, important: Boolean, gTaskId: String?
     ): Boolean = dbQuery {
         val entity = TaskEntity.find { Tasks.id eq id }.singleOrNull() ?: return@dbQuery false
         entity.apply {
@@ -96,11 +96,18 @@ class DAOFacadeImpl : DAOFacade {
             this.creationDate = creationDate
             this.dueDate = dueDate
             this.tags = TagEntity.forIds(tags.map { it.id })
-            this.notificationSent = notificationSent
             this.important = important
             this.gTaskId = gTaskId
         }
 
+        return@dbQuery true
+    }
+
+    override suspend fun notifyTask(id: Int): Boolean = dbQuery{
+        val entity = TaskEntity.find { Tasks.id eq id }.singleOrNull() ?: return@dbQuery false
+        entity.apply {
+            this.notificationSent = true
+        }
         return@dbQuery true
     }
 

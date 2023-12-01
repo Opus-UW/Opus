@@ -18,8 +18,10 @@ interface DAOFacade {
     ): Task
 
     suspend fun editTask(
-        id: Int, completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>, notificationSent: Boolean, important: Boolean,  gTaskId: String?
+        id: Int, completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>, important: Boolean,  gTaskId: String?
     ): Boolean
+
+    suspend fun notifyTask(id: Int): Boolean
 
     suspend fun editGTask(
         gTaskId: String, completed: Boolean, action: String, dueDate: String?

@@ -89,7 +89,6 @@ fun Routing.handleTasks() {
                     createdTask.creationDate.toString(),
                     createdTask.dueDate?.toString(),
                     createdTask.tags,
-                    createdTask.notificationSent,
                     createdTask.important,
                     createdGTask.id
                 )
@@ -138,7 +137,6 @@ fun Routing.handleTasks() {
                 task.creationDate.toString(),
                 task.dueDate?.toString(),
                 task.tags,
-                task.notificationSent,
                 task.important,
                 gTaskId
             )
@@ -179,7 +177,6 @@ fun Routing.handleTasks() {
                     task.creationDate.toString(),
                     task.dueDate?.toString(),
                     task.tags,
-                    task.notificationSent,
                     task.important,
                     gTaskId
                 )

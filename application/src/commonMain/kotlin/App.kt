@@ -48,8 +48,9 @@ fun App() {
             val tags by viewModel.tags.collectAsStateWithLifecycle()
             val loading by viewModel.loading.collectAsStateWithLifecycle()
 
-            coroutineScope.launch { ApiClient.getInstance().startClientConn{ viewModel.fetchAllData() } }
-
+            LaunchedEffect(Unit) {
+                coroutineScope.launch { ApiClient.getInstance().startClientConn { viewModel.fetchAllData() } }
+            }
             val (showLoading, setShowLoading) = remember { mutableStateOf(false) }
 
             ModalNavigationDrawer(
