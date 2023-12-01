@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import api.ApiClient
 import com.google.api.client.auth.oauth2.Credential
+import com.google.api.client.auth.oauth2.StoredCredential
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow
@@ -38,14 +39,13 @@ import kotlinx.coroutines.launch
 import moe.tlaster.precompose.flow.collectAsStateWithLifecycle
 import moe.tlaster.precompose.navigation.Navigator
 import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.models.opus.models.DBCredentials
 import ui.components.darkModeLogoVector
 import ui.components.lightModeLogoVector
 import ui.theme.isDarkTheme
 import viewmodels.MainViewModel
-import java.io.File
-import java.io.FileNotFoundException
-import java.io.IOException
-import java.io.InputStreamReader
+import java.io.*
+import java.util.HashMap
 
 private const val APPLICATION_NAME = "Opus"
 private val TOKENS_DIRECTORY_PATH = "${System.getProperty("user.home")}/.opus/tokens"
@@ -124,7 +124,12 @@ fun Login(
         viewModel.setPictureURL(oauth2.userinfo().get().execute().picture)
         viewModel.setEmail(oauth2.userinfo().get().execute().email)
 
-        viewModel.setUser(ApiClient.getInstance().getOrCreateUser())
+        val stream = ObjectInputStream(FileInputStream(File("$TOKENS_DIRECTORY_PATH/StoredCredential")))
+        val mapping = stream.readObject() as HashMap<*, *>
+        val creds = ObjectInputStream((mapping.get("user") as ByteArray).inputStream()).readObject() as StoredCredential
+
+        viewModel.setUser(ApiClient.getInstance().getOrCreateUser(DBCredentials(creds.expirationTimeMilliseconds, creds.accessToken, creds.refreshToken)))
+
 
         ApiClient.getInstance().sendLogin();
 

@@ -51,6 +51,7 @@ inline fun <reified T : Enum<T>> Int.toEnum(): T? {
 
 @Serializable
 data class User(
+    val credentials: DBCredentials,
     val id: String = ""
 )
 
@@ -62,6 +63,8 @@ data class UserWSData(
 
 
 @Serializable
-data class UserLoginData(
-    val userId: String, val accessToken: String
+data class DBCredentials(
+    val expirationTimeMilliseconds: Long,
+    val accessToken: String,
+    val refreshToken: String
 )
