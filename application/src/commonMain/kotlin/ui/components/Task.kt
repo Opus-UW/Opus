@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.StarRate
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
@@ -64,6 +66,7 @@ fun task(
     var isTaskFocused by remember(task) { mutableStateOf(false) }
     var edit by remember(isTaskFocused) { mutableStateOf(false) }
     var editCount by remember(task) { mutableStateOf(0) }
+    var important by remember(task) { mutableStateOf(false) }
     val darkTheme by viewModel.darkTheme.collectAsStateWithLifecycle()
 
 
@@ -97,6 +100,13 @@ fun task(
             if (!tags.contains(it.key)){
                 tagStatus.remove(it.key)
             }
+        }
+    }
+
+    LaunchedEffect(task){
+        if (task != null) {
+            if (task.important)
+                important = true
         }
     }
 
@@ -178,7 +188,8 @@ fun task(
                                             text = text,
                                             task = task,
                                             dueDate = taskDueDate,
-                                            tagStatus = tagStatus
+                                            tagStatus = tagStatus,
+                                            important = important
                                         )
                                         if (new) {
                                             taskDueDate = null
@@ -239,6 +250,24 @@ fun task(
                         }
                     }
                 }
+                if (new) {
+                    IconButton(
+                        onClick = { important = !important }
+                    ) { Icon(if (important) Icons.Filled.Star else Icons.Outlined.StarRate, contentDescription = "Important") }
+                } else {
+                    if (important){
+                        IconButton(
+                            onClick = { viewModel.updateTask(task = task, important = !important); important = !important},
+                            modifier = Modifier.focusProperties { canFocus = false }
+                        ) { Icon(Icons.Filled.Star, contentDescription = "Important") }
+                    } else if (isTaskFocused){
+                        IconButton(
+                            onClick = { viewModel.updateTask(task = task, important = !important); important = !important },
+                            modifier = Modifier.focusProperties { canFocus = false }
+                        ) { Icon(if (important) Icons.Filled.Star else Icons.Outlined.StarRate, contentDescription = "Important") }
+                    }
+                }
+
                 if (!new && isTaskFocused && !edit) {
                     IconButton(
                         onClick = { textFieldFocusRequester.requestFocus(); edit = true; editCount++},
@@ -281,46 +310,4 @@ fun taskDisplayDate(
     } else {
         Text("Due on ${date.date}", fontSize = 10.sp)
     }
-}
-
-@Composable
-fun AlertDialogExample(
-    onDismissRequest: () -> Unit,
-    onConfirmation: () -> Unit,
-    dialogTitle: String,
-    dialogText: String,
-    icon: ImageVector,
-) {
-    AlertDialog(
-        icon = {
-            Icon(icon, contentDescription = "Example Icon")
-        },
-        title = {
-            Text(text = dialogTitle)
-        },
-        text = {
-            Text(text = dialogText)
-        },
-        onDismissRequest = {
-            onDismissRequest()
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onConfirmation()
-                }
-            ) {
-                Text("Confirm")
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = {
-                    onDismissRequest()
-                }
-            ) {
-                Text("Dismiss")
-            }
-        }
-    )
 }

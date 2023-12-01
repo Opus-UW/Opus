@@ -14,7 +14,6 @@ import org.models.opus.models.Tag
 import org.models.opus.models.Task
 import kotlinx.datetime.Clock
 import org.models.opus.models.User
-import ui.components.getTheme
 import ui.components.storeTheme
 
 
@@ -46,6 +45,9 @@ class MainViewModel(
     private var _user = MutableStateFlow(savedStateHolder.consumeRestored("user") as User?)
     val user = _user.asStateFlow()
 
+    private var _loading = MutableStateFlow(savedStateHolder.consumeRestored("Loading") as Boolean?)
+    val loading = _loading.asStateFlow()
+
     private var _userName = MutableStateFlow(savedStateHolder.consumeRestored("username") as String?)
     val userName = _userName.asStateFlow()
 
@@ -57,6 +59,17 @@ class MainViewModel(
 
     private var _darkTheme = MutableStateFlow(savedStateHolder.consumeRestored("theme") as Boolean?)
     val darkTheme = _darkTheme.asStateFlow()
+
+    private var _searchString = MutableStateFlow(savedStateHolder.consumeRestored("search") as String?)
+    val searchString = _searchString.asStateFlow()
+
+    fun setSearchString(value: String){
+        _searchString.value = value
+    }
+
+    fun setLoading(value: Boolean) {
+        _loading.value = value
+    }
 
     fun setDarkTheme(value: Boolean){
         _darkTheme.value = value
@@ -107,12 +120,14 @@ class MainViewModel(
         note: Note,
         title: String? = null,
         body: String? = null,
-        tags: List<Tag>? = null
+        tags: List<Tag>? = null,
+        pinned: Boolean? = null
     ){
         val updatedNote = Note(
             title ?: note.title,
             body ?: note.body,
             tags ?: note.tags,
+            pinned ?: false,
             note.id
         )
         viewModelScope.launch {
@@ -154,7 +169,8 @@ class MainViewModel(
         tagStatus: Map<Tag, Boolean>? = null,
         dueDate: LocalDateTime? = null,
         new: Boolean = false,
-        task: Task? = null
+        task: Task? = null,
+        important: Boolean? = null
     ) {
         // Convert tag status map to list of tags
         val taskTags = mutableListOf<Tag>()
@@ -173,7 +189,8 @@ class MainViewModel(
                 text ?: task.action,
                 time.toLocalDateTime(TimeZone.currentSystemDefault()),
                 dueDate?: task.dueDate,
-                if (tagStatus != null) taskTags else task.tags
+                if (tagStatus != null) taskTags else task.tags,
+                important ?: false,
             )
             viewModelScope.launch {
                 setTasks(ApiClient.getInstance().editTask(task.id, taskToSend))
@@ -185,7 +202,8 @@ class MainViewModel(
                 text ?: "",
                 time.toLocalDateTime(TimeZone.currentSystemDefault()),
                 dueDate,
-                taskTags.toList()
+                taskTags.toList(),
+                important ?: false,
             )
             viewModelScope.launch {
                 setTasks(ApiClient.getInstance().postTask(taskToSend))
@@ -205,10 +223,10 @@ class MainViewModel(
 
     fun fetchAllData() {
         viewModelScope.launch {
-
             setTags(ApiClient.getInstance().getTags())
             setTasks(ApiClient.getInstance().getTasks())
             setNotes(ApiClient.getInstance().getNotes())
+            setLoading(false)
         }
     }
 
@@ -228,5 +246,6 @@ class MainViewModel(
         savedStateHolder.registerProvider("credential"){
             credential.value
         }
+        setLoading(false)
     }
 }

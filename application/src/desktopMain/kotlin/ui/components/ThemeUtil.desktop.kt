@@ -10,6 +10,9 @@ actual fun storeTheme(
     boolean: Boolean
 ){
     val settingsFile = File(SETTINGS_DIRECTORY_PATH)
+    if (!settingsFile.exists()){
+        settingsFile.createNewFile()
+    }
     settingsFile.writeText("theme: " + if (boolean) "1" else "0")
 }
 
@@ -31,6 +34,7 @@ actual fun getTheme(sysTheme: Boolean) :  Boolean {
         }
     }
     else {
+        settingsFile.createNewFile()
         settingsFile.writeText("theme: " + if (sysTheme) "1" else "0")
         isDark = sysTheme
     }
