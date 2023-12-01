@@ -3,6 +3,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -18,6 +19,7 @@ import moe.tlaster.precompose.navigation.rememberNavigator
 import moe.tlaster.precompose.viewmodel.viewModel
 import ui.*
 import ui.OpusTopAppBar
+import ui.components.LoadingDialog
 import ui.components.TagBar
 import ui.components.getTheme
 import ui.components.noRippleClickable
@@ -41,14 +43,14 @@ fun App() {
         OpusTheme (useDarkTheme = darkTheme ?: true) {
             val navigator = rememberNavigator()
             val coroutineScope = rememberCoroutineScope()
-
-            // Data
             val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-
             val currentScreen by viewModel.currentScreen.collectAsStateWithLifecycle()
             val tags by viewModel.tags.collectAsStateWithLifecycle()
+            val loading by viewModel.loading.collectAsStateWithLifecycle()
 
             coroutineScope.launch { ApiClient.getInstance().startClientConn{ viewModel.fetchAllData() } }
+
+            val (showLoading, setShowLoading) = remember { mutableStateOf(false) }
 
             ModalNavigationDrawer(
                 drawerState = drawerState,
@@ -94,6 +96,11 @@ fun App() {
                                 scene(route = "/tags"){
                                     TagScreen(viewModel)
                                 }
+                            }
+                        }
+                        when {
+                            loading == true ->{
+                                LoadingDialog(viewModel)
                             }
                         }
                     }
