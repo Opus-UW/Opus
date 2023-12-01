@@ -25,11 +25,30 @@ fun OpusTopAppBar(
     var taskState by remember { mutableStateOf(true) }
     var noteState by remember { mutableStateOf(false) }
     var calendarState by remember { mutableStateOf(false) }
+    var tagState by remember { mutableStateOf(false) }
 
     TopAppBar(
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(if (taskState) "Tasks" else (if (noteState) "Notes" else "Calendar") )
+                Text(if (taskState) "Tasks" else (if (noteState) "Notes" else  (if (calendarState) "Calendar" else (if (tagState) "Tags" else "Unknown")) ) )
+                IconButton(
+                    onClick = {
+                        if (!tagState) {
+                            tagState = true
+                            taskState = false
+                            noteState = false
+                            calendarState = false
+                            viewModel.setCurrentScreen("/tags")
+                            navigator.navigate("/tags")
+                        }
+                    }
+                ) {
+                    Icon(
+                        Icons.Default.Sell,
+                        tint = if (tagState) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
+                        contentDescription = "Navigate to tags"
+                    )
+                }
 
                 if (calendarState) {
                     Row(
@@ -53,6 +72,7 @@ fun OpusTopAppBar(
                 IconButton(
                     onClick = {
                         if (!taskState) {
+                            tagState = false
                             taskState = true
                             noteState = false
                             calendarState = false
@@ -70,6 +90,7 @@ fun OpusTopAppBar(
                 IconButton(
                     onClick = {
                         if (!noteState) {
+                            tagState = false
                             taskState = false
                             noteState = true
                             calendarState = false
@@ -87,6 +108,7 @@ fun OpusTopAppBar(
                 IconButton(
                     onClick = {
                         if (!calendarState) {
+                            tagState = false
                             taskState = false
                             noteState = false
                             calendarState = true
