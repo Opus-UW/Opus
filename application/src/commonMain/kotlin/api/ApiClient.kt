@@ -41,7 +41,7 @@ class ApiClient {
 
     suspend fun startClientConn(cb: () -> Unit) {
         //runBlocking {
-            httpClient.webSocket(method = HttpMethod.Get, host = "0.0.0.0", port = 8080, path = "/chat") {
+            httpClient.webSocket(method = HttpMethod.Get, host = "35.239.87.183", port = 8080, path = "/chat") {
                 val messageOutputRoutine = launch { outputMessages(cb) }
                 val userInputRoutine = launch { inputMessages() }
 
