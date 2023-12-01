@@ -190,6 +190,7 @@ class MainViewModel(
                 time.toLocalDateTime(TimeZone.currentSystemDefault()),
                 dueDate?: task.dueDate,
                 if (tagStatus != null) taskTags else task.tags,
+                false,
                 important ?: false,
             )
             viewModelScope.launch {
@@ -203,6 +204,7 @@ class MainViewModel(
                 time.toLocalDateTime(TimeZone.currentSystemDefault()),
                 dueDate,
                 taskTags.toList(),
+                false,
                 important ?: false,
             )
             viewModelScope.launch {
