@@ -33,10 +33,11 @@ fun TaskScreen(
 
     val tagTasks = tasks.filter { if (currentTag != null) it.tags.contains(currentTag) else true }
     println (validSearchString)
-    val uncompletedTasks = tagTasks.filter { !it.completed }
-    val completedTasks = tagTasks.filter { it.completed }
+    var uncompletedTasks = tagTasks.filter { !it.completed }
+    var completedTasks = tagTasks.filter { it.completed }
     if (validSearchString){
-
+        uncompletedTasks = uncompletedTasks.filter { searchString?.let { it1 -> it.action.contains(it1, ignoreCase = true) } ?: true }
+        completedTasks = completedTasks.filter { searchString?.let { it1 -> it.action.contains(it1, ignoreCase = true) } ?: true }
     }
 
     Column(
