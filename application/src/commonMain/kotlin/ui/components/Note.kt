@@ -342,7 +342,7 @@ fun EditNoteDialog(
             RichTextEditor(
                 state = newState,
                 modifier = Modifier
-                    .weight(1f)
+                    .weight(1f).fillMaxWidth()
                     .onKeyEvent {
                         if (it.type == KeyEventType.KeyUp) {
                             keyboardShortcuts.forEach { shortcut ->
