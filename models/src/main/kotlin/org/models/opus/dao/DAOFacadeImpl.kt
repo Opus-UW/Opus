@@ -49,7 +49,7 @@ class DAOFacadeImpl : DAOFacade {
     }
 
     override suspend fun addNewTask(
-        completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>, gTaskId: String?, userId: String
+        completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>, notificationSent: Boolean, gTaskId: String?, userId: String
     ): Task = dbQuery {
         entityToTask(TaskEntity.new {
             this.completed = completed
@@ -58,6 +58,7 @@ class DAOFacadeImpl : DAOFacade {
             this.dueDate = dueDate
             this.user = UserEntity.findById(userId) ?: throw Exception()
             this.tags = TagEntity.forIds(tags.map { it.id })
+            this.notificationSent = notificationSent
             this.gTaskId = gTaskId
         })
     }
@@ -71,13 +72,14 @@ class DAOFacadeImpl : DAOFacade {
             this.dueDate = dueDate.toLDT().toString()
             this.creationDate = dueDate.toLDT().toString()
             this.user = UserEntity.findById(userId) ?: throw Exception()
+            this.notificationSent = false
             this.gTaskId = gTaskId
             this.tags = SizedCollection()
         })
     }
 
     override suspend fun editTask(
-        id: Int, completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>, gTaskId: String?
+        id: Int, completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>, notificationSent: Boolean, gTaskId: String?
     ): Boolean = dbQuery {
         val entity = TaskEntity.find { Tasks.id eq id }.singleOrNull() ?: return@dbQuery false
         entity.apply {
@@ -86,6 +88,7 @@ class DAOFacadeImpl : DAOFacade {
             this.creationDate = creationDate
             this.dueDate = dueDate
             this.tags = TagEntity.forIds(tags.map { it.id })
+            this.notificationSent = notificationSent
             this.gTaskId = gTaskId
         }
 
