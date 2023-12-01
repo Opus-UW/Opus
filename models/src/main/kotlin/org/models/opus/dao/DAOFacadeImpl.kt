@@ -1,18 +1,19 @@
 package org.models.opus.dao
 
-import kotlinx.datetime.LocalDateTime
+import org.jetbrains.exposed.sql.SizedCollection
 import org.models.opus.dao.DatabaseFactory.dbQuery
 import org.models.opus.db.*
 import org.models.opus.models.*
+import org.models.opus.utils.toLDT
 
 class DAOFacadeImpl : DAOFacade {
     private fun entityToTask(entity: TaskEntity) = Task(
         id = entity.id.value,
         completed = entity.completed,
         action = entity.action,
-        creationDate = LocalDateTime.parse(entity.creationDate),
+        creationDate = entity.creationDate.toLDT(),
         dueDate = entity.dueDate?.let {
-            if (it != "null") return@let LocalDateTime.parse(it)
+            if (it != "null") return@let it.toLDT()
             null
         },
         tags = entity.tags.map(::entityToTag)
@@ -61,6 +62,20 @@ class DAOFacadeImpl : DAOFacade {
         })
     }
 
+    override suspend fun addNewGTask(
+        completed: Boolean, action: String, dueDate: String, gTaskId: String?, userId: String
+    ): Task = dbQuery {
+        entityToTask(TaskEntity.new {
+            this.completed = completed
+            this.action = action
+            this.dueDate = dueDate.toLDT().toString()
+            this.creationDate = dueDate.toLDT().toString()
+            this.user = UserEntity.findById(userId) ?: throw Exception()
+            this.gTaskId = gTaskId
+            this.tags = SizedCollection()
+        })
+    }
+
     override suspend fun editTask(
         id: Int, completed: Boolean, action: String, creationDate: String, dueDate: String?, tags: List<Tag>, gTaskId: String?
     ): Boolean = dbQuery {
@@ -77,8 +92,28 @@ class DAOFacadeImpl : DAOFacade {
         return@dbQuery true
     }
 
+    override suspend fun editGTask(
+        gTaskId: String, completed: Boolean, action: String,  dueDate: String?
+    ): Boolean = dbQuery {
+        val entity = TaskEntity.find { Tasks.gTaskId eq gTaskId }.singleOrNull() ?: return@dbQuery false
+        entity.apply {
+            this.completed = completed
+            this.action = action
+            this.dueDate = dueDate?.toLDT()?.toString()
+        }
+
+        return@dbQuery true
+    }
+
     override suspend fun deleteTask(id: Int): Boolean = dbQuery {
         val tasks = TaskEntity.find { Tasks.id eq id }
+        if (tasks.count().toInt() == 0) return@dbQuery false
+        tasks.forEach { it.delete() }
+        return@dbQuery true
+    }
+
+    override suspend fun deleteGTask(gTaskId: String): Boolean = dbQuery {
+        val tasks = TaskEntity.find { Tasks.gTaskId eq gTaskId }
         if (tasks.count().toInt() == 0) return@dbQuery false
         tasks.forEach { it.delete() }
         return@dbQuery true

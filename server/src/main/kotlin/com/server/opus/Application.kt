@@ -2,12 +2,14 @@ package com.server.opus
 
 import com.server.opus.plugins.configureRouting
 import com.server.opus.plugins.configureSockets
+import io.ktor.serialization.kotlinx.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.websocket.*
+import kotlinx.serialization.json.Json
 import org.models.opus.dao.DatabaseFactory
 import java.time.Duration
 
@@ -25,6 +27,7 @@ fun Application.module() {
         timeout = Duration.ofSeconds(15)
         maxFrameSize = Long.MAX_VALUE
         masking = false
+        contentConverter = KotlinxWebsocketSerializationConverter(Json)
     }
     DatabaseFactory.init()
     configureRouting()
