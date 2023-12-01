@@ -32,7 +32,7 @@ class ApiClient {
             json()
         }
         install(Logging) {
-            level = LogLevel.ALL
+            level = LogLevel.NONE
         }
         install(WebSockets) {
             contentConverter = KotlinxWebsocketSerializationConverter(Json)
@@ -273,13 +273,14 @@ class ApiClient {
     }
 
 
-    suspend fun getOrCreateUser(): User {
+    suspend fun getOrCreateUser(creds: DBCredentials): User {
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId")
         }
         return httpClient.post(url.build()) {
             bearerAuth(accessToken)
             contentType(ContentType.Application.Json)
+            setBody(creds)
         }.body()
     }
 

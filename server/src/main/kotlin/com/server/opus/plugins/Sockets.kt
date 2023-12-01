@@ -32,7 +32,8 @@ fun Application.configureSockets() {
                     frame as? Frame.Text ?: continue
                     val receivedText = converter!!.deserialize<UserWSData>(frame, Charset.defaultCharset())
                     if(receivedText.accessToken.isEmpty() || receivedText.userId.isEmpty()) continue
-                    val updatedTasks = TaskAPI(receivedText.accessToken).modifiedTasks()
+                    val user = dao.user(receivedText.userId)
+                    val updatedTasks = TaskAPI(user!!.credentials).modifiedTasks()
                     //println(updatedTasks)
                     updatedTasks.items.forEach { task ->
                         if (dbQuery { TaskEntity.find { Tasks.gTaskId eq task.id }.count().toInt() > 0 }) {

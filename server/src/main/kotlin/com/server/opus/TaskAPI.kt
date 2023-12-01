@@ -1,23 +1,39 @@
 package com.server.opus
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleRefreshTokenRequest
+import com.google.api.client.googleapis.auth.oauth2.OAuth2Utils
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.json.JsonFactory
 import com.google.api.client.json.gson.GsonFactory
 import com.google.api.client.util.DateTime
+import com.google.api.services.gmail.GmailScopes
+import com.google.api.services.oauth2.Oauth2Scopes
 import com.google.api.services.tasks.Tasks
+import com.google.api.services.tasks.TasksScopes
 import com.google.api.services.tasks.model.Task
 import com.google.auth.http.HttpCredentialsAdapter
 import com.google.auth.oauth2.AccessToken
-import com.google.auth.oauth2.GoogleCredentials
+import com.google.auth.oauth2.OAuth2CredentialsWithRefresh
+import com.google.auth.oauth2.OAuth2CredentialsWithRefresh.OAuth2RefreshHandler
 import kotlinx.datetime.Clock
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import org.models.opus.dao.dao
+import org.models.opus.models.DBCredentials
+import java.io.FileNotFoundException
+import java.util.*
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-class TaskAPI(private val accessTokenString: String) {
+class TaskAPI(private val creds: DBCredentials) {
 
     private val APPLICATION_NAME = "Opus"
-    private val accessToken: AccessToken
+    private val credentials: OAuth2CredentialsWithRefresh
 
     private val JSON_FACTORY: JsonFactory = GsonFactory.getDefaultInstance()
+
+    private val CREDENTIALS_FILE_PATH = "/credentials.json"
 
     // If modifying these scopes, delete your previously saved tokens/ folder.
 
@@ -25,19 +41,30 @@ class TaskAPI(private val accessTokenString: String) {
 
     private val taskListId: String
 
+    private val handler = OAuth2RefreshHandler {
+        val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
+        val credFile = object{}.javaClass.getResource(CREDENTIALS_FILE_PATH) ?: throw FileNotFoundException("Resource not found: $CREDENTIALS_FILE_PATH")
+        val installedObj = Json.parseToJsonElement(credFile.readText()).jsonObject.get("installed")!!.jsonObject
+        val SCOPES = listOf(TasksScopes.TASKS, GmailScopes.GMAIL_COMPOSE) + Oauth2Scopes.all()
+        println(installedObj)
+
+        val newToken = GoogleRefreshTokenRequest(httpTransport, JSON_FACTORY, creds.refreshToken, installedObj.get("client_id")!!.jsonPrimitive.content, installedObj.get("client_secret")!!.jsonPrimitive.content).setScopes(SCOPES).execute()
+
+        AccessToken(newToken.accessToken, Date(newToken.expiresInSeconds*1000))
+    }
+
     init {
         val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
 
-        accessToken = AccessToken.newBuilder().setTokenValue(accessTokenString).build()
+        val accessToken = AccessToken.newBuilder().setTokenValue(creds.accessToken).setExpirationTime(Date(creds.expirationTimeMilliseconds)).build()
+        credentials = OAuth2CredentialsWithRefresh.newBuilder().setAccessToken(accessToken).setRefreshHandler(handler).build()
+        credentials.refreshAccessToken()
 
-        val credential = GoogleCredentials.create(accessToken)
-
-        taskService = Tasks.Builder(httpTransport, JSON_FACTORY, HttpCredentialsAdapter(credential))
+        taskService = Tasks.Builder(httpTransport, JSON_FACTORY, HttpCredentialsAdapter(credentials))
             .setApplicationName(APPLICATION_NAME)
             .build()
 
         taskListId = taskService.tasklists().list().execute().items[0].id
-
     }
 
     fun allTasks(): com.google.api.services.tasks.model.Tasks{

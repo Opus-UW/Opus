@@ -29,7 +29,8 @@ class DAOFacadeImpl : DAOFacade {
     )
 
     private fun entityToUser(entity: UserEntity) = User(
-        id = entity.id.value
+        id = entity.id.value,
+        credentials = entity.credentials
     )
 
 
@@ -215,13 +216,17 @@ class DAOFacadeImpl : DAOFacade {
         UserEntity.find { Users.id eq id }.map(::entityToUser).singleOrNull()
     }
 
-    override suspend fun addNewUser(id: String): User = dbQuery {
-        entityToUser(UserEntity.new(id){})
+    override suspend fun addNewUser(id: String, credentials: DBCredentials): User = dbQuery {
+        entityToUser(UserEntity.new(id){
+            this.credentials = credentials
+        })
     }
 
-    override suspend fun editUser(id: String): Boolean = dbQuery {
+    override suspend fun editUser(id: String, credentials: DBCredentials): Boolean = dbQuery {
         val entity = UserEntity.find { Users.id eq id }.singleOrNull() ?: return@dbQuery false
-        entity.apply {} // Does nothing for now, change when user has more data
+        entity.apply {
+            this.credentials = credentials
+        } // Does nothing for now, change when user has more data
         return@dbQuery true
     }
 
