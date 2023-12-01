@@ -41,3 +41,9 @@ data class User(
 data class UserWSData(
     val userId: String, val accessToken: String
 )
+
+
+@Serializable
+data class UserLoginData(
+    val userId: String, val accessToken: String
+)
