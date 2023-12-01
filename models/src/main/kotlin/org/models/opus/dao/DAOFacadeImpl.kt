@@ -40,6 +40,10 @@ class DAOFacadeImpl : DAOFacade {
         TaskEntity.find { Tasks.id eq id }.map(::entityToTask).singleOrNull()
     }
 
+    override suspend fun unsentTasks(): List<Task> = dbQuery {
+        TaskEntity.find{ Tasks.notificationSent eq false}.map(::entityToTask)
+    }
+
     override suspend fun taskGId(id: Int): String? = dbQuery {
         TaskEntity.find { Tasks.id eq id }.firstOrNull()?.gTaskId
     }

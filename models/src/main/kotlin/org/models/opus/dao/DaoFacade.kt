@@ -6,6 +6,7 @@ interface DAOFacade {
     suspend fun allTasks(): List<Task>
     suspend fun task(id: Int): Task?
 
+    suspend fun unsentTasks(): List<Task>
     suspend fun taskGId(id: Int): String?
     suspend fun userTasks(userId: String): List<Task>
     suspend fun addNewTask(
