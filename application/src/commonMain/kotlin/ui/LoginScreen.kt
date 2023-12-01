@@ -58,34 +58,7 @@ fun LoginScreen(
     viewModel: MainViewModel,
     navigator: Navigator
 ) {
-    val (showLoginDialog, setShowLoginDialog) = remember { mutableStateOf(false) }
-    if (showLoginDialog) {
-        Dialog(onDismissRequest = { setShowLoginDialog(false) }) {
-            Card(
-                modifier = Modifier.fillMaxHeight(0.5f).fillMaxWidth().padding(16.dp),
-                shape = RoundedCornerShape(16.dp),
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxHeight().fillMaxWidth().padding(5.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Spacer(modifier = Modifier.weight(1f))
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(64.dp),
-                        color = MaterialTheme.colorScheme.secondary,
-                        trackColor = MaterialTheme.colorScheme.surfaceVariant,
-                    )
-                    Spacer(modifier = Modifier.height(25.dp))
-                    Text(
-                        text = "Loading...",
-                        fontSize = 20.sp,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    Spacer(modifier = Modifier.weight(1f))
-                }
-            }
-        }
-    }
+
 
     val logoVector = if (isDarkTheme()) darkModeLogoVector() else lightModeLogoVector()
     Column{
@@ -99,7 +72,6 @@ fun LoginScreen(
         Row{
             Spacer(modifier = Modifier.weight(1f))
             Button(onClick = {
-                setShowLoginDialog(true)
                 Login(viewModel, navigator)
             },
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer, contentColor = MaterialTheme.colorScheme.onPrimaryContainer)
@@ -137,6 +109,7 @@ fun Login(
     navigator: Navigator,
 ) {
     GlobalScope.launch {
+        viewModel.setLoading(true)
         val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
         val cred = Cred.getCredentials(httpTransport)
         viewModel.setCredential(cred)
@@ -146,6 +119,7 @@ fun Login(
         ApiClient.getInstance().setUserId(oauth2.userinfo().get().execute().id)
 
         viewModel.setUser(ApiClient.getInstance().getOrCreateUser())
+        viewModel.setLoading(false)
 
         // Grab Data from server
         viewModel.fetchAllData()

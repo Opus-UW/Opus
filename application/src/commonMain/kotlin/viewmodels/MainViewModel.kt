@@ -44,6 +44,13 @@ class MainViewModel(
     private var _user = MutableStateFlow(savedStateHolder.consumeRestored("user") as User?)
     val user = _user.asStateFlow()
 
+    private var _loading = MutableStateFlow(savedStateHolder.consumeRestored("Loading") as Boolean?)
+    val loading = _loading.asStateFlow()
+
+    fun setLoading(value: Boolean){
+        _loading.value = value
+    }
+
     fun setCurDate(value: LocalDateTime){
         _curDate.value = value
     }
@@ -174,9 +181,11 @@ class MainViewModel(
 
     fun fetchAllData() {
         viewModelScope.launch {
+            setLoading(true)
             setTags(ApiClient.getInstance().getTags())
             setTasks(ApiClient.getInstance().getTasks())
             setNotes(ApiClient.getInstance().getNotes())
+            setLoading(false)
         }
     }
 
@@ -196,5 +205,6 @@ class MainViewModel(
         savedStateHolder.registerProvider("credential"){
             credential.value
         }
+        setLoading(false)
     }
 }
