@@ -7,15 +7,16 @@ import org.jetbrains.exposed.sql.SizedCollection
 import org.models.opus.dao.DatabaseFactory.dbQuery
 import org.models.opus.db.*
 import org.models.opus.models.*
+import org.models.opus.utils.toLDT
 
 class DAOFacadeImpl : DAOFacade {
     private fun entityToTask(entity: TaskEntity) = Task(
         id = entity.id.value,
         completed = entity.completed,
         action = entity.action,
-        creationDate = Instant.parse(entity.creationDate).toLocalDateTime(TimeZone.UTC),
+        creationDate = entity.creationDate.toLDT(),
         dueDate = entity.dueDate?.let {
-            if (it != "null") return@let Instant.parse(it).toLocalDateTime(TimeZone.UTC)
+            if (it != "null") return@let it.toLDT()
             null
         },
         tags = entity.tags.map(::entityToTag)
