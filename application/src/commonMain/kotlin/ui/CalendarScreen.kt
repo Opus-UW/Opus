@@ -5,10 +5,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.Text
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -23,7 +21,6 @@ import viewmodels.MainViewModel
 fun CalendarScreen(
     viewModel: MainViewModel
 ) {
-
     val curDate by viewModel.curDate.collectAsStateWithLifecycle()
     val tasks by viewModel.tasks.collectAsStateWithLifecycle()
 
@@ -33,8 +30,8 @@ fun CalendarScreen(
     BoxWithConstraints (
         modifier = Modifier.fillMaxSize()
     ) {
-        var compact = (maxWidth < 600.dp)
-
+        val height = maxHeight
+        val dayHeight = (height - 55.dp) / 6
         Column {
 
             //Days of the week
@@ -43,7 +40,7 @@ fun CalendarScreen(
                 verticalArrangement = Arrangement.spacedBy(0.dp),
                 horizontalArrangement = Arrangement.spacedBy(0.dp),
                 columns = GridCells.Fixed(7),
-                modifier = Modifier.fillMaxWidth().padding(2.dp).padding(5.dp),
+                modifier = Modifier.fillMaxWidth().padding(2.dp).padding(5.dp).height(25.dp),
                 content = {
                     items(daysOfWeek.size) {
                         Card (shape = RectangleShape){
@@ -61,14 +58,14 @@ fun CalendarScreen(
                 verticalArrangement = Arrangement.spacedBy(0.dp),
                 horizontalArrangement = Arrangement.spacedBy(0.dp),
                 columns = GridCells.Fixed(7),
-                modifier = Modifier.fillMaxWidth().padding(2.dp).padding(5.dp),
+                modifier = Modifier.fillMaxWidth().padding(2.dp).padding(5.dp).heightIn(0.dp, height),
                 content = {
                     items(list.size, key = { tempDate + it }) {idx ->
                         val tasksOnDay = tasks.filter{
                             it.dueDate?.dayOfYear == ((tempDate + idx).dayOfYear)
                                     && it.dueDate?.year == (tempDate + idx).year
                         }
-                        DayPreview((tempDate + idx), curDate.month.name, tasksOnDay, setShowDateDialog, setSelectedDate, compact)
+                        DayPreview((tempDate + idx), curDate.month.name, tasksOnDay, setShowDateDialog, setSelectedDate, dayHeight)
                     }
                 }
             )
