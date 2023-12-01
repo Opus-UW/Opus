@@ -45,6 +45,9 @@ class MainViewModel(
     private var _user = MutableStateFlow(savedStateHolder.consumeRestored("user") as User?)
     val user = _user.asStateFlow()
 
+    private var _loading = MutableStateFlow(savedStateHolder.consumeRestored("Loading") as Boolean?)
+    val loading = _loading.asStateFlow()
+
     private var _userName = MutableStateFlow(savedStateHolder.consumeRestored("username") as String?)
     val userName = _userName.asStateFlow()
 
@@ -62,6 +65,10 @@ class MainViewModel(
 
     fun setSearchString(value: String){
         _searchString.value = value
+    }
+
+    fun setLoading(value: Boolean) {
+        _loading.value = value
     }
 
     fun setDarkTheme(value: Boolean){
@@ -216,10 +223,10 @@ class MainViewModel(
 
     fun fetchAllData() {
         viewModelScope.launch {
-
             setTags(ApiClient.getInstance().getTags())
             setTasks(ApiClient.getInstance().getTasks())
             setNotes(ApiClient.getInstance().getNotes())
+            setLoading(false)
         }
     }
 
@@ -239,5 +246,6 @@ class MainViewModel(
         savedStateHolder.registerProvider("credential"){
             credential.value
         }
+        setLoading(false)
     }
 }

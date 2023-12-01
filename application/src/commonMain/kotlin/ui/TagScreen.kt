@@ -49,9 +49,9 @@ fun TagEntry(
     viewModel: MainViewModel,
     tag: Tag
 ) {
-
+    val darkTheme by viewModel.darkTheme.collectAsStateWithLifecycle()
     Row {
-        TagButtonContent(tag)
+        TagButtonContent(darkTheme ?: false, tag)
         Spacer(modifier = Modifier.weight(1f))
         deleteTagMenu(viewModel, tag)
     }

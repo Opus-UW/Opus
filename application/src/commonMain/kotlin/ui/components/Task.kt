@@ -67,6 +67,7 @@ fun task(
     var edit by remember(isTaskFocused) { mutableStateOf(false) }
     var editCount by remember(task) { mutableStateOf(0) }
     var important by remember(task) { mutableStateOf(false) }
+    val darkTheme by viewModel.darkTheme.collectAsStateWithLifecycle()
 
 
     // Task variables
@@ -245,7 +246,7 @@ fun task(
                                 }
                                 Spacer(modifier = Modifier.width(10.dp))
                             }
-                            displayTags(tagStatus)
+                            displayTags(darkTheme ?: false, tagStatus)
                         }
                     }
                 }
