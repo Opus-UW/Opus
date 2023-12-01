@@ -16,7 +16,6 @@ import com.server.opus.CreateMessage.createMessageWithEmail
 import java.io.IOException
 import javax.mail.MessagingException
 
-/* Class to demonstrate the use of Gmail Send Message API */
 class GmailAPI(private val accessTokenString: String) {
     private val APPLICATION_NAME = "Opus"
     private val accessToken: AccessToken
@@ -36,7 +35,6 @@ class GmailAPI(private val accessTokenString: String) {
         val requestInitializer: HttpRequestInitializer = HttpCredentialsAdapter(credential)
 
         gmailService = Gmail.Builder(
-            /*NetHttpTransport(),*/
             httpTransport,
             JSON_FACTORY,
             requestInitializer
@@ -51,45 +49,12 @@ class GmailAPI(private val accessTokenString: String) {
 
     }
 
-
-    // If modifying these scopes, delete your previously saved tokens/ folder.
-
-    /**
-     * Send an email from the user's mailbox to its recipient.
-     *
-     * @param fromEmailAddress - Email address to appear in the from: header
-     * @param toEmailAddress   - Email address of the recipient
-     * @return the sent message, `null` otherwise.
-     * @throws MessagingException - if a wrongly formatted address is encountered.
-     * @throws IOException        - if service account credentials file not found.
-     */
     @Throws(MessagingException::class, IOException::class)
     fun sendEmail(
         messageSubject: String,
         bodyText: String
     ): Message? {
-
-        // Encode as MIME message
-        /*val props = Properties()
-        val session = Session.getDefaultInstance(props, null)
-        val email = MimeMessage(session)
-        email.setFrom(InternetAddress(fromEmailAddress))
-        email.addRecipient(
-            javax.mail.Message.RecipientType.TO,
-            InternetAddress(toEmailAddress)
-        )
-        email.subject = messageSubject
-        email.setText(bodyText)*/
-
         val email = createEmail(fromEmailAddress, toEmailAddress, messageSubject, bodyText)
-
-        // Encode and wrap the MIME message into a gmail message
-        /*val buffer = ByteArrayOutputStream()
-        email.writeTo(buffer)
-        val rawMessageBytes = buffer.toByteArray()
-        val encodedEmail = Base64.encodeBase64URLSafeString(rawMessageBytes)
-        var message = Message()
-        message.setRaw(encodedEmail)*/
         var message = createMessageWithEmail(email)
         try {
             // Create send message
