@@ -30,7 +30,6 @@ import viewmodels.MainViewModel
 @Composable
 fun App() {
     PreComposeApp {
-
         val viewModel = viewModel(modelClass = MainViewModel::class, keys = listOf("main")) {
             MainViewModel(it)
         }

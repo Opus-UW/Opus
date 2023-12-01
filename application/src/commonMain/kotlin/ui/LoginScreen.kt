@@ -62,7 +62,7 @@ fun LoginScreen(
     navigator: Navigator
 ) {
     val darkTheme by viewModel.darkTheme.collectAsStateWithLifecycle()
-    val logoVector = if (darkTheme) darkModeLogoVector() else lightModeLogoVector()
+    val logoVector = if (darkTheme == true) darkModeLogoVector() else lightModeLogoVector()
     Column{
         Spacer(modifier = Modifier.weight(1f))
         Row{
@@ -125,7 +125,6 @@ fun Login(
         viewModel.setEmail(oauth2.userinfo().get().execute().email)
 
         viewModel.setUser(ApiClient.getInstance().getOrCreateUser())
-        viewModel.setLoading(false)
 
         ApiClient.getInstance().sendLogin();
 
