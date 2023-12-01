@@ -44,7 +44,9 @@ class TaskAPI(private val accessTokenString: String) {
         val time = Clock.System.now()
 
         return taskService.tasks().list(taskListId)
-
+            .setShowDeleted(true)
+            .setShowHidden(true)
+            .setShowCompleted(true)
             .setUpdatedMin(DateTime((time - 3.seconds).toString()).toStringRfc3339())
             .execute()
     }

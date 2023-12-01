@@ -28,11 +28,16 @@ fun Application.configureSockets() {
                     val receivedText = converter!!.deserialize<UserWSData>(frame, Charset.defaultCharset())
                     if(receivedText.accessToken.isEmpty() || receivedText.userId.isEmpty()) continue
                     val updatedTasks = TaskAPI(receivedText.accessToken).modifiedTasks()
+                    //println(updatedTasks)
                     updatedTasks.items.forEach { task ->
                         println("ROHIT: ${task.due}")
                         if (dbQuery { TaskEntity.find { Tasks.gTaskId eq task.id }.count().toInt() > 0 }) {
-                            dao.editGTask(task.id, task.status == "completed", task.title, task.due)
-                        } else {
+                            if (task.deleted == true) {
+                                dao.deleteGTask(task.id)
+                            } else {
+                                dao.editGTask(task.id, task.status == "completed", task.title, task.due)
+                            }
+                        } else if (task.deleted != true){
                             dao.addNewGTask(task.status == "completed", task.title, task.due, task.id, receivedText.userId)
                         }
                     }

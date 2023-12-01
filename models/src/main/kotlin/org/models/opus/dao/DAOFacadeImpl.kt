@@ -1,8 +1,5 @@
 package org.models.opus.dao
 
-import kotlinx.datetime.Instant
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.exposed.sql.SizedCollection
 import org.models.opus.dao.DatabaseFactory.dbQuery
 import org.models.opus.db.*
@@ -111,6 +108,13 @@ class DAOFacadeImpl : DAOFacade {
 
     override suspend fun deleteTask(id: Int): Boolean = dbQuery {
         val tasks = TaskEntity.find { Tasks.id eq id }
+        if (tasks.count().toInt() == 0) return@dbQuery false
+        tasks.forEach { it.delete() }
+        return@dbQuery true
+    }
+
+    override suspend fun deleteGTask(gTaskId: String): Boolean = dbQuery {
+        val tasks = TaskEntity.find { Tasks.gTaskId eq gTaskId }
         if (tasks.count().toInt() == 0) return@dbQuery false
         tasks.forEach { it.delete() }
         return@dbQuery true
