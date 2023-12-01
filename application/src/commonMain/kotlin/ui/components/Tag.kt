@@ -93,6 +93,11 @@ fun AddTag(viewModel: MainViewModel) {
                     modifier = Modifier.noRippleClickable(onClick = { addTagFocusRequester.requestFocus() })
                 )
                 Spacer(modifier = Modifier.width(5.dp))
+                Column {
+                    Spacer(modifier = Modifier.height(2.dp))
+                    chooseColor(color, setColor, 20.dp)
+                }
+                Spacer(modifier = Modifier.width(10.dp))
                 val interactionSource = remember { MutableInteractionSource() }
                 val visualTransformation = VisualTransformation.None
                 BasicTextField(
@@ -141,11 +146,6 @@ fun AddTag(viewModel: MainViewModel) {
                         },
                         contentPadding = PaddingValues(0.dp)
                     )
-                }
-                Spacer(modifier = Modifier.width(5.dp))
-                Column {
-                    Spacer(modifier = Modifier.height(2.dp))
-                    chooseColor(color, setColor, 20.dp)
                 }
                 Spacer(modifier = Modifier.weight(1f))
             }

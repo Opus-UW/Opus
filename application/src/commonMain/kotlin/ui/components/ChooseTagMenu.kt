@@ -52,7 +52,7 @@ fun ChooseTagMenu(
                             contentDescription = "Not Selected"
                         )
                     }
-                    Text(tag.title)
+                    TagButtonContent(tag)
                 }
             }
             createNewTag(viewModel)
@@ -70,6 +70,9 @@ fun createNewTag(viewModel: MainViewModel){
         IconButton(onClick = {textFieldFocusRequester.requestFocus()}){
             Icon(Icons.Default.Add, contentDescription = "Add Tag")
         }
+        Spacer(modifier = Modifier.width(5.dp))
+        chooseColor(color, setColor, 40.dp)
+        Spacer(modifier = Modifier.width(10.dp))
         TextField(
             value = newTag,
             placeholder = { Text("Add a tag...") },
@@ -94,8 +97,6 @@ fun createNewTag(viewModel: MainViewModel){
             }
                 .focusRequester(textFieldFocusRequester)
         )
-        chooseColor(color, setColor, 40.dp)
-        Spacer(modifier = Modifier.width(15.dp))
     }
 }
 
