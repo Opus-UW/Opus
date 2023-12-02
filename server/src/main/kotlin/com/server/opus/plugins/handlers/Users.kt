@@ -44,7 +44,7 @@ fun Routing.handleUsers() {
                 return@get
             }
             val user = dao.user(userId)!!
-            val gTasks = TaskAPI(user.credentials).allTasks()
+            val gTasks = TaskAPI(user).allTasks()
             for(task in gTasks.items){
                 if (DatabaseFactory.dbQuery { TaskEntity.find { Tasks.gTaskId eq task.id }.count().toInt() > 0 }) {
                     if (task.deleted == true) {

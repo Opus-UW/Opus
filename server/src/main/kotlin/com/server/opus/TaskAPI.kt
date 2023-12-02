@@ -15,18 +15,20 @@ import com.google.auth.http.HttpCredentialsAdapter
 import com.google.auth.oauth2.AccessToken
 import com.google.auth.oauth2.OAuth2CredentialsWithRefresh
 import com.google.auth.oauth2.OAuth2CredentialsWithRefresh.OAuth2RefreshHandler
+import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.models.opus.dao.dao
 import org.models.opus.models.DBCredentials
+import org.models.opus.models.User
 import java.io.FileNotFoundException
 import java.util.*
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-class TaskAPI(private val creds: DBCredentials) {
+class TaskAPI(private val user: User) {
 
     private val APPLICATION_NAME = "Opus"
     private val credentials: OAuth2CredentialsWithRefresh
@@ -48,7 +50,7 @@ class TaskAPI(private val creds: DBCredentials) {
         val SCOPES = listOf(TasksScopes.TASKS, GmailScopes.GMAIL_COMPOSE) + Oauth2Scopes.all()
         println(installedObj)
 
-        val newToken = GoogleRefreshTokenRequest(httpTransport, JSON_FACTORY, creds.refreshToken, installedObj.get("client_id")!!.jsonPrimitive.content, installedObj.get("client_secret")!!.jsonPrimitive.content).setScopes(SCOPES).execute()
+        val newToken = GoogleRefreshTokenRequest(httpTransport, JSON_FACTORY, user.credentials.refreshToken, installedObj.get("client_id")!!.jsonPrimitive.content, installedObj.get("client_secret")!!.jsonPrimitive.content).setScopes(SCOPES).execute()
 
         AccessToken(newToken.accessToken, Date(newToken.expiresInSeconds*1000))
     }
@@ -56,9 +58,13 @@ class TaskAPI(private val creds: DBCredentials) {
     init {
         val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
 
-        val accessToken = AccessToken.newBuilder().setTokenValue(creds.accessToken).setExpirationTime(Date(creds.expirationTimeMilliseconds)).build()
+        val accessToken = AccessToken.newBuilder().setTokenValue(user.credentials.accessToken).setExpirationTime(Date(user.credentials.expirationTimeMilliseconds)).build()
         credentials = OAuth2CredentialsWithRefresh.newBuilder().setAccessToken(accessToken).setRefreshHandler(handler).build()
-        credentials.refreshAccessToken()
+        val newToken = credentials.refreshAccessToken()
+
+        runBlocking {
+            dao.editUser(user.id, user.credentials.copy(accessToken=newToken.tokenValue, expirationTimeMilliseconds = newToken.expirationTime.time))
+        }
 
         taskService = Tasks.Builder(httpTransport, JSON_FACTORY, HttpCredentialsAdapter(credentials))
             .setApplicationName(APPLICATION_NAME)

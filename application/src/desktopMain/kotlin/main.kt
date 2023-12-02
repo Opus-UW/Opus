@@ -12,9 +12,6 @@ import java.io.File
 fun main() = application {
     Window(
         onCloseRequest = {
-            val TOKENS_DIRECTORY_PATH = "${System.getProperty("user.home")}/.opus/tokens"
-            val tokenFile = File(TOKENS_DIRECTORY_PATH)
-            tokenFile.deleteRecursively()
             exitApplication()
         },
         title = "Opus",

@@ -18,16 +18,19 @@ import com.google.auth.oauth2.GoogleCredentials
 import com.google.auth.oauth2.OAuth2CredentialsWithRefresh
 import com.server.opus.CreateEmail.createEmail
 import com.server.opus.CreateMessage.createMessageWithEmail
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import org.models.opus.dao.dao
 import org.models.opus.models.DBCredentials
+import org.models.opus.models.User
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.util.*
 import javax.mail.MessagingException
 
-class GmailAPI(private val creds: DBCredentials) {
+class GmailAPI(private val user: User) {
     private val APPLICATION_NAME = "Opus"
     private val credentials: OAuth2CredentialsWithRefresh
 
@@ -48,7 +51,7 @@ class GmailAPI(private val creds: DBCredentials) {
         val newToken = GoogleRefreshTokenRequest(
             httpTransport,
             JSON_FACTORY,
-            creds.refreshToken,
+            user.credentials.refreshToken,
             installedObj.get("client_id")!!.jsonPrimitive.content,
             installedObj.get("client_secret")!!.jsonPrimitive.content
         ).setScopes(SCOPES).execute()
@@ -58,9 +61,14 @@ class GmailAPI(private val creds: DBCredentials) {
     init {
         val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
 
-        val accessToken = AccessToken.newBuilder().setTokenValue(creds.accessToken).setExpirationTime(Date(creds.expirationTimeMilliseconds)).build()
+        val accessToken = AccessToken.newBuilder().setTokenValue(user.credentials.accessToken).setExpirationTime(Date(user.credentials.expirationTimeMilliseconds)).build()
         credentials = OAuth2CredentialsWithRefresh.newBuilder().setAccessToken(accessToken).setRefreshHandler(handler).build()
-        credentials.refreshAccessToken()
+
+        val newToken = credentials.refreshAccessToken()
+
+        runBlocking {
+            dao.editUser(user.id, user.credentials.copy(accessToken=newToken.tokenValue, expirationTimeMilliseconds = newToken.expirationTime.time))
+        }
 
         val credential = GoogleCredentials.create(accessToken)
         val requestInitializer: HttpRequestInitializer = HttpCredentialsAdapter(credential)
