@@ -20,7 +20,7 @@ object DatabaseFactory {
         }
     }
 
-    fun setupMockDatabase(){
+    fun resetDatabase(){
         runBlocking {
             dbQuery {
                 SchemaUtils.drop(Users,Notes,Tags,Tasks,NoteTags,TaskTags)
