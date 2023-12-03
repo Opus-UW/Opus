@@ -32,8 +32,8 @@ fun Application.configureSockets() {
                     frame as? Frame.Text ?: continue
                     val receivedText = converter!!.deserialize<UserWSData>(frame, Charset.defaultCharset())
                     if(receivedText.accessToken.isEmpty() || receivedText.userId.isEmpty()) continue
-                    val user = dao.user(receivedText.userId)
-                    val updatedTasks = TaskAPI(user!!.credentials).modifiedTasks()
+                    val user = dao.user(receivedText.userId)!!
+                    val updatedTasks = TaskAPI(user).modifiedTasks()
                     //println(updatedTasks)
                     updatedTasks.items.forEach { task ->
                         if (dbQuery { TaskEntity.find { Tasks.gTaskId eq task.id }.count().toInt() > 0 }) {
@@ -59,7 +59,7 @@ fun Application.configureSockets() {
                         val dur = curDT.until(targetDT, ChronoUnit.DAYS)
                         if (dur <= 1 && dur >= 0 && task.completed == false) {
                             dao.notifyTask(task.id)
-                            GmailAPI(user!!.credentials).sendEmail("Task \"${task.action}\" due","Your task \"${task.action}\" is due in < 1 day.\n Good Luck!")
+                            GmailAPI(user).sendEmail("Task \"${task.action}\" due","Your task \"${task.action}\" is due in < 1 day.\n Good Luck!")
                         }
                     }
                 }
