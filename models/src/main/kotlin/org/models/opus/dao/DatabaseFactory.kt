@@ -1,11 +1,13 @@
 package org.models.opus.dao
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.models.opus.db.*
+import org.models.opus.models.DBCredentials
 
 object DatabaseFactory {
     fun init() {
@@ -15,6 +17,15 @@ object DatabaseFactory {
 
         transaction(database) {
             SchemaUtils.create(Users, Notes, Tags, Tasks, NoteTags, TaskTags)
+        }
+    }
+
+    fun setupMockDatabase(){
+        runBlocking {
+            dbQuery {
+                SchemaUtils.drop(Users,Notes,Tags,Tasks,NoteTags,TaskTags)
+                SchemaUtils.create(Users, Notes, Tags, Tasks, NoteTags, TaskTags)
+            }
         }
     }
 
