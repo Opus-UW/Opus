@@ -11,6 +11,5 @@ fun Application.configureRouting() {
         handleNotes()
         handleTags()
         handleUsers()
-        handleTaskApi()
     }
 }

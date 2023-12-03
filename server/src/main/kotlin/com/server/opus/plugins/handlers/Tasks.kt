@@ -80,7 +80,7 @@ fun Routing.handleTasks() {
                 }
                 val user = dao.user(userId)!!
 
-                val createdGTask = TaskAPI(user.credentials).createTask(gTask)
+                val createdGTask = TaskAPI(user).createTask(gTask)
 
                 dao.editTask(
                     createdTask.id,
@@ -112,8 +112,8 @@ fun Routing.handleTasks() {
 
             if (taskGId != null && accessToken !== null) {
                 // Delete google task
-                val user = dao.user(userId)
-                TaskAPI(user!!.credentials).deleteTask(taskGId)
+                val user = dao.user(userId)!!
+                TaskAPI(user).deleteTask(taskGId)
             }
         } catch (e: Exception) {
             println(e.message)
@@ -161,13 +161,12 @@ fun Routing.handleTasks() {
                         setStatus("needsAction")
                     }
                 }
+                val user = dao.user(userId)!!
                 if (gTaskId == null) {
-                    val user = dao.user(userId)!!
-                    val createdGTask = TaskAPI(user.credentials).createTask(gTask)
+                    val createdGTask = TaskAPI(user).createTask(gTask)
                     gTaskId = createdGTask.id
                 } else {
-                    val user = dao.user(userId)!!
-                    TaskAPI(user.credentials).patchTask(gTask)
+                    TaskAPI(user).patchTask(gTask)
                 }
 
                 dao.editTask(
