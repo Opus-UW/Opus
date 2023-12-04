@@ -37,12 +37,6 @@ fun Routing.handleUsers() {
         try {
             val userId = call.parameters.getOrFail("user_id")
 
-            val accessToken = call.request.headers["Authorization"]?.drop(7)
-
-            if(accessToken == null){
-                call.response.status(HttpStatusCode.BadRequest)
-                return@get
-            }
             val user = dao.user(userId)!!
             val gTasks = TaskAPI(user).allTasks()
             for(task in gTasks.items){
@@ -56,6 +50,7 @@ fun Routing.handleUsers() {
                     dao.addNewGTask(task.status == "completed", task.title, task.due, task.id, userId)
                 }
             }
+            call.response.status(HttpStatusCode.OK)
         } catch (e: Exception) {
             println(e.message)
             e.printStackTrace()
