@@ -1,6 +1,5 @@
-package com.server.opus.plugins.handlers
+package com.server.opus
 
-import com.server.opus.TaskAPI
 import com.server.opus.util.DefaultTask
 import com.server.opus.util.mockGoogle
 import com.server.opus.util.setup
