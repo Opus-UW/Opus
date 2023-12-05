@@ -60,6 +60,13 @@ class MainViewModel(
     private var _searchString = MutableStateFlow(savedStateHolder.consumeRestored("search") as String?)
     val searchString = _searchString.asStateFlow()
 
+    private var _authLink = MutableStateFlow(savedStateHolder.consumeRestored("authLink") as String?)
+    val authLink = _authLink.asStateFlow()
+
+    fun setAuthLink(value: String?){
+        _authLink.value = value
+    }
+
     fun setSearchString(value: String){
         _searchString.value = value
     }
@@ -259,6 +266,9 @@ class MainViewModel(
         }
         savedStateHolder.registerProvider("credential"){
             credential.value
+        }
+        savedStateHolder.registerProvider("authLink"){
+            authLink.value
         }
         setLoading(false)
     }

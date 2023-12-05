@@ -80,7 +80,18 @@ compose.desktop {
             includeAllModules = true
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "Opus"
-            packageVersion = "1.0.2"
+            packageVersion = "1.0.4"
+            windows {
+                iconFile.set(project.file("logo.ico"))
+                shortcut = true
+                menu = true
+            }
+            macOS {
+                iconFile.set(project.file("logo.icns"))
+            }
+            linux {
+                iconFile.set(project.file("logo.png"))
+            }
         }
     }
 }

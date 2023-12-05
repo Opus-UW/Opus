@@ -1,28 +1,26 @@
 package ui
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Login
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import api.ApiClient
+import com.google.api.client.auth.oauth2.AuthorizationCodeFlow
 import com.google.api.client.auth.oauth2.Credential
 import com.google.api.client.auth.oauth2.StoredCredential
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp
+import com.google.api.client.extensions.java6.auth.oauth2.VerificationCodeReceiver
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeRequestUrl
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.http.javanet.NetHttpTransport
@@ -42,10 +40,8 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.models.opus.models.DBCredentials
 import ui.components.darkModeLogoVector
 import ui.components.lightModeLogoVector
-import ui.theme.isDarkTheme
 import viewmodels.MainViewModel
 import java.io.*
-import java.util.HashMap
 
 private const val APPLICATION_NAME = "Opus"
 private val TOKENS_DIRECTORY_PATH = "${System.getProperty("user.home")}/.opus/tokens"
@@ -89,7 +85,7 @@ fun LoginScreen(
 
 object Cred {
     @Throws(IOException::class)
-    fun getCredentials(HTTP_TRANSPORT: NetHttpTransport): Credential { // Load client secrets.
+    fun getCredentials(HTTP_TRANSPORT: NetHttpTransport, viewModel: MainViewModel): Credential { // Load client secrets.
         val credentials = Cred::class.java.getResourceAsStream(CREDENTIALS_FILE_PATH) ?: throw FileNotFoundException("Resource not found: $CREDENTIALS_FILE_PATH")
 
         val clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, InputStreamReader(credentials))
@@ -101,7 +97,50 @@ object Cred {
             .build()
 
         val receiver = LocalServerReceiver.Builder().setPort(-1).build()
-        return AuthorizationCodeInstalledApp(flow, receiver).authorize("user")
+
+        val credential = flow.loadCredential("user")
+        if (credential != null
+            && (credential.getRefreshToken() != null || credential.getExpiresInSeconds() == null || credential.getExpiresInSeconds() > 60)
+        ) {
+            return credential
+        }
+
+        val redirectUri = receiver.redirectUri
+        val authorizationUrl = flow.newAuthorizationUrl().setRedirectUri(redirectUri)
+
+        val auth = CustomAuth(flow, receiver)
+        auth.setAuthUrl(authorizationUrl)
+        auth.setRedirectUri(redirectUri)
+        viewModel.setAuthLink(authorizationUrl.build())
+
+
+        return auth.authorize("user")
+    }
+}
+
+class CustomAuth(flow: AuthorizationCodeFlow, receiver: VerificationCodeReceiver): AuthorizationCodeInstalledApp(flow, receiver) {
+
+    private var authUrl: GoogleAuthorizationCodeRequestUrl? = null
+    private var redirectUri: String = ""
+
+    fun setRedirectUri(uri: String){
+        redirectUri = uri
+    }
+    fun setAuthUrl(url: GoogleAuthorizationCodeRequestUrl){
+        authUrl = url
+    }
+    override fun authorize(userId: String): Credential {
+        return try {
+            // open in browser
+            onAuthorization(authUrl)
+            // receive authorization code and exchange it for an access token
+            val code = receiver.waitForCode()
+            val response = flow.newTokenRequest(code).setRedirectUri(redirectUri).execute()
+            // store credential and return it
+            flow.createAndStoreCredential(response, userId)
+        } finally {
+            receiver.stop()
+        }
     }
 }
 
@@ -113,7 +152,7 @@ fun Login(
     GlobalScope.launch {
         viewModel.setLoading(true)
         val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
-        val cred = Cred.getCredentials(httpTransport)
+        val cred = Cred.getCredentials(httpTransport, viewModel)
         viewModel.setCredential(cred)
         ApiClient.getInstance().setAccessToken(cred.accessToken)
         val oauth2 = Oauth2.Builder(httpTransport, JSON_FACTORY, cred).build()
@@ -137,6 +176,7 @@ fun Login(
 
         // Grab Data from server
         viewModel.fetchAllData()
+        viewModel.setAuthLink(null)
 
         navigator.navigate("/tasks")
         viewModel.setCurrentScreen("/tasks")
