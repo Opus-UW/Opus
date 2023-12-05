@@ -40,7 +40,6 @@ fun optionsTray(
     updateDueDate: (LocalDateTime?) -> Unit
 ) {
     val (showDueDatePicker, setShowDueDatePickerPicker) = remember { mutableStateOf(false) }
-    val (showOccurrence, setShowOccurrence) = remember { mutableStateOf(false) }
     val (showTags, setShowTags) = remember { mutableStateOf(false) }
 
     var rootPos by remember { mutableStateOf(Offset.Zero) }
@@ -55,14 +54,6 @@ fun optionsTray(
                     }) {
                     Icon(Icons.Default.CalendarMonth, contentDescription = "Calendar")
                     chooseDate(showDueDatePicker, setShowDueDatePickerPicker, rootPos, updateDueDate)
-
-                }
-                TextButton(onClick = { setShowOccurrence(true) },
-                    modifier = Modifier.onGloballyPositioned { coordinates ->
-                        rootPos = coordinates.positionInRoot()
-                    }) {
-                    Icon(Icons.Default.Repeat, contentDescription = "Occurring")
-                    chooseOccurrence(showOccurrence, setShowOccurrence, rootPos)
 
                 }
                 TextButton(onClick = { setShowTags(true) },
@@ -181,21 +172,6 @@ fun datePickerDialog(
             }
         ) {
             DatePicker(state = datePickerState)
-        }
-    }
-}
-
-@Composable
-fun chooseOccurrence(showOccurrence: Boolean, setShowOccurrence: (Boolean) -> Unit, pos: Offset) {
-    var multi by remember { mutableStateOf("1") }
-    DropdownMenu(
-        expanded = showOccurrence,
-        onDismissRequest = { setShowOccurrence(false) }
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(5.dp)) {
-            Text("Every")
-            BasicTextField(value = multi, onValueChange = { multi = it }, Modifier.width(10.dp))
-            Text("Weeks")
         }
     }
 }

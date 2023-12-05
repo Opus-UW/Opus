@@ -4,6 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -54,15 +57,34 @@ fun NavigationContent(
             Box(
                 modifier = Modifier.fillMaxWidth()
                     .background(Color.Transparent)
-                    .clickable { viewModel.setDarkTheme(!darkTheme!!)}
+                    .clickable { viewModel.setDarkTheme(!darkTheme!!) }
             ) {
                 Column {
                     Spacer(modifier = Modifier.height(10.dp))
-                    Text(
-                        if (darkTheme == true) "Change to Light Mode" else "Change to Dark Mode",
-                        textAlign = TextAlign.Left,
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth()
-                    )
+                    ) {
+                        Icon(Icons.Default.DarkMode, contentDescription = "Dark Mode")
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            "Dark Mode",
+                            textAlign = TextAlign.Left
+                        )
+                        Spacer(modifier = Modifier.weight(1f))
+                        Switch(
+                            checked = darkTheme == true,
+                            onCheckedChange = { },
+                            colors = SwitchDefaults.colors(
+                                disabledCheckedBorderColor = MaterialTheme.colorScheme.primary,
+                                disabledCheckedThumbColor = MaterialTheme.colorScheme.primaryContainer,
+                                disabledCheckedIconColor = MaterialTheme.colorScheme.primaryContainer,
+                                disabledCheckedTrackColor = MaterialTheme.colorScheme.primary,
+                            ),
+                            enabled = false
+                        )
+
+                    }
                     Spacer(modifier = Modifier.height(10.dp))
                 }
             }
@@ -76,7 +98,19 @@ fun NavigationContent(
             ) {
                 Column {
                     Spacer(modifier = Modifier.height(10.dp))
-                    Text("Logout", textAlign = TextAlign.Left, modifier = Modifier.fillMaxWidth(), color = Color.Red)
+                    Row (
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ){
+                        Icon(Icons.Default.Logout, contentDescription = "Dark Mode", tint = Color.Red)
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            "Logout",
+                            textAlign = TextAlign.Left,
+                            modifier = Modifier.fillMaxWidth(),
+                            color = Color.Red
+                        )
+                    }
                     Spacer(modifier = Modifier.height(10.dp))
                 }
             }
