@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.style.TextAlign
@@ -81,7 +82,8 @@ fun NavigationContent(
                                 disabledCheckedIconColor = MaterialTheme.colorScheme.primaryContainer,
                                 disabledCheckedTrackColor = MaterialTheme.colorScheme.primary,
                             ),
-                            enabled = false
+                            enabled = false,
+                            modifier = Modifier.focusProperties { canFocus = false }
                         )
 
                     }
