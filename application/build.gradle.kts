@@ -13,7 +13,7 @@ plugins {
 }
 
 group = "com.team202.opus"
-version = "1.0.2"
+version = "1.0.4"
 
 repositories {
     mavenCentral()
