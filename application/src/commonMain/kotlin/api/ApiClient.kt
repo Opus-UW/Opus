@@ -85,9 +85,7 @@ class ApiClient {
                 takeFrom("$baseUrl/users/$userId/login")
             }
 
-            return httpClient.get(url.build()) {
-                bearerAuth(accessToken)
-            }.body()
+            return httpClient.get(url.build()).body()
         } catch (e: Exception) {
             println("Error while sending: " + e.localizedMessage)
             return
@@ -113,9 +111,7 @@ class ApiClient {
                 takeFrom("$baseUrl/users/$userId/tasks")
             }
 
-            return httpClient.get(url.build()) {
-                bearerAuth(accessToken)
-            }.body()
+            return httpClient.get(url.build()).body()
         } catch (e: Exception) {
             e.printStackTrace()
             System.out.println(e.message)
@@ -128,9 +124,7 @@ class ApiClient {
             takeFrom("$baseUrl/users/$userId/completed-tasks")
         }
 
-        return httpClient.get(url.build()) {
-            bearerAuth(accessToken)
-        }.body()
+        return httpClient.get(url.build()).body()
     }
 
     suspend fun getUncompletedTasks(): List<Task> {
@@ -138,9 +132,7 @@ class ApiClient {
             takeFrom("$baseUrl/users/$userId/uncompleted-tasks")
         }
 
-        return httpClient.get(url.build()) {
-            bearerAuth(accessToken)
-        }.body()
+        return httpClient.get(url.build()).body()
     }
 
     suspend fun postTask(task: Task): List<Task> {
@@ -150,7 +142,6 @@ class ApiClient {
 
 
         return httpClient.post(url.build()) {
-            bearerAuth(accessToken)
             contentType(ContentType.Application.Json)
             setBody(task)
         }.body()
@@ -160,9 +151,7 @@ class ApiClient {
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId/tasks/$taskId")
         }
-        return httpClient.delete(url.build()) {
-            bearerAuth(accessToken)
-        }.body()
+        return httpClient.delete(url.build()).body()
     }
 
     suspend fun editTask(taskId: Int, newTask: Task): List<Task> {
@@ -170,7 +159,6 @@ class ApiClient {
             takeFrom("$baseUrl/users/$userId/tasks/$taskId")
         }
         return httpClient.put(url.build()) {
-            bearerAuth(accessToken)
             contentType(ContentType.Application.Json)
             setBody(newTask)
         }.body()
@@ -182,9 +170,7 @@ class ApiClient {
                 takeFrom("$baseUrl/users/$userId/notes")
             }
 
-            return httpClient.get(url.build()) {
-                bearerAuth(accessToken)
-            }.body()
+            return httpClient.get(url.build()).body()
         } catch (e: Exception) {
             e.printStackTrace()
             println(e.message)
@@ -198,7 +184,6 @@ class ApiClient {
         }
 
         return httpClient.post(url.build()) {
-            bearerAuth(accessToken)
             contentType(ContentType.Application.Json)
             setBody(note)
         }.body()
@@ -208,9 +193,7 @@ class ApiClient {
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId/notes/$noteId")
         }
-        return httpClient.delete(url.build()) {
-            bearerAuth(accessToken)
-        }.body()
+        return httpClient.delete(url.build()).body()
     }
 
     suspend fun editNote(noteId: Int, newNote: Note): List<Note> {
@@ -218,7 +201,6 @@ class ApiClient {
             takeFrom("$baseUrl/users/$userId/notes/$noteId")
         }
         return httpClient.put(url.build()) {
-            bearerAuth(accessToken)
             contentType(ContentType.Application.Json)
             setBody(newNote)
         }.body()
@@ -230,9 +212,7 @@ class ApiClient {
                 takeFrom("$baseUrl/users/$userId/tags")
             }
 
-            return httpClient.get(url.build()) {
-                bearerAuth(accessToken)
-            }.body()
+            return httpClient.get(url.build()).body()
         } catch (e: Exception) {
             e.printStackTrace()
             println(e.message)
@@ -246,7 +226,6 @@ class ApiClient {
         }
 
         return httpClient.post(url.build()) {
-            bearerAuth(accessToken)
             contentType(ContentType.Application.Json)
             setBody(tag)
         }.body()
@@ -256,9 +235,7 @@ class ApiClient {
         val url = URLBuilder().apply {
             takeFrom("$baseUrl/users/$userId/tags/$tagId")
         }
-        return httpClient.delete(url.build()) {
-            bearerAuth(accessToken)
-        }.body()
+        return httpClient.delete(url.build()).body()
     }
 
     suspend fun editTag(tagId: Int, newTag: Tag): List<Tag> {
@@ -266,7 +243,6 @@ class ApiClient {
             takeFrom("$baseUrl/users/$userId/tags/$tagId")
         }
         return httpClient.put(url.build()) {
-            bearerAuth(accessToken)
             contentType(ContentType.Application.Json)
             setBody(newTag)
         }.body()
@@ -278,7 +254,6 @@ class ApiClient {
             takeFrom("$baseUrl/users/$userId")
         }
         return httpClient.post(url.build()) {
-            bearerAuth(accessToken)
             contentType(ContentType.Application.Json)
             setBody(creds)
         }.body()

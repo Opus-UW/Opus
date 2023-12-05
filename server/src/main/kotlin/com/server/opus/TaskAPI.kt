@@ -20,6 +20,7 @@ import kotlinx.datetime.Clock
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import org.jetbrains.annotations.VisibleForTesting
 import org.models.opus.dao.dao
 import org.models.opus.models.DBCredentials
 import org.models.opus.models.User

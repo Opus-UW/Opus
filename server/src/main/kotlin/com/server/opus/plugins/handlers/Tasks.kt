@@ -46,7 +46,6 @@ fun Routing.handleTasks() {
         try {
             val userId = call.parameters.getOrFail("user_id")
             val task = call.receive<Task>()
-            val accessToken = call.request.headers["Authorization"]?.drop(7)
 
             val createdTask = dao.addNewTask(
                 task.completed,
@@ -62,7 +61,7 @@ fun Routing.handleTasks() {
 
             call.respond(dao.userTasks(userId))
 
-            if (task.dueDate != null && accessToken != null) {
+            if (task.dueDate != null) {
                 // Create google task
                 val gTask = com.google.api.services.tasks.model.Task()
                 gTask.apply {
@@ -104,13 +103,12 @@ fun Routing.handleTasks() {
             val userId = call.parameters.getOrFail("user_id")
             val taskId = call.parameters.getOrFail("task_id").toInt()
             val taskGId = dao.taskGId(taskId)
-            val accessToken = call.request.headers["Authorization"]?.drop(7)
 
             dao.deleteTask(taskId)
 
             call.respond(dao.userTasks(userId))
 
-            if (taskGId != null && accessToken !== null) {
+            if (taskGId != null) {
                 // Delete google task
                 val user = dao.user(userId)!!
                 TaskAPI(user).deleteTask(taskGId)
@@ -125,7 +123,6 @@ fun Routing.handleTasks() {
         try {
             val userId = call.parameters.getOrFail("user_id")
             val taskId = call.parameters.getOrFail("task_id").toInt()
-            val accessToken = call.request.headers["Authorization"]?.drop(7)
 
             val task = call.receive<Task>()
             var gTaskId: String? = dao.taskGId(taskId)
@@ -143,7 +140,7 @@ fun Routing.handleTasks() {
 
             call.respond(dao.userTasks(userId))
 
-            if (task.dueDate != null && accessToken != null) {
+            if (task.dueDate != null) {
                 // Modify google task
                 val gTask = com.google.api.services.tasks.model.Task()
                 gTask.apply {
