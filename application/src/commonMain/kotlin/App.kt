@@ -42,6 +42,7 @@ fun App() {
 
         OpusTheme (useDarkTheme = darkTheme ?: true) {
             val navigator = rememberNavigator()
+            val snackbarState = remember { SnackbarHostState() }
             val coroutineScope = rememberCoroutineScope()
             val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
             val currentScreen by viewModel.currentScreen.collectAsStateWithLifecycle()
@@ -61,6 +62,7 @@ fun App() {
                 gesturesEnabled = currentScreen != "/login"
             ) {
                 Scaffold(
+                    snackbarHost = { SnackbarHost(snackbarState) },
                     topBar = {
                         AnimatedVisibility(visible = currentScreen != "/login") {
                             OpusTopAppBar(viewModel, navigator) {
@@ -101,7 +103,7 @@ fun App() {
                         }
                         when {
                             loading == true ->{
-                                LoadingDialog(viewModel)
+                                LoadingDialog(viewModel, snackbarState)
                             }
                         }
                     }
