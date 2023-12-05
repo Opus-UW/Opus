@@ -13,7 +13,7 @@ plugins {
 }
 
 group = "com.team202.opus"
-version = "1.0.4"
+version = "1.1.0"
 
 repositories {
     mavenCentral()
@@ -80,7 +80,7 @@ compose.desktop {
             includeAllModules = true
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "Opus"
-            packageVersion = "1.0.4"
+            packageVersion = "1.1.0"
             windows {
                 iconFile.set(project.file("logo.ico"))
                 shortcut = true

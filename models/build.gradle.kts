@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "org.team202.models"
-version = "1.0-SNAPSHOT"
+version = "1.1-SNAPSHOT"
 val exposedVersion: String by project
 val sqliteVersion: String by project
 

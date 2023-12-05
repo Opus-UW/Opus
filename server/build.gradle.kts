@@ -20,7 +20,7 @@ repositories {
     mavenCentral()
 }
 group = "com.server.opus"
-version = "0.0.1"
+version = "1.1.0"
 
 application {
     mainClass.set("com.server.opus.ApplicationKt")
