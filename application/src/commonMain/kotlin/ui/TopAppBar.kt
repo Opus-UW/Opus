@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import moe.tlaster.precompose.flow.collectAsStateWithLifecycle
@@ -31,6 +32,7 @@ import moe.tlaster.precompose.navigation.Navigator
 import utils.minusMonth
 import utils.plusMonth
 import viewmodels.MainViewModel
+import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,7 +62,7 @@ fun OpusTopAppBar(
                             onClick = { viewModel.setCurDate(curDate.minusMonth(1)) },
                             enabled = true
                         ) { Icon(Icons.Default.ArrowBack, contentDescription = "Calender Left") }
-                        Text(curDate.month.name + " " + curDate.year)
+                        Text(curDate.month.name[0] + curDate.month.name.substring(1).lowercase() + " " + curDate.year)
                         IconButton(
                             onClick = { viewModel.setCurDate(curDate.plusMonth(1)) },
                             enabled = true
@@ -76,18 +78,19 @@ fun OpusTopAppBar(
                     Box(modifier = Modifier
                         .fillMaxWidth(0.5f)
                         .clip(RoundedCornerShape(7.dp))
-                        .background(MaterialTheme.colorScheme.surfaceVariant)
-                        .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(7.dp))
+                        .background(MaterialTheme.colorScheme.secondaryContainer)
+                        //.border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(7.dp))
                         .padding(7.dp)
                     ){
                         Row {
+                            // Search bar
                             BasicTextField(
                                 value = text,
                                 onValueChange = { text = it; viewModel.setSearchString(text) },
                                 interactionSource = interactionSource,
                                 visualTransformation = visualTransformation,
-                                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                                textStyle = TextStyle(fontSize = 15.sp, color = MaterialTheme.colorScheme.onSurface),
+                                cursorBrush = SolidColor(MaterialTheme.colorScheme.secondary),
+                                textStyle = TextStyle(fontSize = 15.sp, color = MaterialTheme.colorScheme.onSecondaryContainer),
                                 singleLine = true,
                                 modifier = Modifier.weight(1f).focusRequester(focusRequester)
                             ) { innerTextField ->

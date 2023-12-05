@@ -9,11 +9,8 @@ import kotlinx.datetime.*
 import moe.tlaster.precompose.stateholder.SavedStateHolder
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
-import org.models.opus.models.Note
-import org.models.opus.models.Tag
-import org.models.opus.models.Task
 import kotlinx.datetime.Clock
-import org.models.opus.models.User
+import org.models.opus.models.*
 import ui.components.storeTheme
 
 
@@ -62,6 +59,13 @@ class MainViewModel(
 
     private var _searchString = MutableStateFlow(savedStateHolder.consumeRestored("search") as String?)
     val searchString = _searchString.asStateFlow()
+
+    private var _authLink = MutableStateFlow(savedStateHolder.consumeRestored("authLink") as String?)
+    val authLink = _authLink.asStateFlow()
+
+    fun setAuthLink(value: String?){
+        _authLink.value = value
+    }
 
     fun setSearchString(value: String){
         _searchString.value = value
@@ -157,6 +161,21 @@ class MainViewModel(
         }
     }
 
+    fun updateTag(
+        title: String? = null,
+        colour: Colour? = null,
+        tag: Tag
+    ){
+        val newTag = Tag(
+            title = title ?: tag.title,
+            colour = colour ?: tag.colour,
+            id = tag.id
+        )
+        viewModelScope.launch {
+            setTags(ApiClient.getInstance().editTag(tag.id, newTag))
+        }
+    }
+
     fun deleteTag(value: Tag){
         viewModelScope.launch {
             setTags(ApiClient.getInstance().deleteTag(value.id))
@@ -247,6 +266,9 @@ class MainViewModel(
         }
         savedStateHolder.registerProvider("credential"){
             credential.value
+        }
+        savedStateHolder.registerProvider("authLink"){
+            authLink.value
         }
         setLoading(false)
     }

@@ -138,13 +138,22 @@ fun chooseColor(
         expanded = showColors,
         onDismissRequest = {
             setShowColors (false)
-        }
+        },
+        modifier = Modifier.background(MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp))
     ){
         Row(modifier = Modifier.padding(10.dp), horizontalArrangement = Arrangement.spacedBy(5.dp)){
             (if (darkTheme == true) md_theme_dark_tags else md_theme_light_tags).forEach{color ->
                 displayColor(color, currentColor, size){setColor(color)}
             }
         }
+    }
+}
+
+fun Modifier.conditionalBorder (condition : Boolean, color: Color) : Modifier {
+    return if (condition) {
+        then(Modifier.border(2.dp,  color, CircleShape))
+    } else {
+        this
     }
 }
 
@@ -159,7 +168,7 @@ fun displayColor(
         modifier = Modifier
             .size(size)
             .clip(CircleShape)
-            .border(2.dp, if (currentColor == color) MaterialTheme.colorScheme.outline else color, CircleShape)
+            .conditionalBorder(currentColor == color, MaterialTheme.colorScheme.outline)
             .background(color)
             .noRippleClickable { action() }
     )
