@@ -9,11 +9,8 @@ import kotlinx.datetime.*
 import moe.tlaster.precompose.stateholder.SavedStateHolder
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
-import org.models.opus.models.Note
-import org.models.opus.models.Tag
-import org.models.opus.models.Task
 import kotlinx.datetime.Clock
-import org.models.opus.models.User
+import org.models.opus.models.*
 import ui.components.storeTheme
 
 
@@ -154,6 +151,21 @@ class MainViewModel(
     fun createTag(value: Tag){
         viewModelScope.launch {
             setTags(ApiClient.getInstance().postTag(value))
+        }
+    }
+
+    fun updateTag(
+        title: String? = null,
+        colour: Colour? = null,
+        tag: Tag
+    ){
+        val newTag = Tag(
+            title = title ?: tag.title,
+            colour = colour ?: tag.colour,
+            id = tag.id
+        )
+        viewModelScope.launch {
+            setTags(ApiClient.getInstance().editTag(tag.id, newTag))
         }
     }
 
