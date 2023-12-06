@@ -4,12 +4,17 @@ import androidx.compose.runtime.Composable
 import ui.theme.isDarkTheme
 import java.io.File
 
-private val SETTINGS_DIRECTORY_PATH = "${System.getProperty("user.home")}/.opus/settings"
+private val OPUS_DIRECTORY_PATH = "${System.getProperty("user.home")}/.opus"
+private val SETTINGS_DIRECTORY_PATH = "$OPUS_DIRECTORY_PATH/settings"
 
 actual fun storeTheme(
     boolean: Boolean
 ){
+    val opusDirectory = File(OPUS_DIRECTORY_PATH)
     val settingsFile = File(SETTINGS_DIRECTORY_PATH)
+    if(!opusDirectory.exists()){
+        opusDirectory.mkdir()
+    }
     if (!settingsFile.exists()){
         settingsFile.createNewFile()
     }
@@ -34,6 +39,10 @@ actual fun getTheme(sysTheme: Boolean) :  Boolean {
         }
     }
     else {
+        val opusDirectory = File(OPUS_DIRECTORY_PATH)
+        if(!opusDirectory.exists()){
+            opusDirectory.mkdir()
+        }
         settingsFile.createNewFile()
         settingsFile.writeText("theme: " + if (sysTheme) "1" else "0")
         isDark = sysTheme
