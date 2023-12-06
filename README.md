@@ -15,8 +15,6 @@ Dereck Tu d8tu@uwaterloo.ca
 ## Screenshots/Videos
 N/A
 ## Quick Start Instructions
-Instructions: links to your latest release,
-and installation instructions for both the client and service (if needed).
 
 ### [Latest Release](https://git.uwaterloo.ca/d8tu/cs346-team-202-project/-/tree/main/releases/v1.1.0?ref_type=heads)
 
@@ -28,9 +26,9 @@ and installation instructions for both the client and service (if needed).
 ### Testing
 Opus can be tested using the following user:
 
-Email: 346TA.202@gmail.com
+Email: `346TA.202@gmail.com`
 
-Password: Thi$iSa$tr0ngP$W
+Password: `Thi$iSa$tr0ngP$W`
 
 ## [Software Releases](https://git.uwaterloo.ca/d8tu/cs346-team-202-project/-/wikis/Releases)
 
